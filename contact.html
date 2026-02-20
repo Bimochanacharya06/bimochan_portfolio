@@ -1,324 +1,471 @@
-
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head><script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bimochan Acharya - Contact | Get in Touch</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/responsive.css">
-    <link rel="stylesheet" href="/static/css/loader-fix.css">
-    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
-    <link rel="manifest" href="/manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimochan Acharya — Contact</title>
+    <meta name="description" content="Contact Bimochan Acharya for web development projects, freelance work, or collaboration opportunities.">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <meta name="description"
-        content="Contact Bimochan Acharya for web development projects, collaborations, or inquiries. Full Stack Developer available for freelance and full-time opportunities.">
-    <meta name="author" content="Bimochan Acharya">
-    <meta name="keywords"
-        content="Bimochan Acharya, Contact, Web Developer, Hire Developer, Freelance, Full Stack Developer">
-</head>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #060609; --border: rgba(255,255,255,0.06);
+            --accent: #4f7cff; --accent2: #b06cff; --accent3: #00f5c4;
+            --text: #e8e8f0; --muted: #666680; --card: rgba(255,255,255,0.028);
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text); font-family: 'Cabinet Grotesk', sans-serif; overflow-x: hidden; cursor: none; }
 
+        /* ── CURSOR ── */
+        .cursor { width:10px; height:10px; background:var(--accent); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; mix-blend-mode:screen; transition:transform .15s; }
+        .cursor-ring { width:32px; height:32px; border:1px solid rgba(79,124,255,.4); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; }
+        body:has(.form-field:focus-within) .cursor { background:var(--accent3); transform:scale(1.5); }
+        body:has(.form-field:focus-within) .cursor-ring { border-color:var(--accent3); width:44px; height:44px; margin:-6px; }
+
+        /* ── SCROLL PROGRESS ── */
+        #sp { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); z-index:9999; width:0; }
+
+        /* ── BACKGROUNDS ── */
+        body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:.35; }
+        .mesh { position:fixed; inset:0; z-index:0; pointer-events:none;
+            background: radial-gradient(ellipse 60% 50% at 0% 0%, rgba(79,124,255,.09) 0%, transparent 65%),
+                        radial-gradient(ellipse 50% 60% at 100% 100%, rgba(176,108,255,.07) 0%, transparent 65%),
+                        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,245,196,.03) 0%, transparent 65%); }
+        .grid-lines { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025; background-image:linear-gradient(to right,white 1px,transparent 1px),linear-gradient(to bottom,white 1px,transparent 1px); background-size:80px 80px; }
+
+        /* ── NAV ── */
+        nav { position:fixed; top:0; left:0; right:0; z-index:500; padding:1.4rem 0; background:rgba(6,6,9,.75); backdrop-filter:blur(22px); border-bottom:1px solid var(--border); }
+        .nav-inner { max-width:1200px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:.75rem; text-decoration:none; }
+        .logo-badge { width:38px; height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.85rem; color:white; box-shadow:0 0 20px rgba(79,124,255,.35); }
+        .logo-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:var(--text); }
+        .nav-links { display:flex; gap:.25rem; list-style:none; }
+        .nav-links a { text-decoration:none; color:var(--muted); font-size:.875rem; font-weight:500; padding:.4rem .9rem; border-radius:8px; transition:color .2s,background .2s; }
+        .nav-links a:hover,.nav-links a.active { color:var(--text); background:rgba(255,255,255,.06); }
+        .nav-links a.active { color:var(--accent); }
+
+        /* ── HERO ── */
+        .hero { position:relative; z-index:10; padding:150px 2rem 60px; max-width:1200px; margin:0 auto; text-align:center; }
+        .hero-eyebrow { display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent3); letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.5rem; padding:.35rem 1rem; border:1px solid rgba(0,245,196,.2); border-radius:100px; background:rgba(0,245,196,.04); animation:fadeUp .7s ease both; }
+        .hero-eyebrow::before { content:''; width:5px; height:5px; background:var(--accent3); border-radius:50%; animation:blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+        .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(2.8rem,7vw,5.5rem); font-weight:800; line-height:.95; letter-spacing:-.03em; animation:fadeUp .7s .1s ease both; }
+        .hero h1 .grad { display:block; background:linear-gradient(135deg,var(--accent),var(--accent2) 55%,var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-sub { margin-top:1.5rem; color:var(--muted); font-size:1.05rem; max-width:460px; margin-left:auto; margin-right:auto; line-height:1.7; animation:fadeUp .7s .2s ease both; }
+
+        /* ── AVAILABILITY BADGE ── */
+        .avail-badge { display:inline-flex; align-items:center; gap:.6rem; font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent3); padding:.5rem 1.2rem; border:1px solid rgba(0,245,196,.2); border-radius:100px; background:rgba(0,245,196,.04); margin-top:1.5rem; animation:fadeUp .7s .3s ease both; }
+        .avail-dot { width:8px; height:8px; background:var(--accent3); border-radius:50%; animation:pulse-dot 2s ease infinite; }
+        @keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(0,245,196,.4)} 50%{box-shadow:0 0 0 6px rgba(0,245,196,0)} }
+
+        /* ── MAIN CONTENT GRID ── */
+        .contact-section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 6rem; }
+        .contact-grid { display:grid; grid-template-columns:1fr 1.6fr; gap:2rem; align-items:start; }
+
+        /* ── LEFT PANEL ── */
+        .left-panel { display:flex; flex-direction:column; gap:1.25rem; }
+
+        /* Info cards */
+        .info-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.5rem; display:flex; align-items:center; gap:1.1rem; transition:border-color .3s,transform .3s,box-shadow .3s; text-decoration:none; }
+        .info-card:hover { border-color:rgba(79,124,255,.22); transform:translateX(4px); box-shadow:0 12px 40px rgba(0,0,0,.25); }
+        .info-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; transition:transform .2s; }
+        .info-card:hover .info-icon { transform:scale(1.1); }
+        .ic-blue { background:rgba(79,124,255,.1); color:var(--accent); border:1px solid rgba(79,124,255,.15); }
+        .ic-purple { background:rgba(176,108,255,.1); color:var(--accent2); border:1px solid rgba(176,108,255,.15); }
+        .ic-green { background:rgba(0,245,196,.1); color:var(--accent3); border:1px solid rgba(0,245,196,.15); }
+        .ic-orange { background:rgba(255,180,0,.1); color:#ffb400; border:1px solid rgba(255,180,0,.15); }
+        .info-label { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.2rem; }
+        .info-value { font-size:.9rem; font-weight:600; color:var(--text); }
+        .info-arrow { margin-left:auto; color:var(--muted); font-size:.85rem; transition:transform .2s, color .2s; }
+        .info-card:hover .info-arrow { transform:translateX(3px); color:var(--accent); }
+
+        /* Social links panel */
+        .social-panel { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.5rem; }
+        .social-label { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:1rem; }
+        .socials-row { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+        .social-btn { display:flex; align-items:center; gap:.65rem; padding:.7rem .9rem; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:12px; text-decoration:none; color:var(--muted); font-size:.82rem; font-weight:500; transition:all .2s; }
+        .social-btn i { font-size:1rem; }
+        .social-btn:hover { color:var(--text); border-color:rgba(79,124,255,.2); background:rgba(79,124,255,.06); transform:translateY(-2px); }
+        .sb-github:hover { border-color:rgba(255,255,255,.15); background:rgba(255,255,255,.04); }
+        .sb-linkedin:hover { border-color:rgba(0,119,181,.3); color:#0a66c2; }
+        .sb-facebook:hover { border-color:rgba(24,119,242,.3); color:#1877f2; }
+        .sb-instagram:hover { border-color:rgba(225,48,108,.3); color:#e1306c; }
+
+        /* Response time card */
+        .response-card { background:linear-gradient(135deg,rgba(79,124,255,.06),rgba(176,108,255,.04)); border:1px solid rgba(79,124,255,.12); border-radius:18px; padding:1.5rem; }
+        .response-header { display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem; }
+        .response-header i { color:var(--accent3); font-size:1rem; }
+        .response-header span { font-family:'Syne',sans-serif; font-weight:700; font-size:.95rem; }
+        .response-text { font-size:.83rem; color:var(--muted); line-height:1.65; }
+        .response-time { display:inline-block; margin-top:.6rem; font-family:'DM Mono',monospace; font-size:.7rem; color:var(--accent3); letter-spacing:.08em; }
+
+        /* ── RIGHT PANEL — FORM ── */
+        .form-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:2.5rem; position:relative; overflow:hidden; }
+        .form-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 40% at 100% 0%, rgba(79,124,255,.04) 0%, transparent 60%); pointer-events:none; }
+        .form-title { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; letter-spacing:-.02em; margin-bottom:.4rem; }
+        .form-subtitle { font-size:.88rem; color:var(--muted); margin-bottom:2rem; }
+
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+        .form-field { display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem; }
+        .form-field.row-field { margin-bottom:0; }
+        .form-label { font-family:'DM Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+        .form-input, .form-textarea, .form-select {
+            background:rgba(255,255,255,.03);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:.85rem 1rem;
+            color:var(--text);
+            font-family:'Cabinet Grotesk',sans-serif;
+            font-size:.9rem;
+            outline:none;
+            transition:border-color .25s, background .25s, box-shadow .25s;
+            width:100%;
+            appearance:none;
+        }
+        .form-input::placeholder, .form-textarea::placeholder { color:var(--muted); }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color:rgba(79,124,255,.45);
+            background:rgba(79,124,255,.04);
+            box-shadow:0 0 0 3px rgba(79,124,255,.08);
+        }
+        .form-textarea { resize:vertical; min-height:130px; }
+        .form-select { color:var(--muted); cursor:none; }
+        .form-select option { background:#0d0d18; color:var(--text); }
+
+        /* Interest chips */
+        .chips-wrap { display:flex; flex-wrap:wrap; gap:.5rem; }
+        .chip { display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .8rem; border-radius:100px; border:1px solid var(--border); background:rgba(255,255,255,.03); color:var(--muted); font-size:.75rem; font-family:'DM Mono',monospace; cursor:none; transition:all .2s; user-select:none; }
+        .chip:hover { border-color:rgba(79,124,255,.3); color:var(--accent); background:rgba(79,124,255,.07); }
+        .chip.selected { border-color:var(--accent); color:var(--accent); background:rgba(79,124,255,.1); }
+        .chip i { font-size:.75rem; }
+
+        /* Submit button */
+        .form-submit { width:100%; margin-top:1.5rem; padding:1rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border:none; border-radius:14px; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; cursor:none; display:flex; align-items:center; justify-content:center; gap:.6rem; box-shadow:0 8px 28px rgba(79,124,255,.3); transition:transform .2s,box-shadow .2s,filter .2s; letter-spacing:.01em; }
+        .form-submit:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(79,124,255,.4); filter:brightness(1.05); }
+        .form-submit:active { transform:translateY(0); }
+
+        /* Success / error states */
+        .form-success { display:none; text-align:center; padding:3rem 2rem; }
+        .form-success.show { display:block; }
+        .success-icon { width:64px; height:64px; background:rgba(0,245,196,.1); border:1px solid rgba(0,245,196,.2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--accent3); margin:0 auto 1.25rem; animation:popIn .5s cubic-bezier(.23,1,.32,1) both; }
+        @keyframes popIn { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+        .success-title { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:.5rem; }
+        .success-text { color:var(--muted); font-size:.9rem; }
+
+        /* Character counter */
+        .char-count { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); text-align:right; margin-top:.3rem; }
+
+        /* ── EXTRAS ── */
+        /* What to expect */
+        .expect-section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 6rem; }
+        .section-label { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; display:flex; align-items:center; gap:.75rem; }
+        .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+        .section-heading { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-.03em; margin-bottom:2.5rem; }
+        .steps-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; }
+        .step-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.75rem; position:relative; overflow:hidden; transition:border-color .3s,transform .3s; }
+        .step-card:hover { border-color:rgba(79,124,255,.2); transform:translateY(-4px); }
+        .step-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); opacity:0; transition:opacity .3s; }
+        .step-card:hover::before { opacity:1; }
+        .step-num { font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; margin-bottom:.75rem; }
+        .step-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.5rem; }
+        .step-desc { font-size:.82rem; color:var(--muted); line-height:1.65; }
+
+        /* ── FOOTER ── */
+        footer { position:relative; z-index:10; border-top:1px solid var(--border); padding:2rem; display:flex; align-items:center; justify-content:space-between; max-width:1200px; margin:0 auto; }
+        footer p { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); }
+        .footer-links { display:flex; gap:1.5rem; }
+        .footer-links a { font-size:.8rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+        .footer-links a:hover { color:var(--text); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+        .reveal.visible { opacity:1; transform:translateY(0); }
+        .rd1{transition-delay:.1s} .rd2{transition-delay:.2s} .rd3{transition-delay:.3s} .rd4{transition-delay:.4s}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:960px) {
+            .contact-grid { grid-template-columns:1fr; }
+            .steps-grid { grid-template-columns:1fr 1fr; }
+            .left-panel { order:2; }
+            .form-card { order:1; }
+        }
+        @media(max-width:600px) {
+            .nav-links { display:none; }
+            .form-row { grid-template-columns:1fr; }
+            .steps-grid { grid-template-columns:1fr; }
+            .contact-section,.expect-section { padding-left:1.25rem; padding-right:1.25rem; }
+            footer { flex-direction:column; gap:1rem; text-align:center; }
+            .form-card { padding:1.75rem 1.25rem; }
+            .socials-row { grid-template-columns:1fr 1fr; }
+        }
+    </style>
+</head>
 <body>
-    <!-- Loading Screen -->
- <div id="loadingOverlay" class="loading-overlay" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: rgba(10, 10, 10, 0.8) !important;">        <div class="loading-content">
-            <div class="loading-logo">
-                <svg width="50" height="50" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="loadingLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3b82f6"/>
-                            <stop offset="100%" style="stop-color:#1d4ed8"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="20" cy="20" r="20" fill="url(#loadingLogoGradient)"/>
-                    <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                </svg>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div id="sp"></div>
+<div class="mesh"></div>
+<div class="grid-lines"></div>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a class="logo" href="/"><div class="logo-badge">BA</div><span class="logo-name">Bimochan Acharya</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/project.html">Projects</a></li>
+            <li><a href="/education.html">Education</a></li>
+            <li><a href="/contact.html" class="active">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-eyebrow">Let's Connect</div>
+    <h1>Get In <span class="grad">Touch</span></h1>
+    <p class="hero-sub">Have a project, a question, or just want to say hello? My inbox is always open.</p>
+    <div class="avail-badge"><div class="avail-dot"></div>Available for freelance & full-time work</div>
+</section>
+
+<!-- CONTACT GRID -->
+<section class="contact-section">
+    <div class="contact-grid">
+
+        <!-- LEFT -->
+        <div class="left-panel reveal">
+
+            <a href="mailto:bimochan081b@asm.edu.np" class="info-card">
+                <div class="info-icon ic-blue"><i class="bi bi-envelope-fill"></i></div>
+                <div>
+                    <div class="info-label">Email</div>
+                    <div class="info-value">bimochan081b@asm.edu.np</div>
+                </div>
+                <i class="bi bi-arrow-right info-arrow"></i>
+            </a>
+
+            <a href="tel:+9779869667953" class="info-card">
+                <div class="info-icon ic-purple"><i class="bi bi-telephone-fill"></i></div>
+                <div>
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">+977 9869667953</div>
+                </div>
+                <i class="bi bi-arrow-right info-arrow"></i>
+            </a>
+
+            <div class="info-card" style="cursor:default;">
+                <div class="info-icon ic-green"><i class="bi bi-geo-alt-fill"></i></div>
+                <div>
+                    <div class="info-label">Location</div>
+                    <div class="info-value">Sindupalchok, Nepal 🇳🇵</div>
+                </div>
             </div>
-            <div class="loading-text">
-                <h3>Loading Contact</h3>
-                <p>Get ready to connect with me</p>
+
+            <a href="https://www.bimochanacharya.com.np" target="_blank" class="info-card">
+                <div class="info-icon ic-orange"><i class="bi bi-globe"></i></div>
+                <div>
+                    <div class="info-label">Website</div>
+                    <div class="info-value">bimochanacharya.com.np</div>
+                </div>
+                <i class="bi bi-arrow-up-right info-arrow"></i>
+            </a>
+
+            <!-- Socials -->
+            <div class="social-panel">
+                <div class="social-label">Find me on</div>
+                <div class="socials-row">
+                    <a href="https://github.com/Bimochanacharya06" target="_blank" class="social-btn sb-github"><i class="bi bi-github"></i> GitHub</a>
+                    <a href="https://www.linkedin.com/in/bimochan-acharya-75a085370/" target="_blank" class="social-btn sb-linkedin"><i class="bi bi-linkedin"></i> LinkedIn</a>
+                    <a href="https://www.facebook.com/bimochan.acharya.7" target="_blank" class="social-btn sb-facebook"><i class="bi bi-facebook"></i> Facebook</a>
+                    <a href="https://www.instagram.com/bimochan_acharya/" target="_blank" class="social-btn sb-instagram"><i class="bi bi-instagram"></i> Instagram</a>
+                </div>
             </div>
-            <div class="loading-progress">
-                <div class="loading-progress-bar"></div>
+
+            <!-- Response time -->
+            <div class="response-card">
+                <div class="response-header">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span>Quick Responder</span>
+                </div>
+                <div class="response-text">I read every message personally and respond thoughtfully. You won't get an autoresponder or a ghost.</div>
+                <div class="response-time">⚡ Avg. response: within 24 hours</div>
             </div>
-            <div class="loading-dots">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
+
+        </div>
+
+        <!-- RIGHT — FORM -->
+        <div class="form-card reveal rd1">
+            <div id="formWrap">
+                <div class="form-title">Send a Message</div>
+                <div class="form-subtitle">Tell me about your project — the more detail, the better.</div>
+
+                <form id="contactForm" action="https://formsubmit.co/bimochan081b@asm.edu.np" method="POST">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_next" value="https://www.bimochanacharya.com.np/contact.html">
+                    <input type="hidden" name="_subject" value="New Contact Form Submission — Portfolio">
+                    <input type="hidden" name="interests" id="interestsField" value="">
+
+                    <div class="form-row">
+                        <div class="form-field row-field">
+                            <label class="form-label" for="name">Full Name *</label>
+                            <input class="form-input" type="text" id="name" name="name" placeholder="Bimochan Acharya" required>
+                        </div>
+                        <div class="form-field row-field">
+                            <label class="form-label" for="email">Email Address *</label>
+                            <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field row-field">
+                            <label class="form-label" for="phone">Phone (optional)</label>
+                            <input class="form-input" type="tel" id="phone" name="phone" placeholder="+977 98XXXXXXXX">
+                        </div>
+                        <div class="form-field row-field">
+                            <label class="form-label" for="type">Project Type *</label>
+                            <select class="form-select" id="type" name="project_type" required>
+                                <option value="" disabled selected>Select a type...</option>
+                                <option value="Web App">Web Application</option>
+                                <option value="Portfolio Site">Portfolio / Personal Site</option>
+                                <option value="API Development">API Development</option>
+                                <option value="Full Stack">Full Stack Project</option>
+                                <option value="Freelance">Freelance Work</option>
+                                <option value="Full Time">Full-Time Opportunity</option>
+                                <option value="Collaboration">Collaboration</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Interest chips -->
+                    <div class="form-field">
+                        <label class="form-label">I'm interested in (select all that apply)</label>
+                        <div class="chips-wrap">
+                            <div class="chip" data-val="Python / Django"><i class="bi bi-filetype-py"></i> Python / Django</div>
+                            <div class="chip" data-val="Flask API"><i class="bi bi-diagram-3"></i> Flask API</div>
+                            <div class="chip" data-val="Frontend UI"><i class="bi bi-palette2"></i> Frontend UI</div>
+                            <div class="chip" data-val="Database Design"><i class="bi bi-database"></i> Database Design</div>
+                            <div class="chip" data-val="Full Stack"><i class="bi bi-code-slash"></i> Full Stack</div>
+                            <div class="chip" data-val="Consulting"><i class="bi bi-chat-dots"></i> Consulting</div>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="subject">Subject *</label>
+                        <input class="form-input" type="text" id="subject" name="subject" placeholder="e.g. Need a Django web app built" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label" for="message">Message *</label>
+                        <textarea class="form-textarea" id="message" name="message" placeholder="Describe your project, goals, timeline, and budget. The more detail, the better I can help." required maxlength="1000"></textarea>
+                        <div class="char-count"><span id="charCount">0</span> / 1000</div>
+                    </div>
+
+                    <button type="submit" class="form-submit">
+                        <i class="bi bi-send-fill"></i>
+                        Send Message
+                    </button>
+                </form>
             </div>
+
+            <!-- Success state -->
+            <div class="form-success" id="successState">
+                <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+                <div class="success-title">Message Sent! 🎉</div>
+                <div class="success-text">Thanks for reaching out. I'll get back to you within 24 hours.<br>In the meantime, feel free to check out my projects.</div>
+                <a href="/project.html" style="display:inline-flex;align-items:center;gap:.5rem;margin-top:1.5rem;padding:.75rem 1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;text-decoration:none;border-radius:12px;font-weight:700;font-size:.88rem;">View Projects <i class="bi bi-arrow-right"></i></a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- WHAT TO EXPECT -->
+<section class="expect-section">
+    <div class="section-label reveal">Process</div>
+    <h2 class="section-heading reveal">What happens next?</h2>
+    <div class="steps-grid">
+        <div class="step-card reveal rd1">
+            <div class="step-num">01</div>
+            <div class="step-title">You send a message</div>
+            <div class="step-desc">Fill in the form above or email me directly. The more detail about your project, the better.</div>
+        </div>
+        <div class="step-card reveal rd2">
+            <div class="step-num">02</div>
+            <div class="step-title">I review & respond</div>
+            <div class="step-desc">I personally read every message and respond within 24 hours with questions or a proposal.</div>
+        </div>
+        <div class="step-card reveal rd3">
+            <div class="step-num">03</div>
+            <div class="step-title">We align on scope</div>
+            <div class="step-desc">We discuss your goals, timeline, and budget to make sure we're a good fit before anything starts.</div>
+        </div>
+        <div class="step-card reveal rd4">
+            <div class="step-num">04</div>
+            <div class="step-title">We build together</div>
+            <div class="step-desc">I get to work. You get regular updates. We ship something you're proud of.</div>
         </div>
     </div>
+</section>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <div class="custom-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6"/>
-                                <stop offset="100%" style="stop-color:#1d4ed8"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
-                        <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                    </svg>
-                </div>
-                <span class="brand-text">Bimochan Acharya</span>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/project.html">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/education.html">Education</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="theme-toggle" id="themeToggle">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <!-- Hero Section -->
-    <section class="hero-section contact-hero" style="min-height: 60vh; display: flex; align-items: center;">
-        <div class="container">
-            <div class="text-center">
-                <h1 class="hero-name">Get In <span class="text-gradient">Touch</span></h1>
-                <p class="hero-description" style="max-width: 600px; margin: 1.5rem auto 0;">Let's discuss your next project or collaboration opportunity.</p>
-            </div>
-        </div>
-    </section>
+<footer>
+    <p>&copy; <span id="yr"></span> Bimochan Acharya — All rights reserved.</p>
+    <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/project.html">Projects</a>
+        <a href="/education.html">Education</a>
+    </div>
+</footer>
 
-    <!-- Contact Section -->
-    <section class="section" style="background: var(--bg-secondary);">
-        <div class="container">
-            <div class="row g-4">
-                <!-- Contact Info Cards -->
-                <div class="col-lg-4 mb-4">
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-envelope"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Email</h5>
-                                <p>bimochan081b@asm.edu.np</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-telephone"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Phone</h5>
-                                <p>+977 9869667953<br>+977 9869667953</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-geo-alt"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Location</h5>
-                                <p>Indrawati-5, Sindupalchok<br>Nepal</p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-globe"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Website</h5>
-                                <p>www.bimochanacharya.com.np</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<script>
+    // Cursor
+    const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cur.style.transform=`translate(${mx-5}px,${my-5}px)`; });
+    (function ar(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.transform=`translate(${rx-16}px,${ry-16}px)`; requestAnimationFrame(ar); })();
 
-                <!-- Contact Form -->
-                <div class="col-lg-8">
-                    <div class="contact-info">
-                        <h3>Send Me a Message</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                            Have a project in mind? Let's discuss how we can work together to bring your ideas to life.
-                        </p>
-                        <form action="https://formsubmit.co/bimochan081b@asm.edu.np" method="POST">
-                            <input type="hidden" name="_captcha" value="false">
-                            <input type="hidden" name="_next" value="https://www.bimochanacharya.com.np/contact.html">
-                            <input type="hidden" name="_subject" value="New Contact Form Submission">
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="name" style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; display: block;">Full Name *</label>
-                                    <input type="text" name="name" class="form-control" id="name"
-                                        placeholder="Enter your full name" required
-                                        style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem;">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="email" style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; display: block;">Email Address *</label>
-                                    <input type="email" name="email" class="form-control" placeholder="Enter your email address"
-                                        id="email" required
-                                        style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem;">
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="phone" style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; display: block;">Phone Number</label>
-                                    <input type="tel" name="phone" class="form-control"
-                                        placeholder="Enter your phone number" id="phone"
-                                        style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem;">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="subject" style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; display: block;">Subject *</label>
-                                    <input type="text" name="subject" class="form-control"
-                                        placeholder="Enter the subject" id="subject" required
-                                        style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem;">
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="message" style="color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem; display: block;">Message *</label>
-                                <textarea name="message" class="form-control" placeholder="Tell me about your project or inquiry"
-                                    id="message" rows="6" required
-                                    style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem; resize: vertical;"></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-send"></i>
-                                Send Message
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    // Scroll progress
+    const sp=document.getElementById('sp');
+    window.addEventListener('scroll',()=>{ sp.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%'; });
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; <span class="current-year"></span> Bimochan Acharya. All rights reserved.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="/" class="anchor_all">Home</a>
-                    <a href="/project.html" class="anchor_all">Projects</a>
-                    <a href="/education.html" class="anchor_all">Education</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    // Reveal
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.1});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="/static/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script>
-        // Initialize AOS animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ensure page loads at the top
-            window.scrollTo(0, 0);
-            
-            AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
-                once: true,
-                mirror: false,
-                disable: window.innerWidth < 768 ? 'mobile' : false
-            });
-            
-            // Set current year in footer
-            const yearElements = document.querySelectorAll('.current-year');
-            yearElements.forEach(el => {
-                el.textContent = new Date().getFullYear();
-            });
-            
-            // Close navbar when clicking a nav item on mobile
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-            const menuToggle = document.querySelector('.navbar-toggler');
-            const navbarCollapse = document.querySelector('.navbar-collapse');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 992) {
-                        bootstrap.Collapse.getInstance(navbarCollapse)?.hide();
-                    }
-                });
-            });
+    // Interest chips
+    const selected=new Set();
+    document.querySelectorAll('.chip').forEach(chip=>{
+        chip.addEventListener('click',()=>{
+            chip.classList.toggle('selected');
+            const val=chip.dataset.val;
+            selected.has(val)?selected.delete(val):selected.add(val);
+            document.getElementById('interestsField').value=[...selected].join(', ');
         });
-        
-        // Store initial scroll position
-        const initialScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-        
-        // Ensure the loading overlay is properly positioned
-        window.addEventListener('load', function() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) {
-                // Double check that the overlay is properly displayed
-                loadingOverlay.style.top = '0';
-                loadingOverlay.style.left = '0';
-                loadingOverlay.style.position = 'fixed';
-                
-                // Fade out the loading overlay with blur transition
-                setTimeout(function() {
-                    loadingOverlay.style.opacity = '0';
-                    loadingOverlay.style.backdropFilter = 'blur(0px)';
-                    loadingOverlay.style.webkitBackdropFilter = 'blur(0px)';
-                    loadingOverlay.style.transition = 'opacity 0.5s ease, backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease';
-                    
-                    // Reset body state completely
-                    document.documentElement.style.overflow = '';
-                    document.documentElement.style.height = '';
-                    document.body.style.overflow = '';
-                    document.body.style.position = '';
-                    document.body.style.width = '';
-                    document.body.style.height = '';
-                    document.body.style.top = '';
-                    document.body.style.touchAction = '';
-                    document.body.classList.add('loaded');
-                    
-                    // Double check that all pointer events work
-                    document.body.style.pointerEvents = 'auto';
-                    
-                    // Restore scroll position
-                    window.scrollTo(0, initialScroll);
-                    
-                    // Remove the overlay completely from the DOM after transition
-                    setTimeout(function() {
-                        if (loadingOverlay && loadingOverlay.parentNode) {
-                            loadingOverlay.parentNode.removeChild(loadingOverlay);
-                        }
-                    }, 500);
-                }, 500);
-            }
-        });
-    </script>
+    });
+
+    // Character counter
+    const msgArea=document.getElementById('message');
+    const charCount=document.getElementById('charCount');
+    msgArea.addEventListener('input',()=>{
+        const len=msgArea.value.length;
+        charCount.textContent=len;
+        charCount.style.color=len>900?'#ff4560':len>700?'#ffb400':'var(--muted)';
+    });
+
+    // Form success state (for direct submit; formsubmit handles redirect)
+    // This fires if JS intercepts; actual redirect handled by formsubmit _next param
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        const btn = this.querySelector('.form-submit');
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+        btn.style.opacity = '.7';
+        btn.disabled = true;
+    });
+
+    // Footer year
+    document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
 </body>
 </html>
