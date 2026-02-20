@@ -1,347 +1,450 @@
-
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head><script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bimochan Acharya - Education | Academic Background</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/responsive.css">
-    <link rel="stylesheet" href="/static/css/loader-fix.css">
-    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
-    <link rel="manifest" href="/manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimochan Acharya — Education</title>
+    <meta name="description" content="Bimochan Acharya's academic background, education timeline, and continuous learning journey in web development.">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <meta name="description"
-        content="Explore Bimochan Acharya's educational background including Bachelor's in Information Management, secondary education, and continuous learning in web development.">
-    <meta name="author" content="Bimochan acharya">
-    <meta name="keywords"
-        content="Bimochan Acharya, Education, Bachelor Information Management, Web Development, Academic Background">
-</head>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #060609; --border: rgba(255,255,255,0.06);
+            --accent: #4f7cff; --accent2: #b06cff; --accent3: #00f5c4;
+            --text: #e8e8f0; --muted: #666680; --card: rgba(255,255,255,0.028);
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text); font-family: 'Cabinet Grotesk', sans-serif; overflow-x: hidden; cursor: none; }
 
+        /* ── CURSOR ── */
+        .cursor { width:10px; height:10px; background:var(--accent); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; mix-blend-mode:screen; }
+        .cursor-ring { width:32px; height:32px; border:1px solid rgba(79,124,255,0.4); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; }
+
+        /* ── SCROLL PROGRESS ── */
+        #sp { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); z-index:9999; width:0; }
+
+        /* ── BG ── */
+        body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:.35; }
+        .mesh { position:fixed; inset:0; z-index:0; pointer-events:none; background: radial-gradient(ellipse 55% 45% at 5% 10%, rgba(79,124,255,.08) 0%, transparent 70%), radial-gradient(ellipse 45% 55% at 95% 90%, rgba(176,108,255,.06) 0%, transparent 70%), radial-gradient(ellipse 35% 35% at 60% 40%, rgba(0,245,196,.03) 0%, transparent 70%); }
+        .grid-lines { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025; background-image:linear-gradient(to right,white 1px,transparent 1px),linear-gradient(to bottom,white 1px,transparent 1px); background-size:80px 80px; }
+
+        /* ── NAV ── */
+        nav { position:fixed; top:0; left:0; right:0; z-index:500; padding:1.4rem 0; background:rgba(6,6,9,.75); backdrop-filter:blur(22px); border-bottom:1px solid var(--border); }
+        .nav-inner { max-width:1200px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:.75rem; text-decoration:none; }
+        .logo-badge { width:38px; height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.85rem; color:white; box-shadow:0 0 20px rgba(79,124,255,.35); }
+        .logo-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:var(--text); }
+        .nav-links { display:flex; gap:.25rem; list-style:none; }
+        .nav-links a { text-decoration:none; color:var(--muted); font-size:.875rem; font-weight:500; padding:.4rem .9rem; border-radius:8px; transition:color .2s,background .2s; }
+        .nav-links a:hover,.nav-links a.active { color:var(--text); background:rgba(255,255,255,.06); }
+        .nav-links a.active { color:var(--accent); }
+
+        /* ── HERO ── */
+        .hero { position:relative; z-index:10; padding:150px 2rem 70px; max-width:1200px; margin:0 auto; text-align:center; }
+        .hero-eyebrow { display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent3); letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.5rem; padding:.35rem 1rem; border:1px solid rgba(0,245,196,.2); border-radius:100px; background:rgba(0,245,196,.04); animation:fadeUp .7s ease both; }
+        .hero-eyebrow::before { content:''; width:5px; height:5px; background:var(--accent3); border-radius:50%; animation:blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+        .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(2.8rem,7vw,5.5rem); font-weight:800; line-height:.95; letter-spacing:-.03em; animation:fadeUp .7s .1s ease both; }
+        .hero h1 .grad { display:block; background:linear-gradient(135deg,var(--accent),var(--accent2) 55%,var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-sub { margin-top:1.5rem; color:var(--muted); font-size:1.05rem; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.7; animation:fadeUp .7s .2s ease both; }
+
+        /* ── QUICK STATS STRIP ── */
+        .stats-strip { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 5rem; }
+        .stats-strip-inner { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+        .strip-item { background:var(--card); padding:1.5rem; text-align:center; }
+        .strip-num { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; margin-bottom:.3rem; }
+        .strip-label { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+
+        /* ── TIMELINE ── */
+        .timeline-section { position:relative; z-index:10; max-width:900px; margin:0 auto; padding:0 2rem 6rem; }
+        .section-label { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:1rem; display:flex; align-items:center; gap:.75rem; }
+        .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+        .section-heading { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; letter-spacing:-.03em; margin-bottom:3rem; }
+
+        .timeline { position:relative; padding-left:2.5rem; }
+        .timeline::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3), transparent); }
+
+        .timeline-item { position:relative; margin-bottom:2.5rem; }
+        .timeline-item:last-child { margin-bottom:0; }
+
+        /* Dot on the line */
+        .tl-dot { position:absolute; left:-2.5rem; top:1.6rem; width:14px; height:14px; border-radius:50%; border:2px solid var(--accent); background:var(--bg); transform:translateX(-6px); z-index:2; transition:background .3s, border-color .3s, box-shadow .3s; }
+        .timeline-item:hover .tl-dot { background:var(--accent); box-shadow:0 0 14px rgba(79,124,255,.5); }
+        .tl-dot.dot-current { border-color:var(--accent3); background:rgba(0,245,196,.15); animation:dotpulse 2.5s ease infinite; }
+        .tl-dot.dot-ongoing { border-color:var(--accent2); }
+        @keyframes dotpulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,245,196,.4)} 50%{box-shadow:0 0 0 8px rgba(0,245,196,0)} }
+
+        .tl-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:2rem; transition:border-color .3s, box-shadow .3s, transform .3s; position:relative; overflow:hidden; }
+        .tl-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at var(--mx,50%) var(--my,50%), rgba(79,124,255,.06) 0%, transparent 60%); opacity:0; transition:opacity .4s; pointer-events:none; }
+        .tl-card:hover::before { opacity:1; }
+        .tl-card:hover { border-color:rgba(79,124,255,.2); box-shadow:0 16px 50px rgba(0,0,0,.3); transform:translateX(4px); }
+
+        .tl-header { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+        .tl-title-wrap { flex:1; }
+        .tl-period { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--muted); letter-spacing:.08em; margin-bottom:.4rem; display:flex; align-items:center; gap:.4rem; }
+        .tl-period::before { content:''; width:16px; height:1px; background:var(--muted); }
+        .tl-title { font-family:'Syne',sans-serif; font-size:1.15rem; font-weight:700; color:var(--text); letter-spacing:-.02em; margin-bottom:.3rem; }
+        .tl-school { font-size:.88rem; color:var(--muted); display:flex; align-items:center; gap:.4rem; }
+        .tl-school i { color:var(--accent); font-size:.8rem; }
+
+        .tl-badge { flex-shrink:0; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; padding:.3rem .75rem; border-radius:100px; white-space:nowrap; }
+        .badge-current { background:rgba(0,245,196,.1); color:var(--accent3); border:1px solid rgba(0,245,196,.2); }
+        .badge-completed { background:rgba(79,124,255,.08); color:var(--accent); border:1px solid rgba(79,124,255,.15); }
+        .badge-ongoing { background:rgba(176,108,255,.1); color:var(--accent2); border:1px solid rgba(176,108,255,.2); }
+
+        .tl-desc { color:var(--muted); font-size:.88rem; line-height:1.75; margin:1rem 0 1.25rem; }
+
+        .tl-tags { display:flex; flex-wrap:wrap; gap:.5rem; }
+        .tl-tag { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.06em; padding:.3rem .75rem; border-radius:8px; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--muted); display:flex; align-items:center; gap:.4rem; transition:background .2s, border-color .2s, color .2s; }
+        .tl-tag:hover { background:rgba(79,124,255,.07); border-color:rgba(79,124,255,.18); color:var(--accent); }
+        .tl-tag i { font-size:.75rem; }
+
+        /* ── CURRENTLY LEARNING SECTION ── */
+        .learning-section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 6rem; }
+        .learning-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+        .learn-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.75rem; transition:border-color .3s, transform .3s; cursor:default; }
+        .learn-card:hover { border-color:rgba(79,124,255,.2); transform:translateY(-4px); }
+        .learn-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:1rem; }
+        .lc-blue { background:rgba(79,124,255,.1); color:var(--accent); border:1px solid rgba(79,124,255,.15); }
+        .lc-purple { background:rgba(176,108,255,.1); color:var(--accent2); border:1px solid rgba(176,108,255,.15); }
+        .lc-green { background:rgba(0,245,196,.1); color:var(--accent3); border:1px solid rgba(0,245,196,.15); }
+        .lc-orange { background:rgba(255,180,0,.1); color:#ffb400; border:1px solid rgba(255,180,0,.15); }
+        .lc-red { background:rgba(255,69,90,.1); color:#ff4560; border:1px solid rgba(255,69,90,.15); }
+        .lc-teal { background:rgba(0,200,180,.1); color:#00c8b4; border:1px solid rgba(0,200,180,.15); }
+        .learn-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.4rem; }
+        .learn-desc { font-size:.82rem; color:var(--muted); line-height:1.6; margin-bottom:1rem; }
+        .learn-progress-bar { height:3px; background:rgba(255,255,255,.06); border-radius:100px; overflow:hidden; }
+        .learn-progress-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 1.2s cubic-bezier(.23,1,.32,1); width:0; }
+
+        /* ── PHILOSOPHY CARD ── */
+        .philosophy-section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 6rem; }
+        .philosophy-card { background:var(--card); border:1px solid var(--border); border-radius:24px; padding:3.5rem; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+        .philosophy-card:hover { border-color:rgba(79,124,255,.15); }
+        .quote-mark { font-family:'Syne',sans-serif; font-size:5rem; font-weight:800; line-height:.8; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:.5rem; }
+        .quote-text { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; line-height:1.45; letter-spacing:-.02em; color:var(--text); margin-bottom:1.25rem; }
+        .quote-author { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+        .philosophy-right { display:flex; flex-direction:column; gap:1rem; }
+        .phil-item { display:flex; align-items:flex-start; gap:1rem; padding:1rem 1.25rem; background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:14px; }
+        .phil-num { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--accent); min-width:28px; }
+        .phil-text { font-size:.88rem; color:var(--muted); line-height:1.6; }
+        .phil-text strong { color:var(--text); font-weight:600; }
+
+        /* ── CTA ── */
+        .cta-section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 8rem; }
+        .cta-card { border:1px solid var(--border); border-radius:24px; padding:4rem; text-align:center; position:relative; overflow:hidden; background:var(--card); }
+        .cta-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 80% at 50% 100%, rgba(79,124,255,.07) 0%, transparent 70%); pointer-events:none; }
+        .cta-card h2 { font-family:'Syne',sans-serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-.03em; margin-bottom:.75rem; }
+        .cta-card p { color:var(--muted); margin-bottom:2rem; max-width:420px; margin-left:auto; margin-right:auto; }
+        .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+        .btn-main { display:inline-flex; align-items:center; gap:.5rem; padding:.85rem 1.8rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; text-decoration:none; border-radius:12px; font-weight:700; font-size:.9rem; box-shadow:0 8px 28px rgba(79,124,255,.3); transition:transform .2s,box-shadow .2s; cursor:none; }
+        .btn-main:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(79,124,255,.4); color:white; }
+        .btn-ghost { display:inline-flex; align-items:center; gap:.5rem; padding:.85rem 1.8rem; border:1px solid var(--border); color:var(--text); text-decoration:none; border-radius:12px; font-weight:600; font-size:.9rem; transition:border-color .2s,background .2s; cursor:none; }
+        .btn-ghost:hover { border-color:rgba(79,124,255,.3); background:rgba(79,124,255,.05); color:var(--text); }
+
+        /* ── FOOTER ── */
+        footer { position:relative; z-index:10; border-top:1px solid var(--border); padding:2rem; display:flex; align-items:center; justify-content:space-between; max-width:1200px; margin:0 auto; }
+        footer p { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); }
+        .footer-links { display:flex; gap:1.5rem; }
+        .footer-links a { font-size:.8rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+        .footer-links a:hover { color:var(--text); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+        .reveal.visible { opacity:1; transform:translateY(0); }
+        .rd1{transition-delay:.1s} .rd2{transition-delay:.2s} .rd3{transition-delay:.3s} .rd4{transition-delay:.4s}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:900px) {
+            .learning-grid { grid-template-columns:1fr 1fr; }
+            .philosophy-card { grid-template-columns:1fr; }
+            .stats-strip-inner { grid-template-columns:1fr 1fr; }
+        }
+        @media(max-width:600px) {
+            .nav-links { display:none; }
+            .learning-grid { grid-template-columns:1fr; }
+            .stats-strip-inner { grid-template-columns:1fr 1fr; }
+            .timeline-section,.learning-section,.philosophy-section,.cta-section { padding-left:1.25rem; padding-right:1.25rem; }
+            footer { flex-direction:column; gap:1rem; text-align:center; }
+            .cta-card { padding:2.5rem 1.5rem; }
+            .philosophy-card { padding:2rem 1.5rem; }
+        }
+    </style>
+</head>
 <body>
-    <!-- Loading Screen -->
- <div id="loadingOverlay" class="loading-overlay" style="backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background-color: rgba(10, 10, 10, 0.8) !important;">
-            <div class="loading-content">
-            <div class="loading-logo">
-                <svg width="50" height="50" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="loadingLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3b82f6"/>
-                            <stop offset="100%" style="stop-color:#1d4ed8"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="20" cy="20" r="20" fill="url(#loadingLogoGradient)"/>
-                    <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                </svg>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div id="sp"></div>
+<div class="mesh"></div>
+<div class="grid-lines"></div>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a class="logo" href="/"><div class="logo-badge">BA</div><span class="logo-name">Bimochan Acharya</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/project.html">Projects</a></li>
+            <li><a href="/education.html" class="active">Education</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-eyebrow">Academic Journey</div>
+    <h1>My <span class="grad">Education</span></h1>
+    <p class="hero-sub">A timeline of formal education and continuous self-learning — because the best developers never stop being students.</p>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip reveal">
+    <div class="stats-strip-inner">
+        <div class="strip-item">
+            <span class="strip-num">3+</span>
+            <span class="strip-label">Years Learning</span>
+        </div>
+        <div class="strip-item">
+            <span class="strip-num">BIM</span>
+            <span class="strip-label">Degree Pursuing</span>
+        </div>
+        <div class="strip-item">
+            <span class="strip-num">8+</span>
+            <span class="strip-label">Technologies</span>
+        </div>
+        <div class="strip-item">
+            <span class="strip-num">∞</span>
+            <span class="strip-label">Still Learning</span>
+        </div>
+    </div>
+</div>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+    <div class="section-label reveal">Timeline</div>
+    <h2 class="section-heading reveal">Formal Education</h2>
+
+    <div class="timeline">
+
+        <!-- BIM -->
+        <div class="timeline-item reveal">
+            <div class="tl-dot dot-current"></div>
+            <div class="tl-card">
+                <div class="tl-header">
+                    <div class="tl-title-wrap">
+                        <div class="tl-period">2024 — Present</div>
+                        <div class="tl-title">Bachelor in Information Management (BIM)</div>
+                        <div class="tl-school"><i class="bi bi-building"></i> Asian School of Management & Technology — Gongabu, Kathmandu</div>
+                    </div>
+                    <div class="tl-badge badge-current">● Pursuing</div>
+                </div>
+                <p class="tl-desc">Studying information management systems, database architecture, software development methodologies, and business technology applications. The BIM program bridges technical computing with real-world business contexts — giving me both the code and the context.</p>
+                <div class="tl-tags">
+                    <div class="tl-tag"><i class="bi bi-database"></i>Information Systems</div>
+                    <div class="tl-tag"><i class="bi bi-server"></i>Database Management</div>
+                    <div class="tl-tag"><i class="bi bi-code-slash"></i>Software Engineering</div>
+                    <div class="tl-tag"><i class="bi bi-graph-up"></i>Business Analysis</div>
+                    <div class="tl-tag"><i class="bi bi-shield-check"></i>IT Security</div>
+                </div>
             </div>
-            <div class="loading-text">
-                <h3>Loading Education</h3>
-                <p>Exploring my academic journey</p>
+        </div>
+
+        <!-- +2 -->
+        <div class="timeline-item reveal rd1">
+            <div class="tl-dot"></div>
+            <div class="tl-card">
+                <div class="tl-header">
+                    <div class="tl-title-wrap">
+                        <div class="tl-period">2022 — 2024</div>
+                        <div class="tl-title">Higher Secondary Education (+2)</div>
+                        <div class="tl-school"><i class="bi bi-building"></i>Orient College</div>
+                    </div>
+                    <div class="tl-badge badge-completed">✓ Completed</div>
+                </div>
+                <p class="tl-desc">Completed higher secondary education with a focus on management and computer science. Built a solid foundation in logical thinking, mathematics, and computing that directly fuels my programming work today.</p>
+                <div class="tl-tags">
+                    <div class="tl-tag"><i class="bi bi-calculator"></i>Accountancy</div>
+                    <div class="tl-tag"><i class="bi bi-laptop"></i>Computer Science</div>
+                    <div class="tl-tag"><i class="bi bi-people"></i>Social Studies</div>
+                    <div class="tl-tag"><i class="bi bi-translate"></i>English</div>
+                </div>
             </div>
-            <div class="loading-progress">
-                <div class="loading-progress-bar"></div>
+        </div>
+
+        <!-- SEE / Primary -->
+        <div class="timeline-item reveal rd2">
+            <div class="tl-dot"></div>
+            <div class="tl-card">
+                <div class="tl-header">
+                    <div class="tl-title-wrap">
+                        <div class="tl-period">2009 — 2019</div>
+                        <div class="tl-title">Primary & Secondary Education (SEE)</div>
+                        <div class="tl-school"><i class="bi bi-building"></i>Bansbari Secondary School</div>
+                    </div>
+                    <div class="tl-badge badge-completed">✓ Completed</div>
+                </div>
+                <p class="tl-desc">A decade of foundational schooling where curiosity was built and a love for problem-solving first took root. This is where the journey started.</p>
+                <div class="tl-tags">
+                    <div class="tl-tag"><i class="bi bi-book"></i>Core Academics</div>
+                    <div class="tl-tag"><i class="bi bi-globe"></i>General Science</div>
+                    <div class="tl-tag"><i class="bi bi-calculator"></i>Mathematics</div>
+                </div>
             </div>
-            <div class="loading-dots">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
+        </div>
+
+        <!-- Self-Learning -->
+        <div class="timeline-item reveal rd3">
+            <div class="tl-dot dot-ongoing"></div>
+            <div class="tl-card">
+                <div class="tl-header">
+                    <div class="tl-title-wrap">
+                        <div class="tl-period">2020 — Present</div>
+                        <div class="tl-title">Self-Directed Learning & Online Courses</div>
+                        <div class="tl-school"><i class="bi bi-globe"></i>YouTube · FreeCodeCamp · Documentation · Practice</div>
+                    </div>
+                    <div class="tl-badge badge-ongoing">◐ Ongoing</div>
+                </div>
+                <p class="tl-desc">Real skills are built outside the classroom too. Since 2020 I've been self-teaching through online platforms, official documentation, and building real projects. This is where most of my practical web development knowledge lives.</p>
+                <div class="tl-tags">
+                    <div class="tl-tag"><i class="bi bi-filetype-py"></i>Python</div>
+                    <div class="tl-tag"><i class="bi bi-globe2"></i>Django & Flask</div>
+                    <div class="tl-tag"><i class="bi bi-filetype-js"></i>JavaScript</div>
+                    <div class="tl-tag"><i class="bi bi-layout-text-sidebar"></i>HTML & CSS</div>
+                    <div class="tl-tag"><i class="bi bi-git"></i>Git & Linux</div>
+                    <div class="tl-tag"><i class="bi bi-database"></i>SQL & NoSQL</div>
+                    <div class="tl-tag"><i class="bi bi-arrow-repeat"></i>REST APIs</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- CURRENTLY LEARNING -->
+<section class="learning-section">
+    <div class="section-label reveal">Active Now</div>
+    <h2 class="section-heading reveal">Currently Learning</h2>
+    <div class="learning-grid">
+
+        <div class="learn-card reveal rd1">
+            <div class="learn-icon lc-blue"><i class="bi bi-diagram-3"></i></div>
+            <div class="learn-title">Django REST Framework</div>
+            <div class="learn-desc">Building production-grade APIs with authentication, serializers, and viewsets.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="75"></div></div>
+        </div>
+
+        <div class="learn-card reveal rd2">
+            <div class="learn-icon lc-purple"><i class="bi bi-braces"></i></div>
+            <div class="learn-title">JavaScript (Advanced)</div>
+            <div class="learn-desc">Async patterns, closures, DOM mastery, and ES2024 features.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="65"></div></div>
+        </div>
+
+        <div class="learn-card reveal rd3">
+            <div class="learn-icon lc-green"><i class="bi bi-box"></i></div>
+            <div class="learn-title">Docker & Deployment</div>
+            <div class="learn-desc">Containerizing Django apps and deploying to VPS with Nginx and Gunicorn.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="40"></div></div>
+        </div>
+
+        <div class="learn-card reveal rd1">
+            <div class="learn-icon lc-orange"><i class="bi bi-bar-chart-line"></i></div>
+            <div class="learn-title">Data Structures & Algorithms</div>
+            <div class="learn-desc">Strengthening CS fundamentals for better problem solving and interviews.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="50"></div></div>
+        </div>
+
+        <div class="learn-card reveal rd2">
+            <div class="learn-icon lc-red"><i class="bi bi-phone"></i></div>
+            <div class="learn-title">Responsive UI Design</div>
+            <div class="learn-desc">CSS Grid, Flexbox, and design systems for polished, mobile-first interfaces.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="80"></div></div>
+        </div>
+
+        <div class="learn-card reveal rd3">
+            <div class="learn-icon lc-teal"><i class="bi bi-shield-lock"></i></div>
+            <div class="learn-title">Web Security Basics</div>
+            <div class="learn-desc">CSRF, SQL injection prevention, HTTPS, and secure authentication patterns.</div>
+            <div class="learn-progress-bar"><div class="learn-progress-fill" data-width="45"></div></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy-section">
+    <div class="philosophy-card reveal">
+        <div>
+            <div class="quote-mark">"</div>
+            <div class="quote-text">Education is not the learning of facts, but the training of the mind to think.</div>
+            <div class="quote-author">— Albert Einstein</div>
+        </div>
+        <div class="philosophy-right">
+            <div class="phil-item">
+                <div class="phil-num">01</div>
+                <div class="phil-text"><strong>Build real things.</strong> Every concept I learn, I immediately try to apply in a real project. Theory without practice is just trivia.</div>
+            </div>
+            <div class="phil-item">
+                <div class="phil-num">02</div>
+                <div class="phil-text"><strong>Read the docs.</strong> I've learned more from official documentation than any course. It's the primary source.</div>
+            </div>
+            <div class="phil-item">
+                <div class="phil-num">03</div>
+                <div class="phil-text"><strong>Break things on purpose.</strong> The best debugging sessions are deliberate. I learn the most when something breaks and I have to fix it.</div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <div class="custom-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6"/>
-                                <stop offset="100%" style="stop-color:#1d4ed8"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
-                        <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                    </svg>
-                </div>
-                <span class="brand-text">Bimochan Acharya</span>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/project.html">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/education.html">Education</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="theme-toggle" id="themeToggle">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
+<!-- CTA -->
+<section class="cta-section">
+    <div class="cta-card reveal">
+        <h2>Want to work together?</h2>
+        <p>I'm a developer in progress — always building, always learning. Let's create something.</p>
+        <div class="cta-btns">
+            <a href="/project.html" class="btn-main"><i class="bi bi-grid"></i> See My Work</a>
+            <a href="/contact.html" class="btn-ghost"><i class="bi bi-envelope"></i> Get in Touch</a>
         </div>
-    </nav>
+    </div>
+</section>
 
-    <section class="hero-section education-hero" style="min-height: 60vh; display: flex; align-items: center;">
-        <div class="container">
-            <div class="text-center">
-                <h1 class="hero-name">My <span class="text-gradient">Education</span></h1>
-                <p class="hero-description" style="max-width: 600px; margin: 1.5rem auto 0;">My academic journey and continuous learning in technology and development.</p>
-            </div>
-        </div>
-    </section>
+<footer>
+    <p>&copy; <span id="yr"></span> Bimochan Acharya — All rights reserved.</p>
+    <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/project.html">Projects</a>
+        <a href="/contact.html">Contact</a>
+    </div>
+</footer>
 
-    <section class="section" style="background: var(--bg-secondary);">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="education-timeline" role="list" aria-label="Educational Timeline">
-                        <div class="education-item fade-in-up" role="listitem">
-                            <div class="education-year">
-                                <span>2024 - Present</span>
-                            </div>
-                            <div class="education-content">
-                                <div class="education-icon">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <div class="education-header">
-                                    <h3>Bachelor in Information Management (BIM)</h3>
-                                    <span class="education-status status-current">Currently Pursuing</span>
-                                </div>
-                                <h4><i class="fas fa-university"></i> Asian School of Management & Technology, Gongabu, Kathmandu</h4>
-                                <p>Studying comprehensive information management systems, database design, software development, and modern business technologies. Focusing on practical applications of technology in business environments.</p>
-                                <div class="education-highlights">
-                                    <span><i class="fas fa-database"></i> Information Systems</span>
-                                    <span><i class="fas fa-server"></i> Database Management</span>
-                                    <span><i class="fas fa-code"></i> Software Engineering</span>
-                                    <span><i class="fas fa-chart-line"></i> Business Analysis</span>
-                                </div>
-                            </div>
-                        </div>
+<script>
+    // Cursor
+    const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cur.style.transform=`translate(${mx-5}px,${my-5}px)`; });
+    (function ar(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.transform=`translate(${rx-16}px,${ry-16}px)`; requestAnimationFrame(ar); })();
 
-                        <!-- +2 Education -->
-                        <div class="education-item fade-in-up" role="listitem">
-                            <div class="education-year">
-                                <span>2022 - 2024</span>
-                            </div>
-                            <div class="education-content">
-                                <div class="education-icon">
-                                    <i class="fas fa-school"></i>
-                                </div>
-                                <div class="education-header">
-                                    <h3>Higher Secondary Education (SEE & +2)</h3>
-                                    <span class="education-status status-completed">Completed</span>
-                                </div>
-                                <h4><i class="fas fa-building"></i>Orient college</h4>
-                                <p>Completed higher secondary education with focus on Science stream. Developed strong foundation in mathematics, account, and computer science which later supported my programming journey.</p>
-                                <div class="education-highlights">
-                                    <span><i class="fas fa-calculator"></i> Social Studies</span>
-                                    <span><i class="fas fa-atom"></i> Account</span>
-                                    <span><i class="fas fa-laptop-code"></i> Computer Science</span>
-                                    <span><i class="fas fa-language"></i> English</span>
-                                </div>
-                            </div>
-                        </div>
+    // Scroll progress
+    const sp=document.getElementById('sp');
+    window.addEventListener('scroll',()=>{ sp.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%'; });
 
-                             <div class="education-item fade-in-up" role="listitem">
-                            <div class="education-year">
-                                <span>2009 - 2019</span>
-                            </div>
-                            <div class="education-content">
-                                <div class="education-icon">
-                                    <i class="fas fa-school"></i>
-                                </div>
-                                <div class="education-header">
-                                    <h3>Primary Level Education,
-</h3>
-                                    <span class="education-status status-completed">Completed</span>
-                                </div>
-                                <h4><i class="fas fa-building"></i> Bansbari secondary School</h4>
-                                <p></p>
-                             
-                            </div>
-                        </div>
+    // Reveal
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.1});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-                    
+    // Card mouse glow
+    document.querySelectorAll('.tl-card').forEach(card=>{
+        card.addEventListener('mousemove',e=>{ const r=card.getBoundingClientRect(); card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%'); card.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%'); });
+    });
 
-                        <!-- Self Learning -->
-                        <div class="education-item fade-in-up" role="listitem">
-                            <div class="education-year">
-                                <span>2020 - Present</span>
-                            </div>
-                            <div class="education-content">
-                                <div class="education-icon">
-                                    <i class="fas fa-lightbulb"></i>
-                                </div>
-                                <div class="education-header">
-                                    <h3>Self-Directed Learning & Certifications</h3>
-                                    <span class="education-status status-ongoing">Ongoing</span>
-                                </div>
-                                <h4><i class="fas fa-globe"></i> Online Platforms & Practice</h4>
-                                <p>Continuously learning new technologies through online courses, documentation, and hands-on practice. Staying updated with latest web development trends and best practices.</p>
-                                <div class="education-highlights">
-                                    <span><i class="fab fa-python"></i> Python Programming</span>
-                                    <span><i class="fas fa-code"></i> Web Development</span>
-                                    <span><i class="fab fa-python"></i> Django Framework</span>
-                                    <span><i class="fab fa-js-square"></i> JavaScript</span>
-                                    <span><i class="fab fa-react"></i> React</span>
-                                    <span><i class="fas fa-database"></i> Database Design</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    // Progress bars — animate when visible
+    const barObserver=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting){ const fill=e.target.querySelector('.learn-progress-fill'); if(fill){ fill.style.width=fill.dataset.width+'%'; } } }),{threshold:.3});
+    document.querySelectorAll('.learn-card').forEach(c=>barObserver.observe(c));
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; <span class="current-year"></span> Bimochan Acharya. All rights reserved.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="/C:\Users\Acer\OneDrive\Documents\bimochan\contact.html" class="anchor_all">Contact</a>
-                    <a href="/project.html" class="anchor_all">Projects</a>
-                    <a href="/" class="anchor_all">Home</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="/static/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script>
-        // Initialize AOS animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ensure page loads at the top
-            window.scrollTo(0, 0);
-            
-            // Initialize AOS
-            AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
-                once: true,
-                mirror: false,
-                disable: window.innerWidth < 768 ? 'mobile' : false
-            });
-            
-            // Set current year in footer
-            const yearElements = document.querySelectorAll('.current-year');
-            yearElements.forEach(el => {
-                el.textContent = new Date().getFullYear();
-            });
-            
-            // Close navbar when clicking a nav item on mobile
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-            const menuToggle = document.querySelector('.navbar-toggler');
-            const navbarCollapse = document.querySelector('.navbar-collapse');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 992) {
-                        bootstrap.Collapse.getInstance(navbarCollapse)?.hide();
-                    }
-                });
-            });
-        });
-        
-        // Ensure the loading overlay is properly positioned
-        window.addEventListener('load', function() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) {
-                // Double check that the overlay is properly displayed
-                loadingOverlay.style.top = '0';
-                loadingOverlay.style.left = '0';
-                loadingOverlay.style.position = 'fixed';
-            }
-        });
-    </script>
-    <script>
-        // Consolidated loader script
-        (function() {
-            // Set initial body state - lock scrolling
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-            
-            const initialScroll = window.scrollY;
-            
-            // Function to fade out loading screen
-            function hideLoadingScreen() {
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                if (!loadingOverlay) return;
-                
-                // Add fade-out class and animate blur
-                loadingOverlay.classList.add('hidden');
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.backdropFilter = 'blur(0px)';
-                loadingOverlay.style.webkitBackdropFilter = 'blur(0px)';
-                loadingOverlay.style.transition = 'opacity 0.5s ease, backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease';
-                
-                // Reset body state completely
-                document.documentElement.style.overflow = '';
-                document.documentElement.style.height = '';
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.width = '';
-                document.body.style.height = '';
-                document.body.style.top = '';
-                document.body.style.touchAction = '';
-                document.body.classList.add('loaded');
-                
-                // Double check that all pointer events work
-                document.body.style.pointerEvents = 'auto';
-                
-                // Restore scroll position
-                window.scrollTo(0, initialScroll);
-                
-                // Remove overlay completely from the DOM after transition
-                setTimeout(function() {
-                    if (loadingOverlay && loadingOverlay.parentNode) {
-                        loadingOverlay.parentNode.removeChild(loadingOverlay);
-                    }
-                }, 500);
-            }
-            
-            // When everything is loaded
-            window.addEventListener('load', function() {
-                // Add a slight delay to ensure everything is ready
-                setTimeout(hideLoadingScreen, 500);
-            });
-            
-            // Fallback timeout in case load event doesn't fire
-            setTimeout(hideLoadingScreen, 5000);
-        })();
-    </script>
+    document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
 </body>
 </html>
