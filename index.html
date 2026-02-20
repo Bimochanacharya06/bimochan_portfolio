@@ -1,16 +1,337 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio</title>
-    <link rel="stylesheet" href="chat-animations.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Bimochan Acharya - Full Stack Developer | Portfolio</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link rel="stylesheet" href="/static/css/loader-fix.css">
+    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <meta name="description"
+        content="Bimochan Acharya - Full Stack Developer from Nepal specializing in Python, Django, Flask, React & modern web apps. Explore projects & skills.">
+    <meta name="author" content="Bimochan Acharya">
+    <meta name="keywords"
+        content="Bimochan Acharya, Full Stack Developer, Python, Django, Flask, JavaScript, React, Web Development, Nepal">
+    <!-- Open Graph / Twitter -->
+    <meta property="og:title" content="Bimochan Acharya - Full Stack Developer | Portfolio">
+    <meta property="og:description" content="Building dynamic web applications with Python/Django backend & modern JavaScript frontend.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/static/img/photo.jpeg">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Fonts & AOS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Security -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
 </head>
 <body>
-    <h1>Welcome to My Portfolio</h1>
-    <p>Some content goes here...</p>
-    
-    <script src="ai-responses-database.js"></script>
-    <script src="ai-chat-system.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="50" height="50" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="loadingLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3b82f6"/>
+                            <stop offset="100%" stop-color="#1d4ed8"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="20" cy="20" r="20" fill="url(#loadingLogoGradient)"/>
+                    <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
+                </svg>
+            </div>
+            <div class="loading-text">
+                <h3>Loading Portfolio</h3>
+                <p>Preparing your experience...</p>
+            </div>
+            <div class="loading-progress"><div class="loading-progress-bar"></div></div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor (optional modern touch) -->
+    <div class="custom-cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <div class="custom-logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
+                        <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter" font-weight="700" font-size="14">BA</text>
+                    </svg>
+                </div>
+                <span class="brand-text">Bimochan Acharya</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/education.html">Education</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item">
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                            <i class="bi bi-sun-fill"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6 order-2 order-lg-1">
+                    <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
+                        <div class="hero-greeting">Hello, I'm</div>
+                        <h1 class="hero-name"><span class="text-gradient">Bimochan Acharya</span></h1>
+                        <h2 class="hero-title">
+                            <span id="typing-text">Full Stack Developer</span>
+                            <span class="cursor">|</span>
+                        </h2>
+                        <p class="hero-description">
+                            Crafting responsive, scalable web applications with Python/Django backend 
+                            and modern JavaScript frontend. Turning ideas into production-ready products.
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="#contact" class="btn btn-primary me-3">Get In Touch</a>
+                            <a href="https://github.com/Bimochanacharya06" target="_blank" class="btn btn-outline-light">
+                                <i class="bi bi-github"></i> View GitHub
+                            </a>
+                        </div>
+                        <div class="social-links mt-4">
+                            <!-- your existing social icons here -->
+                            <a href="https://github.com/Bimochanacharya06" target="_blank"><i class="bi bi-github"></i></a>
+                            <a href="https://www.linkedin.com/in/bimochan-acharya-75a085370/" target="_blank"><i class="bi bi-linkedin"></i></a>
+                            <a href="https://www.facebook.com/bimochan.acharya.7" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/bimochan_acharya/" target="_blank"><i class="bi bi-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <div class="hero-image" data-aos="fade-left" data-aos-delay="300">
+                        <img src="/static/img/photo.jpeg" alt="Bimochan Acharya - Full Stack Developer" class="photo-img" loading="eager" width="400" height="400">
+                        <div class="image-glow"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section about-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2>About Me</h2>
+                <p class="section-subtitle">Passionate about clean code & scalable solutions</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-7">
+                    <p>I'm a full-stack developer from Nepal with strong focus on Python ecosystems (Django/Flask) and modern frontend (JS/React). I enjoy building performant, user-centric applications — from MVPs to production systems.</p>
+                    <p>Currently expanding into cloud deployment (Vercel/Railway), API design, and real-time features. Always learning.</p>
+                    <div class="about-stats">
+                        <div class="stat-item"><h4>3+</h4><span>Years Coding</span></div>
+                        <div class="stat-item"><h4>15+</h4><span>Projects Built</span></div>
+                        <div class="stat-item"><h4>100%</h4><span>Code Quality Focus</span></div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="contact-info">
+                        <h3>Contact Info</h3>
+                        <p><i class="bi bi-envelope"></i> <a href="mailto:bimochan081b@asm.edu.np">bimochan081b@asm.edu.np</a></p>
+                        <p><i class="bi bi-telephone"></i> <a href="tel:+9779868667953">+977 9868667953</a></p>
+                        <p><i class="bi bi-geo-alt"></i> Indrawati-5, Sindhupalchok, Nepal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills (your existing) -->
+    <section id="skills" class="section skills-section">
+        <!-- Keep your existing skills grid here – it's already good -->
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2>Featured Projects</h2>
+                <p>Real-world applications I've built</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 mb-4" data-aos="fade-up">
+                    <div class="project-card">
+                        <div class="project-image">
+                            <!-- Replace with real screenshot -->
+                            <img src="/static/img/projects/rps.jpg" alt="Rock Paper Scissors Game" loading="lazy">
+                        </div>
+                        <div class="project-content">
+                            <h3>Rock Paper Scissors</h3>
+                            <p>Interactive browser game with score persistence, animations & responsive design.</p>
+                            <div class="project-tech">
+                                <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+                            </div>
+                            <div class="project-links mt-3">
+                                <a href="/game.html" target="_blank" class="btn btn-sm btn-outline-primary">Live Demo</a>
+                                <a href="https://github.com/Bimochanacharya06/rps-game" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="bi bi-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add your real projects here – example placeholders -->
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="project-card">
+                        <div class="project-image"><div class="project-placeholder"><i class="bi bi-book"></i></div></div>
+                        <div class="project-content">
+                            <h3>Learning Management System</h3>
+                            <p>Django-based platform with user auth, course management & quizzes.</p>
+                            <div class="project-tech"><span>Django</span><span>Python</span><span>PostgreSQL</span></div>
+                            <div class="project-links">
+                                <a href="https://your-lms-demo.com" target="_blank" class="btn btn-sm btn-outline-primary">Live</a>
+                                <a href="https://github.com/Bimochanacharya06/lms" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="bi bi-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="project-card">
+                        <div class="project-image"><div class="project-placeholder"><i class="bi bi-chat-dots"></i></div></div>
+                        <div class="project-content">
+                            <h3>Real-time Chat App</h3>
+                            <p>Flask + Socket.IO chat with private rooms & message persistence.</p>
+                            <div class="project-tech"><span>Flask</span><span>Socket.IO</span><span>MongoDB</span></div>
+                            <div class="project-links">
+                                <a href="#" target="_blank" class="btn btn-sm btn-outline-primary">Live</a>
+                                <a href="#" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="bi bi-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="/project.html" class="btn btn-outline-primary btn-lg">View All Projects →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2>Let's Work Together</h2>
+                <p>Have a project in mind? Drop a message!</p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <form action="https://formspree.io/f/your-form-id" method="POST" class="contact-form" data-aos="fade-up" data-aos-delay="100">
+                        <div class="mb-3">
+                            <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" name="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="message" rows="5" class="form-control" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                    </form>
+                    <p class="text-center mt-3 small">Powered by Formspree (or replace with EmailJS / your backend)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© <span class="current-year"></span> Bimochan Acharya. Built with passion in Nepal.</p>
+            <div class="footer-links">
+                <a href="/project.html">Projects</a>
+                <a href="/education.html">Education</a>
+                <a href="#contact">Contact</a>
+                <a href="#home" class="back-to-top"><i class="bi bi-arrow-up-circle-fill"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // AOS
+        AOS.init({ duration: 800, once: true });
+
+        // Theme Toggle
+        const toggle = document.getElementById('themeToggle');
+        toggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            toggle.innerHTML = next === 'dark' 
+                ? '<i class="bi bi-sun-fill"></i>' 
+                : '<i class="bi bi-moon-fill"></i>';
+            localStorage.setItem('theme', next);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        toggle.innerHTML = savedTheme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
+
+        // Typing Animation
+        const phrases = ["Full Stack Developer", "Python Enthusiast", "Django & Flask Expert", "Web Creator"];
+        let i = 0, j = 0, isDeleting = false;
+        const typingElement = document.getElementById('typing-text');
+        function type() {
+            const currentPhrase = phrases[i];
+            if (isDeleting) {
+                typingElement.textContent = currentPhrase.substring(0, j--);
+                if (j < 0) { isDeleting = false; i = (i + 1) % phrases.length; setTimeout(type, 500); return; }
+            } else {
+                typingElement.textContent = currentPhrase.substring(0, j++);
+                if (j > currentPhrase.length) { isDeleting = true; setTimeout(type, 1500); return; }
+            }
+            setTimeout(type, isDeleting ? 50 : 100);
+        }
+        type();
+
+        // Back to top smooth scroll
+        document.querySelector('.back-to-top').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Loading screen hide
+        window.addEventListener('load', () => {
+            document.getElementById('loadingOverlay')?.classList.add('hidden');
+            setTimeout(() => document.getElementById('loadingOverlay')?.remove(), 800);
+        });
+
+        // Optional: very light custom cursor
+        const cursor = document.querySelector('.custom-cursor');
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+    </script>
 </body>
 </html>
