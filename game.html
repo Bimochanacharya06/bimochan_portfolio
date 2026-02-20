@@ -1,182 +1,565 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Rock Paper Scissors Game - Bimochan Acharya</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/responsive.css">
-    <link rel="stylesheet" href="/static/css/loader-fix.css">
-    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
-    <link rel="manifest" href="/manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors — Bimochan Acharya</title>
+    <meta name="description" content="Play Rock Paper Scissors — created by Bimochan Acharya. Track your score, streaks, and battle the computer with multiple difficulty modes.">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <meta name="description"
-        content="Play Rock Paper Scissors game created by Gaurab Lohani. Interactive web game with score tracking and smooth animations.">
-    <meta name="author" content="Bimochan Acharya">
-    <meta name="keywords"
-        content="Rock Paper Scissors, Game, JavaScript, Web Game, Bimochan Acharya, Interactive Game">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #060609; --border: rgba(255,255,255,0.06);
+            --accent: #4f7cff; --accent2: #b06cff; --accent3: #00f5c4;
+            --win: #00f5c4; --lose: #ff4560; --tie: #ffb400;
+            --text: #e8e8f0; --muted: #666680; --card: rgba(255,255,255,0.028);
+        }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text); font-family: 'Cabinet Grotesk', sans-serif; overflow-x: hidden; cursor: none; min-height: 100vh; }
+
+        /* ── CURSOR ── */
+        .cursor { width:10px; height:10px; background:var(--accent); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; mix-blend-mode:screen; transition:transform .15s, background .2s; }
+        .cursor-ring { width:32px; height:32px; border:1px solid rgba(79,124,255,.4); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; }
+        #sp { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); z-index:9999; width:0; }
+
+        body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:.35; }
+        .mesh { position:fixed; inset:0; z-index:0; pointer-events:none; background: radial-gradient(ellipse 60% 50% at 10% 20%, rgba(79,124,255,.09) 0%, transparent 65%), radial-gradient(ellipse 50% 60% at 90% 80%, rgba(176,108,255,.07) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,245,196,.03) 0%, transparent 65%); }
+        .grid-lines { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.02; background-image:linear-gradient(to right,white 1px,transparent 1px),linear-gradient(to bottom,white 1px,transparent 1px); background-size:80px 80px; }
+
+        /* ── NAV ── */
+        nav { position:fixed; top:0; left:0; right:0; z-index:500; padding:1.4rem 0; background:rgba(6,6,9,.75); backdrop-filter:blur(22px); border-bottom:1px solid var(--border); }
+        .nav-inner { max-width:1200px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:.75rem; text-decoration:none; }
+        .logo-badge { width:38px; height:38px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.85rem; color:white; box-shadow:0 0 20px rgba(79,124,255,.35); }
+        .logo-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; color:var(--text); }
+        .nav-links { display:flex; gap:.25rem; list-style:none; }
+        .nav-links a { text-decoration:none; color:var(--muted); font-size:.875rem; font-weight:500; padding:.4rem .9rem; border-radius:8px; transition:color .2s,background .2s; }
+        .nav-links a:hover { color:var(--text); background:rgba(255,255,255,.06); }
+
+        /* ── HERO ── */
+        .hero { position:relative; z-index:10; padding:130px 2rem 40px; max-width:900px; margin:0 auto; text-align:center; }
+        .hero-eyebrow { display:inline-flex; align-items:center; gap:.5rem; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent3); letter-spacing:.15em; text-transform:uppercase; margin-bottom:1.25rem; padding:.35rem 1rem; border:1px solid rgba(0,245,196,.2); border-radius:100px; background:rgba(0,245,196,.04); animation:fadeUp .6s ease both; }
+        .hero-eyebrow::before { content:'🎮'; }
+        .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(2.4rem,6vw,4.5rem); font-weight:800; line-height:.95; letter-spacing:-.03em; animation:fadeUp .6s .1s ease both; }
+        .hero h1 .grad { background:linear-gradient(135deg,var(--accent),var(--accent2) 50%,var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-sub { margin-top:1rem; color:var(--muted); font-size:.95rem; animation:fadeUp .6s .2s ease both; }
+
+        /* ── DIFFICULTY ── */
+        .diff-wrap { position:relative; z-index:10; max-width:900px; margin:0 auto; padding:0 2rem 2rem; display:flex; justify-content:center; gap:.6rem; animation:fadeUp .6s .3s ease both; flex-wrap:wrap; }
+        .diff-btn { font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; padding:.45rem 1.1rem; border-radius:100px; border:1px solid var(--border); background:rgba(255,255,255,.03); color:var(--muted); cursor:none; transition:all .2s; }
+        .diff-btn:hover { color:var(--text); border-color:rgba(255,255,255,.15); }
+        .diff-btn.active { background:rgba(79,124,255,.1); border-color:var(--accent); color:var(--accent); }
+        .diff-btn[data-diff="hard"].active { background:rgba(255,69,96,.1); border-color:#ff4560; color:#ff4560; }
+        .diff-btn[data-diff="impossible"].active { background:rgba(176,108,255,.1); border-color:var(--accent2); color:var(--accent2); }
+
+        /* ── MAIN GAME AREA ── */
+        .game-wrap { position:relative; z-index:10; max-width:900px; margin:0 auto; padding:0 2rem 3rem; }
+
+        /* SCOREBOARD */
+        .scoreboard { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:1rem; background:var(--card); border:1px solid var(--border); border-radius:22px; padding:1.75rem 2rem; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+        .scoreboard::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 80% at 50% 100%, rgba(79,124,255,.04) 0%, transparent 70%); pointer-events:none; }
+        .score-side { text-align:center; }
+        .score-label { font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.4rem; }
+        .score-num { font-family:'Syne',sans-serif; font-size:3.5rem; font-weight:800; line-height:1; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+        .score-num.bump { transform:scale(1.25); }
+        .score-you { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .score-cpu { background:linear-gradient(135deg,#ff4560,#ff8c00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .score-divider { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--muted); }
+
+        /* streak + win rate mini bar */
+        .score-sub { display:flex; flex-direction:column; align-items:center; gap:.2rem; margin-top:.4rem; }
+        .streak-badge { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; color:var(--accent3); background:rgba(0,245,196,.07); border:1px solid rgba(0,245,196,.15); padding:.15rem .55rem; border-radius:100px; display:none; }
+        .streak-badge.show { display:inline-block; }
+        .winrate-label { font-family:'DM Mono',monospace; font-size:.58rem; color:var(--muted); }
+
+        /* BATTLE ARENA */
+        .arena { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:2.5rem 2rem; margin-bottom:1.5rem; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:1.5rem; position:relative; overflow:hidden; min-height:200px; }
+        .arena::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 100% 60% at 50% 110%, rgba(79,124,255,.05) 0%, transparent 70%); pointer-events:none; }
+
+        .arena-side { display:flex; flex-direction:column; align-items:center; gap:.75rem; }
+        .arena-label { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+        .arena-emoji { font-size:5rem; line-height:1; transition:transform .35s cubic-bezier(.34,1.56,.64,1), filter .35s; filter:grayscale(1) opacity(.3); min-height:90px; display:flex; align-items:center; justify-content:center; }
+        .arena-emoji.chosen { filter:grayscale(0) opacity(1); }
+        .arena-emoji.winner { animation:winner-pop .5s cubic-bezier(.34,1.56,.64,1); filter:grayscale(0) opacity(1); }
+        .arena-emoji.loser { filter:grayscale(.8) opacity(.4); }
+        @keyframes winner-pop { 0%{transform:scale(1)} 40%{transform:scale(1.35)} 70%{transform:scale(.95)} 100%{transform:scale(1)} }
+
+        .vs-pill { display:flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,.04); border:1px solid var(--border); font-family:'Syne',sans-serif; font-weight:800; font-size:.95rem; color:var(--muted); flex-shrink:0; }
+
+        .result-banner { text-align:center; }
+        .result-text { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; letter-spacing:-.02em; transition:color .3s; }
+        .result-sub { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); margin-top:.3rem; letter-spacing:.08em; min-height:1.2em; }
+
+        /* CHOICES */
+        .choices { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-bottom:1.5rem; }
+        .choice-btn { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:1.75rem 1rem 1.4rem; display:flex; flex-direction:column; align-items:center; gap:.6rem; cursor:none; transition:border-color .25s, transform .2s, box-shadow .25s, background .25s; position:relative; overflow:hidden; }
+        .choice-btn::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 50%, rgba(79,124,255,.07) 0%, transparent 70%); opacity:0; transition:opacity .3s; }
+        .choice-btn:hover::before { opacity:1; }
+        .choice-btn:hover { border-color:rgba(79,124,255,.3); transform:translateY(-6px) scale(1.02); box-shadow:0 20px 50px rgba(0,0,0,.35), 0 0 30px rgba(79,124,255,.1); }
+        .choice-btn:active { transform:translateY(-2px) scale(.98); }
+        .choice-btn.selected { border-color:var(--accent); background:rgba(79,124,255,.06); box-shadow:0 0 30px rgba(79,124,255,.15); }
+        .choice-emoji { font-size:3.2rem; line-height:1; transition:transform .3s; }
+        .choice-btn:hover .choice-emoji { transform:scale(1.15) rotate(-5deg); }
+        .choice-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; }
+        .choice-desc { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:.06em; }
+        /* hotkey badge */
+        .choice-key { position:absolute; top:.7rem; right:.7rem; font-family:'DM Mono',monospace; font-size:.55rem; color:var(--muted); background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:5px; padding:.1rem .35rem; }
+
+        /* CONTROLS */
+        .controls { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.5rem; }
+        .ctrl-btn { display:flex; align-items:center; gap:.5rem; padding:.65rem 1.4rem; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--muted); font-family:'Cabinet Grotesk',sans-serif; font-size:.85rem; font-weight:600; cursor:none; transition:all .2s; }
+        .ctrl-btn:hover { border-color:rgba(79,124,255,.3); color:var(--text); background:rgba(79,124,255,.06); transform:translateY(-2px); }
+        .ctrl-btn.danger:hover { border-color:rgba(255,69,96,.3); color:#ff4560; background:rgba(255,69,96,.05); }
+        .ctrl-btn i { font-size:.9rem; }
+
+        /* STATS STRIP */
+        .stats-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:18px; overflow:hidden; margin-bottom:1.5rem; }
+        .stat-item { background:var(--card); padding:1.1rem; text-align:center; }
+        .stat-num { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; margin-bottom:.2rem; }
+        .stat-label { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+
+        /* HISTORY LOG */
+        .history-wrap { background:var(--card); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+        .history-header { padding:1rem 1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .history-title { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+        .history-clear { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); cursor:none; background:none; border:none; transition:color .2s; padding:0; }
+        .history-clear:hover { color:#ff4560; }
+        .history-list { max-height:220px; overflow-y:auto; }
+        .history-list::-webkit-scrollbar { width:3px; }
+        .history-list::-webkit-scrollbar-track { background:transparent; }
+        .history-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:100px; }
+        .history-empty { padding:2rem; text-align:center; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); }
+        .history-row { display:flex; align-items:center; gap:1rem; padding:.7rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.025); font-size:.82rem; animation:slideIn .25s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+        .h-round { font-family:'DM Mono',monospace; font-size:.6rem; color:var(--muted); min-width:28px; }
+        .h-emojis { font-size:1.1rem; letter-spacing:.2em; }
+        .h-result { font-family:'DM Mono',monospace; font-size:.65rem; font-weight:600; margin-left:auto; padding:.15rem .55rem; border-radius:6px; }
+        .h-win { color:var(--win); background:rgba(0,245,196,.08); }
+        .h-lose { color:var(--lose); background:rgba(255,69,96,.08); }
+        .h-tie { color:var(--tie); background:rgba(255,180,0,.08); }
+
+        /* CONFETTI particle */
+        .confetti-container { position:fixed; inset:0; pointer-events:none; z-index:9990; overflow:hidden; }
+        .confetti-piece { position:absolute; width:8px; height:8px; border-radius:2px; animation:confettiFall linear forwards; }
+        @keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+
+        /* SHAKE */
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+        .shake { animation:shake .4s ease; }
+
+        /* FOOTER */
+        footer { position:relative; z-index:10; border-top:1px solid var(--border); padding:2rem; display:flex; align-items:center; justify-content:space-between; max-width:1200px; margin:0 auto; }
+        footer p { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); }
+        .footer-links { display:flex; gap:1.5rem; }
+        .footer-links a { font-size:.8rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+        .footer-links a:hover { color:var(--text); }
+
+        /* KEYBOARD HINT */
+        .kb-hint { text-align:center; font-family:'DM Mono',monospace; font-size:.63rem; color:var(--muted); margin-bottom:1.5rem; letter-spacing:.05em; }
+        .kb { display:inline-block; padding:.1rem .4rem; border:1px solid var(--border); border-radius:5px; font-size:.6rem; margin:0 .1rem; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease,transform .6s ease; }
+        .reveal.visible { opacity:1; transform:translateY(0); }
+
+        @media(max-width:700px) {
+            .nav-links { display:none; }
+            .arena { grid-template-columns:1fr; text-align:center; }
+            .arena-emoji { font-size:3.5rem; min-height:60px; }
+            .vs-pill { display:none; }
+            .stats-strip { grid-template-columns:1fr 1fr; }
+            footer { flex-direction:column; gap:1rem; text-align:center; }
+        }
+    </style>
 </head>
-
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <div class="custom-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6"/>
-                                <stop offset="100%" style="stop-color:#1d4ed8"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
-                        <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                    </svg>
-                </div>
-                <span class="brand-text">Bimochan Acharya</span>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/project.html">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/education.html">Education</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="theme-toggle" id="themeToggle">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                </ul>
+<div class="confetti-container" id="confettiContainer"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div id="sp"></div>
+<div class="mesh"></div>
+<div class="grid-lines"></div>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a class="logo" href="/"><div class="logo-badge">BA</div><span class="logo-name">Bimochan Acharya</span></a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/project.html">Projects</a></li>
+            <li><a href="/education.html">Education</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-eyebrow">Mini Game</div>
+    <h1>Rock Paper <span class="grad">Scissors</span></h1>
+    <p class="hero-sub">Challenge the computer — track streaks, stats, and beat every difficulty.</p>
+</section>
+
+<!-- DIFFICULTY -->
+<div class="diff-wrap reveal">
+    <button class="diff-btn active" data-diff="easy">🟢 Easy</button>
+    <button class="diff-btn" data-diff="normal">🟡 Normal</button>
+    <button class="diff-btn" data-diff="hard">🔴 Hard</button>
+    <button class="diff-btn" data-diff="impossible">💀 Impossible</button>
+</div>
+
+<!-- GAME -->
+<div class="game-wrap">
+
+    <!-- SCOREBOARD -->
+    <div class="scoreboard reveal">
+        <div class="score-side">
+            <div class="score-label">You</div>
+            <div class="score-num score-you" id="scoreYou">0</div>
+            <div class="score-sub">
+                <div class="streak-badge" id="streakBadge">🔥 0 streak</div>
+                <div class="winrate-label" id="winRate">—</div>
             </div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-section game-hero" style="min-height: 60vh; display: flex; align-items: center;">
-        <div class="container">
-            <div class="text-center">
-                <h1 class="hero-name">Rock Paper <span class="text-gradient">Scissors</span></h1>
-                <p class="hero-description" style="max-width: 600px; margin: 1.5rem auto 0;">Challenge the computer and test your luck in this classic game!</p>
+        <div class="score-divider">VS</div>
+        <div class="score-side">
+            <div class="score-label">Computer</div>
+            <div class="score-num score-cpu" id="scoreCpu">0</div>
+            <div class="score-sub">
+                <div class="winrate-label" id="cpuRate">—</div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Game Section -->
-    <section class="section game-section" style="background: var(--bg-secondary);">
-        <div class="container">
-            <div class="game-container">
-                <div class="game-choices">
-                    <div class="choice-card" data-choice="rock">
-                        <div class="choice-icon">
-                            <i class="fas fa-hand-rock"></i>
-                        </div>
-                        <h3>Rock</h3>
-                        <p>Crushes Scissors</p>
-                    </div>
-                    <div class="choice-card" data-choice="paper">
-                        <div class="choice-icon">
-                            <i class="fas fa-hand-paper"></i>
-                        </div>
-                        <h3>Paper</h3>
-                        <p>Covers Rock</p>
-                    </div>
-                    <div class="choice-card" data-choice="scissors">
-                        <div class="choice-icon">
-                            <i class="fas fa-hand-scissors"></i>
-                        </div>
-                        <h3>Scissors</h3>
-                        <p>Cuts Paper</p>
-                    </div>
-                </div>
-
-                <div class="game-status">
-                    <div class="score-board">
-                        <div class="score-item">
-                            <h4>You</h4>
-                            <span class="score" id="playerScore">0</span>
-                        </div>
-                        <div class="vs-divider">VS</div>
-                        <div class="score-item">
-                            <h4>Computer</h4>
-                            <span class="score" id="computerScore">0</span>
-                        </div>
-                    </div>
-
-                    <div class="game-result">
-                        <div class="result-display">
-                            <div class="player-choice">
-                                <h5>Your Choice</h5>
-                                <div class="choice-display" id="playerChoice">
-                                    <i class="fas fa-question"></i>
-                                </div>
-                            </div>
-                            <div class="result-message">
-                                <h3 id="gameMessage">Make your choice!</h3>
-                            </div>
-                            <div class="computer-choice">
-                                <h5>Computer's Choice</h5>
-                                <div class="choice-display" id="computerChoice">
-                                    <i class="fas fa-question"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="game-controls">
-                        <button class="btn btn-secondary" id="resetGame">
-                            <i class="bi bi-arrow-clockwise"></i>
-                            Reset Game
-                        </button>
-                    </div>
-                </div>
+    <!-- ARENA -->
+    <div class="arena reveal rd1">
+        <div class="arena-side">
+            <div class="arena-label">Your pick</div>
+            <div class="arena-emoji" id="arenaYou">🤔</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;">
+            <div class="vs-pill">VS</div>
+            <div class="result-banner">
+                <div class="result-text" id="resultText">Choose!</div>
+                <div class="result-sub" id="resultSub">Press a button or use keyboard</div>
             </div>
         </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>© <span id="currentYear"></span> Bimochan Acharya. All rights reserved.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="/" class="footer-link anchor_all">Home</a>
-                    <a href="/project.html" class="footer-link anchor_all">Projects</a>
-                    <a href="/contact.html" class="footer-link anchor_all">Contact</a>
-                </div>
-            </div>
+        <div class="arena-side">
+            <div class="arena-label">Computer</div>
+            <div class="arena-emoji" id="arenaCpu">🤖</div>
         </div>
-    </footer>
+    </div>
 
-    <script>
-        // Update current year
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
-    <script src="/static/main.js"></script>
-    <script src="/static/game.js"></script>
+    <!-- CHOICES -->
+    <div class="choices reveal rd2">
+        <button class="choice-btn" data-choice="rock">
+            <span class="choice-key kb">R</span>
+            <div class="choice-emoji">🪨</div>
+            <div class="choice-name">Rock</div>
+            <div class="choice-desc">Crushes Scissors</div>
+        </button>
+        <button class="choice-btn" data-choice="paper">
+            <span class="choice-key kb">P</span>
+            <div class="choice-emoji">📄</div>
+            <div class="choice-name">Paper</div>
+            <div class="choice-desc">Covers Rock</div>
+        </button>
+        <button class="choice-btn" data-choice="scissors">
+            <span class="choice-key kb">S</span>
+            <div class="choice-emoji">✂️</div>
+            <div class="choice-name">Scissors</div>
+            <div class="choice-desc">Cuts Paper</div>
+        </button>
+    </div>
+
+    <!-- KEYBOARD HINT -->
+    <div class="kb-hint reveal rd3">
+        Press <span class="kb">R</span> Rock · <span class="kb">P</span> Paper · <span class="kb">S</span> Scissors · <span class="kb">Space</span> Random · <span class="kb">Esc</span> Reset
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls reveal rd3">
+        <button class="ctrl-btn" id="btnRandom"><i class="bi bi-shuffle"></i> Random Pick</button>
+        <button class="ctrl-btn danger" id="btnReset"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-strip reveal rd3">
+        <div class="stat-item">
+            <span class="stat-num" id="statRounds">0</span>
+            <span class="stat-label">Rounds</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" id="statWins">0</span>
+            <span class="stat-label">Wins</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" id="statBestStreak">0</span>
+            <span class="stat-label">Best Streak</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num" id="statTies">0</span>
+            <span class="stat-label">Ties</span>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="history-wrap reveal rd4">
+        <div class="history-header">
+            <div class="history-title">Round History</div>
+            <button class="history-clear" id="historyClear">Clear</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <div class="history-empty" id="historyEmpty">No rounds played yet — make a move!</div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>&copy; <span id="yr"></span> Bimochan Acharya — All rights reserved.</p>
+    <div class="footer-links">
+        <a href="/">Home</a><a href="/project.html">Projects</a><a href="/contact.html">Contact</a>
+    </div>
+</footer>
+
+<script>
+/* ── CURSOR ── */
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cur.style.transform=`translate(${mx-5}px,${my-5}px)`; });
+(function ar(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.transform=`translate(${rx-16}px,${ry-16}px)`; requestAnimationFrame(ar); })();
+
+/* ── SCROLL ── */
+const sp=document.getElementById('sp');
+window.addEventListener('scroll',()=>{ sp.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%'; });
+
+/* ── REVEAL ── */
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ── GAME STATE ── */
+const CHOICES=['rock','paper','scissors'];
+const EMOJI={rock:'🪨',paper:'📄',scissors:'✂️'};
+const BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
+const BEATS_MSG={rock:'Rock crushes Scissors',paper:'Paper covers Rock',scissors:'Scissors cuts Paper'};
+
+let state={
+    you:0, cpu:0, rounds:0, wins:0, losses:0, ties:0,
+    streak:0, bestStreak:0, history:[], difficulty:'easy', thinking:false
+};
+
+/* ── DIFFICULTY AI ── */
+function cpuPick(playerLast){
+    const r=Math.random();
+    const d=state.difficulty;
+    if(d==='easy'){
+        // Plays randomly but slightly disadvantaged
+        return CHOICES[Math.floor(Math.random()*3)];
+    } else if(d==='normal'){
+        return CHOICES[Math.floor(Math.random()*3)];
+    } else if(d==='hard'){
+        // 60% chance to counter player's last move
+        if(playerLast && r<0.6){
+            return Object.keys(BEATS).find(k=>BEATS[k]===playerLast);
+        }
+        return CHOICES[Math.floor(Math.random()*3)];
+    } else { // impossible
+        // 80% chance to counter
+        if(playerLast && r<0.8){
+            return Object.keys(BEATS).find(k=>BEATS[k]===playerLast);
+        }
+        return CHOICES[Math.floor(Math.random()*3)];
+    }
+}
+
+/* ── PLAY ROUND ── */
+let lastPlayerPick=null;
+function play(playerChoice){
+    if(state.thinking) return;
+    state.thinking=true;
+
+    // Highlight chosen button
+    document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+    document.querySelector(`[data-choice="${playerChoice}"]`).classList.add('selected');
+
+    // Thinking state
+    const arenaYou=document.getElementById('arenaYou');
+    const arenaCpu=document.getElementById('arenaCpu');
+    const resultText=document.getElementById('resultText');
+    const resultSub=document.getElementById('resultSub');
+
+    arenaYou.textContent=EMOJI[playerChoice];
+    arenaYou.className='arena-emoji chosen';
+    arenaCpu.textContent='🤔';
+    arenaCpu.className='arena-emoji';
+    resultText.textContent='...';
+    resultText.style.color='var(--muted)';
+    resultSub.textContent='Computer is thinking';
+
+    setTimeout(()=>{
+        const cpuChoice=cpuPick(lastPlayerPick);
+        lastPlayerPick=playerChoice;
+        arenaCpu.textContent=EMOJI[cpuChoice];
+        arenaCpu.className='arena-emoji chosen';
+
+        // Determine result
+        let outcome, msg, sub, color;
+        if(playerChoice===cpuChoice){
+            outcome='tie';
+            msg="It's a Tie!";
+            sub="Same minds think alike";
+            color='var(--tie)';
+        } else if(BEATS[playerChoice]===cpuChoice){
+            outcome='win';
+            msg='You Win! 🎉';
+            sub=BEATS_MSG[playerChoice];
+            color='var(--win)';
+        } else {
+            outcome='lose';
+            msg='You Lose!';
+            sub=BEATS_MSG[cpuChoice];
+            color='var(--lose)';
+        }
+
+        resultText.textContent=msg;
+        resultText.style.color=color;
+        resultSub.textContent=sub;
+
+        // Animate arena
+        if(outcome==='win'){
+            arenaYou.classList.add('winner');
+            arenaCpu.classList.add('loser');
+            state.you++; state.wins++; state.streak++;
+            if(state.streak>state.bestStreak) state.bestStreak=state.streak;
+            if(state.streak>=3) spawnConfetti();
+            animateBump('scoreYou');
+        } else if(outcome==='lose'){
+            arenaCpu.classList.add('winner');
+            arenaYou.classList.add('loser');
+            document.querySelector(`[data-choice="${playerChoice}"]`).classList.add('shake');
+            setTimeout(()=>document.querySelector(`[data-choice="${playerChoice}"]`).classList.remove('shake'),400);
+            state.cpu++; state.losses++; state.streak=0;
+            animateBump('scoreCpu');
+        } else {
+            state.ties++; state.streak=0;
+        }
+
+        state.rounds++;
+        updateUI(playerChoice, cpuChoice, outcome);
+        addHistory(playerChoice, cpuChoice, outcome);
+        state.thinking=false;
+    }, 600);
+}
+
+function animateBump(id){
+    const el=document.getElementById(id);
+    el.classList.add('bump');
+    setTimeout(()=>el.classList.remove('bump'),350);
+}
+
+function updateUI(pChoice, cChoice, outcome){
+    document.getElementById('scoreYou').textContent=state.you;
+    document.getElementById('scoreCpu').textContent=state.cpu;
+    document.getElementById('statRounds').textContent=state.rounds;
+    document.getElementById('statWins').textContent=state.wins;
+    document.getElementById('statBestStreak').textContent=state.bestStreak;
+    document.getElementById('statTies').textContent=state.ties;
+
+    const wRate=state.rounds>0?Math.round((state.wins/state.rounds)*100):0;
+    const cRate=state.rounds>0?Math.round((state.losses/state.rounds)*100):0;
+    document.getElementById('winRate').textContent=`${wRate}% win rate`;
+    document.getElementById('cpuRate').textContent=`${cRate}% win rate`;
+
+    const sb=document.getElementById('streakBadge');
+    if(state.streak>=2){ sb.textContent=`🔥 ${state.streak} streak`; sb.classList.add('show'); }
+    else { sb.classList.remove('show'); }
+}
+
+function addHistory(pChoice, cChoice, outcome){
+    const list=document.getElementById('historyList');
+    document.getElementById('historyEmpty').style.display='none';
+    state.rounds;
+    const row=document.createElement('div');
+    row.className='history-row';
+    const rClass=outcome==='win'?'h-win':outcome==='lose'?'h-lose':'h-tie';
+    const rLabel=outcome==='win'?'WIN':outcome==='lose'?'LOSE':'TIE';
+    row.innerHTML=`<span class="h-round">#${state.rounds}</span><span class="h-emojis">${EMOJI[pChoice]} vs ${EMOJI[cChoice]}</span><span class="h-result ${rClass}">${rLabel}</span>`;
+    list.insertBefore(row, list.firstChild);
+}
+
+/* ── CONFETTI ── */
+function spawnConfetti(){
+    const colors=['#4f7cff','#b06cff','#00f5c4','#ffb400','#ff4560'];
+    const container=document.getElementById('confettiContainer');
+    for(let i=0;i<35;i++){
+        const p=document.createElement('div');
+        p.className='confetti-piece';
+        p.style.cssText=`left:${Math.random()*100}%;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.2+Math.random()*.8}s;animation-delay:${Math.random()*.4}s;transform:rotate(${Math.random()*360}deg);`;
+        container.appendChild(p);
+        setTimeout(()=>p.remove(),2200);
+    }
+}
+
+/* ── RESET ── */
+function resetGame(){
+    state={...state, you:0,cpu:0,rounds:0,wins:0,losses:0,ties:0,streak:0,bestStreak:0,history:[]};
+    lastPlayerPick=null;
+    document.getElementById('scoreYou').textContent='0';
+    document.getElementById('scoreCpu').textContent='0';
+    document.getElementById('statRounds').textContent='0';
+    document.getElementById('statWins').textContent='0';
+    document.getElementById('statBestStreak').textContent='0';
+    document.getElementById('statTies').textContent='0';
+    document.getElementById('arenaYou').textContent='🤔';
+    document.getElementById('arenaYou').className='arena-emoji';
+    document.getElementById('arenaCpu').textContent='🤖';
+    document.getElementById('arenaCpu').className='arena-emoji';
+    document.getElementById('resultText').textContent='Choose!';
+    document.getElementById('resultText').style.color='var(--text)';
+    document.getElementById('resultSub').textContent='Press a button or use keyboard';
+    document.getElementById('winRate').textContent='—';
+    document.getElementById('cpuRate').textContent='—';
+    document.getElementById('streakBadge').classList.remove('show');
+    document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('historyList').innerHTML='<div class="history-empty" id="historyEmpty">No rounds played yet — make a move!</div>';
+}
+
+/* ── EVENT LISTENERS ── */
+document.querySelectorAll('.choice-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>play(btn.dataset.choice));
+});
+
+document.getElementById('btnRandom').addEventListener('click',()=>{
+    play(CHOICES[Math.floor(Math.random()*3)]);
+});
+
+document.getElementById('btnReset').addEventListener('click',resetGame);
+
+document.getElementById('historyClear').addEventListener('click',()=>{
+    document.getElementById('historyList').innerHTML='<div class="history-empty" id="historyEmpty">No rounds played yet — make a move!</div>';
+});
+
+/* Difficulty buttons */
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.difficulty=btn.dataset.diff;
+    });
+});
+
+/* Keyboard */
+document.addEventListener('keydown',e=>{
+    if(e.key.toLowerCase()==='r') play('rock');
+    else if(e.key.toLowerCase()==='p') play('paper');
+    else if(e.key.toLowerCase()==='s') play('scissors');
+    else if(e.key===' '){ e.preventDefault(); play(CHOICES[Math.floor(Math.random()*3)]); }
+    else if(e.key==='Escape') resetGame();
+});
+
+document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
 </body>
-
 </html>
