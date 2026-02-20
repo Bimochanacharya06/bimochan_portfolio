@@ -1,688 +1,685 @@
-
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head><script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bimochan Acharya- Full Stack Developer | Portfolio</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/responsive.css">
-    <link rel="stylesheet" href="/static/css/loader-fix.css">
-    <link rel="shortcut icon" href="static\img\favicon.png" type="image/x-icon">
-    <link rel="manifest" href="/manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <meta name="description"
-        content="Bimochan Acharya - Experienced Full Stack Developer specializing in Python, Django, Flask, and modern web technologies. View my portfolio and projects.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bimochan Acharya — Full Stack Developer</title>
+    <meta name="description" content="Bimochan Acharya - Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
     <meta name="author" content="Bimochan Acharya">
-    <meta name="keywords"
-        content="Bimochan Acharya, Full Stack Developer, Python Developer, Django, Flask, Web Development, Portfolio">
-    <meta property="og:title" content="Bimochan Acharya - Full Stack Developer | Portfolio">
-    <meta property="og:description" content="Experienced Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
+    <meta property="og:title" content="Bimochan Acharya — Full Stack Developer">
+    <meta property="og:description" content="Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="/static/img/photo.jpeg">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Bimochan Acharya - Full Stack Developer">
-    <meta name="twitter:description" content="Experienced Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
-    <meta name="twitter:image" content="\static\img\photo.jpeg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Bimochan Acharya",
-        "jobTitle": "Full Stack Developer",
-        "description": "Experienced Full Stack Developer specializing in Python, Django, Flask, and modern web technologies",
-        "image": "/static/img/photo.jpeg",
-        "email": "bimochan081b@asm.edu.np",
-        "telephone": "+977 9868667953",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Indrawati",
-            "addressRegion": "Sindupalchok",
-            "addressCountry": "Nepal"
-        },
-        "sameAs": [
-            "https://github.com/Bimochanacharya06",
-            "https://www.linkedin.com/in/bimochan-acharya-75a085370/",
-            "https://www.facebook.com/bimochan.acharya.7",
-            "https://www.instagram.com/bimochan_acharya/"
-        ],
-        "knowsAbout": [
-            "Python",
-            "Django",
-            "Flask",
-            "JavaScript",
-            "HTML5",
-            "CSS3",
-            "Web Development",
-            "Full Stack Development"
-        ]
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --bg: #05050a;
+        --surface: #0c0c15;
+        --border: rgba(255,255,255,0.06);
+        --accent: #4f7cff;
+        --accent2: #a855f7;
+        --accent3: #06d6a0;
+        --text: #e2e2f0;
+        --muted: #5a5a78;
+        --card: rgba(255,255,255,0.025);
     }
-    </script>
-    
-    <!-- Security Meta Tags -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    html { scroll-behavior: smooth; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Outfit', sans-serif;
+        overflow-x: hidden;
+        cursor: none;
+    }
+
+    /* ── CURSOR ── */
+    .cursor { width:10px; height:10px; background:var(--accent); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9999; mix-blend-mode:screen; }
+    .cursor-ring { width:32px; height:32px; border:1px solid rgba(79,124,255,0.4); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:9998; transition:width .3s,height .3s,border-color .3s; }
+
+    /* ── SCROLL PROGRESS ── */
+    #sp { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); z-index:9999; width:0; }
+
+    /* ── NOISE + MESH ── */
+    body::after {
+        content:''; position:fixed; inset:0; pointer-events:none; z-index:900; opacity:.3;
+        background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+    }
+    .mesh {
+        position:fixed; inset:0; z-index:0; pointer-events:none;
+        background:
+            radial-gradient(ellipse 70% 50% at 5% 15%, rgba(79,124,255,0.09) 0%, transparent 65%),
+            radial-gradient(ellipse 50% 60% at 95% 85%, rgba(168,85,247,0.07) 0%, transparent 65%),
+            radial-gradient(ellipse 40% 30% at 50% 50%, rgba(6,214,160,0.03) 0%, transparent 65%);
+    }
+    .grid-lines {
+        position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025;
+        background-image:linear-gradient(to right,white 1px,transparent 1px),linear-gradient(to bottom,white 1px,transparent 1px);
+        background-size:80px 80px;
+    }
+
+    /* ── NAV ── */
+    nav {
+        position:fixed; top:0; left:0; right:0; z-index:500;
+        padding:1.3rem 0;
+        background:rgba(5,5,10,0.75);
+        backdrop-filter:blur(24px);
+        border-bottom:1px solid var(--border);
+    }
+    .nav-inner { max-width:1200px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; }
+    .logo { display:flex; align-items:center; gap:.75rem; text-decoration:none; }
+    .logo-badge {
+        width:38px; height:38px;
+        background:linear-gradient(135deg,var(--accent),var(--accent2));
+        border-radius:10px; display:flex; align-items:center; justify-content:center;
+        font-family:'Syne',sans-serif; font-weight:800; font-size:.8rem; color:white;
+        box-shadow:0 0 22px rgba(79,124,255,.35);
+    }
+    .logo-text { font-family:'Syne',sans-serif; font-weight:700; font-size:.95rem; color:var(--text); }
+    .nav-links { display:flex; gap:.2rem; list-style:none; }
+    .nav-links a { text-decoration:none; color:var(--muted); font-size:.85rem; font-weight:500; padding:.4rem .9rem; border-radius:8px; transition:color .2s,background .2s; letter-spacing:.01em; }
+    .nav-links a:hover, .nav-links a.active { color:var(--text); background:rgba(255,255,255,.05); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-cta {
+        padding:.45rem 1.1rem; background:linear-gradient(135deg,var(--accent),var(--accent2));
+        border:none; border-radius:10px; color:white; font-size:.82rem; font-weight:600;
+        cursor:none; text-decoration:none;
+        box-shadow:0 4px 16px rgba(79,124,255,.25);
+        transition:transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(79,124,255,.35); color:white; }
+
+    /* ── HERO ── */
+    .hero {
+        position:relative; z-index:10;
+        min-height:100vh;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        align-items:center;
+        max-width:1200px; margin:0 auto;
+        padding:120px 2rem 80px;
+        gap:4rem;
+    }
+    .hero-left { }
+    .hero-eyebrow {
+        display:inline-flex; align-items:center; gap:.5rem;
+        font-family:'DM Mono',monospace; font-size:.72rem; letter-spacing:.15em; text-transform:uppercase;
+        color:var(--accent3); padding:.35rem 1rem;
+        border:1px solid rgba(6,214,160,.2); border-radius:100px;
+        background:rgba(6,214,160,.04);
+        margin-bottom:1.5rem;
+        animation:fadeUp .7s ease both;
+    }
+    .hero-eyebrow::before { content:''; width:5px; height:5px; background:var(--accent3); border-radius:50%; animation:blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .hero-name {
+        font-family:'Syne',sans-serif;
+        font-size:clamp(2.8rem,6vw,5rem);
+        font-weight:800;
+        line-height:1;
+        letter-spacing:-.03em;
+        margin-bottom:.75rem;
+        animation:fadeUp .7s .08s ease both;
+    }
+    .hero-name .grad {
+        background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 55%,var(--accent3) 100%);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+
+    .hero-role {
+        font-family:'DM Mono',monospace;
+        font-size:1rem; color:var(--muted);
+        margin-bottom:1.5rem;
+        animation:fadeUp .7s .15s ease both;
+        display:flex; align-items:center; gap:.75rem;
+    }
+    .hero-role::before { content:''; flex:0 0 32px; height:1px; background:var(--muted); }
+
+    .hero-desc {
+        color:var(--muted); font-size:1.05rem; line-height:1.75;
+        max-width:480px; margin-bottom:2.5rem;
+        animation:fadeUp .7s .22s ease both;
+    }
+    .hero-desc strong { color:var(--text); font-weight:500; }
+
+    .hero-btns {
+        display:flex; gap:1rem; flex-wrap:wrap;
+        animation:fadeUp .7s .3s ease both;
+    }
+    .btn-main {
+        display:inline-flex; align-items:center; gap:.5rem;
+        padding:.85rem 1.8rem;
+        background:linear-gradient(135deg,var(--accent),var(--accent2));
+        color:white; text-decoration:none; border-radius:12px;
+        font-weight:600; font-size:.9rem;
+        box-shadow:0 8px 28px rgba(79,124,255,.3);
+        transition:transform .2s, box-shadow .2s; cursor:none;
+    }
+    .btn-main:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(79,124,255,.4); color:white; }
+    .btn-ghost {
+        display:inline-flex; align-items:center; gap:.5rem;
+        padding:.85rem 1.8rem;
+        background:transparent; border:1px solid var(--border);
+        color:var(--text); text-decoration:none; border-radius:12px;
+        font-weight:600; font-size:.9rem;
+        transition:border-color .2s, background .2s; cursor:none;
+    }
+    .btn-ghost:hover { border-color:rgba(79,124,255,.4); background:rgba(79,124,255,.05); color:var(--text); }
+
+    .socials {
+        display:flex; gap:.75rem; margin-top:2rem;
+        animation:fadeUp .7s .38s ease both;
+    }
+    .social-link {
+        width:38px; height:38px; border-radius:10px;
+        border:1px solid var(--border);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--muted); text-decoration:none; font-size:1rem;
+        transition:color .2s, border-color .2s, background .2s; cursor:none;
+    }
+    .social-link:hover { color:var(--accent); border-color:rgba(79,124,255,.3); background:rgba(79,124,255,.06); }
+
+    /* ── HERO RIGHT — Photo + Floating Cards ── */
+    .hero-right {
+        position:relative;
+        display:flex; align-items:center; justify-content:center;
+        animation:fadeUp .7s .15s ease both;
+    }
+    .photo-wrap {
+        position:relative; width:320px; height:320px;
+    }
+    .photo-ring {
+        position:absolute; inset:-16px;
+        border-radius:50%;
+        background:conic-gradient(var(--accent),var(--accent2),var(--accent3),var(--accent));
+        animation:spin 8s linear infinite;
+        filter:blur(1px);
+        opacity:.6;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .photo-ring-mask {
+        position:absolute; inset:0;
+        border-radius:50%;
+        background:var(--bg);
+        margin:3px;
+    }
+    .photo-img {
+        position:absolute; inset:0;
+        width:100%; height:100%;
+        border-radius:50%;
+        object-fit:cover;
+        z-index:2;
+        border:3px solid rgba(79,124,255,.2);
+    }
+    .photo-glow {
+        position:absolute; inset:-40px;
+        border-radius:50%;
+        background:radial-gradient(circle,rgba(79,124,255,.12) 0%,transparent 70%);
+        z-index:0;
+    }
+    /* Placeholder when no image */
+    .photo-placeholder {
+        position:absolute; inset:0;
+        border-radius:50%;
+        background:linear-gradient(135deg,var(--surface),#1a1a2e);
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Syne',sans-serif; font-size:3rem; font-weight:800;
+        background:linear-gradient(135deg,var(--accent),var(--accent2));
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        z-index:2;
+        border:3px solid rgba(79,124,255,.15);
+    }
+
+    /* Floating cards */
+    .float-card {
+        position:absolute;
+        background:rgba(255,255,255,.04);
+        border:1px solid var(--border);
+        border-radius:14px;
+        padding:.65rem 1rem;
+        display:flex; align-items:center; gap:.6rem;
+        backdrop-filter:blur(12px);
+        font-size:.8rem; font-weight:600;
+        white-space:nowrap;
+        z-index:5;
+    }
+    .float-card i { font-size:1rem; }
+    .fc-1 { top:10%; left:-30%; animation:float1 4s ease-in-out infinite; }
+    .fc-2 { bottom:15%; left:-25%; animation:float2 4.5s ease-in-out infinite; }
+    .fc-3 { top:20%; right:-28%; animation:float3 5s ease-in-out infinite; }
+    .fc-1 i { color:var(--accent); }
+    .fc-2 i { color:var(--accent2); }
+    .fc-3 i { color:var(--accent3); }
+    @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+    @keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+        position:relative; z-index:10;
+        max-width:1200px; margin:0 auto;
+        padding:0 2rem 6rem;
+    }
+    .stats-inner {
+        display:grid; grid-template-columns:repeat(3,1fr);
+        border:1px solid var(--border);
+        border-radius:20px;
+        background:var(--card);
+        overflow:hidden;
+    }
+    .stat-item {
+        padding:2rem;
+        text-align:center;
+        position:relative;
+    }
+    .stat-item:not(:last-child)::after {
+        content:''; position:absolute; right:0; top:20%; bottom:20%;
+        width:1px; background:var(--border);
+    }
+    .stat-num {
+        font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800;
+        background:linear-gradient(135deg,var(--accent),var(--accent2));
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        display:block; margin-bottom:.3rem;
+    }
+    .stat-label { font-size:.82rem; color:var(--muted); font-weight:500; }
+
+    /* ── ABOUT ── */
+    .section { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 7rem; }
+    .section-label {
+        font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase;
+        color:var(--accent); margin-bottom:1rem; display:flex; align-items:center; gap:.75rem;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .section-title {
+        font-family:'Syne',sans-serif; font-size:clamp(2rem,4vw,3rem);
+        font-weight:800; letter-spacing:-.03em; margin-bottom:1.5rem;
+    }
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+    .about-text p { color:var(--muted); line-height:1.8; margin-bottom:1.2rem; font-size:.98rem; }
+    .about-text p strong { color:var(--text); font-weight:500; }
+    .contact-cards { display:flex; flex-direction:column; gap:1rem; }
+    .contact-card {
+        display:flex; align-items:center; gap:1rem;
+        padding:1.2rem 1.5rem;
+        background:var(--card); border:1px solid var(--border); border-radius:16px;
+        transition:border-color .2s, background .2s;
+    }
+    .contact-card:hover { border-color:rgba(79,124,255,.2); background:rgba(79,124,255,.03); }
+    .cc-icon {
+        width:42px; height:42px; border-radius:12px;
+        background:rgba(79,124,255,.08); border:1px solid rgba(79,124,255,.15);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--accent); font-size:1.1rem; flex-shrink:0;
+    }
+    .cc-label { font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.2rem; }
+    .cc-value { font-size:.9rem; font-weight:500; color:var(--text); }
+    .cc-value a { color:inherit; text-decoration:none; }
+    .cc-value a:hover { color:var(--accent); }
+
+    /* ── SKILLS ── */
+    .skills-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+    .skill-cat {
+        background:var(--card); border:1px solid var(--border); border-radius:20px;
+        padding:1.75rem;
+        transition:border-color .3s;
+    }
+    .skill-cat:hover { border-color:rgba(79,124,255,.2); }
+    .skill-cat-title {
+        font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700;
+        letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+        margin-bottom:1.25rem;
+        display:flex; align-items:center; gap:.6rem;
+    }
+    .skill-cat-title::before { content:''; width:8px; height:8px; border-radius:2px; background:var(--accent); }
+    .skills-row { display:flex; flex-wrap:wrap; gap:.6rem; }
+    .skill-pill {
+        display:flex; align-items:center; gap:.5rem;
+        padding:.4rem .9rem;
+        background:rgba(255,255,255,.03);
+        border:1px solid var(--border);
+        border-radius:100px; font-size:.8rem; font-weight:500;
+        color:var(--text);
+        transition:background .2s, border-color .2s, color .2s;
+    }
+    .skill-pill:hover { background:rgba(79,124,255,.08); border-color:rgba(79,124,255,.2); color:var(--accent); }
+    .skill-pill img { width:16px; height:16px; object-fit:contain; border-radius:2px; }
+    .skill-pill i { font-size:.9rem; color:var(--accent); }
+
+    /* ── FEATURED PROJECT ── */
+    .project-feature {
+        background:var(--card); border:1px solid var(--border); border-radius:24px;
+        overflow:hidden;
+        display:grid; grid-template-columns:1fr 1fr;
+        transition:border-color .3s, box-shadow .3s;
+    }
+    .project-feature:hover { border-color:rgba(79,124,255,.2); box-shadow:0 20px 60px rgba(0,0,0,.35); }
+    .pf-visual {
+        background:linear-gradient(135deg,#0a0d1f,#1a1040);
+        display:flex; align-items:center; justify-content:center;
+        min-height:260px; position:relative; overflow:hidden;
+    }
+    .pf-visual i { font-size:5rem; color:var(--accent); opacity:.2; position:relative; z-index:2; transition:opacity .3s; }
+    .project-feature:hover .pf-visual i { opacity:.35; }
+    .pf-glow { position:absolute; width:180px; height:180px; background:var(--accent); border-radius:50%; filter:blur(70px); opacity:.1; }
+    .pf-body { padding:2.5rem; }
+    .pf-tag {
+        font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.1em; text-transform:uppercase;
+        color:var(--accent3); background:rgba(6,214,160,.08); border:1px solid rgba(6,214,160,.15);
+        padding:.25rem .7rem; border-radius:100px; display:inline-block; margin-bottom:1rem;
+    }
+    .pf-title { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; margin-bottom:.75rem; letter-spacing:-.02em; }
+    .pf-desc { color:var(--muted); font-size:.9rem; line-height:1.7; margin-bottom:1.5rem; }
+    .pf-tech { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .pf-tech span {
+        font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.06em;
+        padding:.2rem .6rem; border-radius:6px;
+        background:rgba(255,255,255,.04); border:1px solid var(--border); color:var(--muted);
+    }
+    .pf-link {
+        display:inline-flex; align-items:center; gap:.4rem;
+        color:var(--accent); text-decoration:none; font-size:.85rem; font-weight:600;
+        transition:gap .2s;
+    }
+    .pf-link:hover { gap:.7rem; color:var(--accent); }
+    .view-all-wrap { text-align:center; margin-top:2rem; }
+    .view-all {
+        display:inline-flex; align-items:center; gap:.5rem;
+        padding:.75rem 1.75rem;
+        border:1px solid var(--border); border-radius:12px;
+        color:var(--text); text-decoration:none; font-weight:600; font-size:.88rem;
+        transition:border-color .2s, background .2s; cursor:none;
+    }
+    .view-all:hover { border-color:rgba(79,124,255,.3); background:rgba(79,124,255,.05); color:var(--text); }
+
+    /* ── CTA ── */
+    .cta-wrap { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:0 2rem 8rem; }
+    .cta-card {
+        border:1px solid var(--border); border-radius:28px; padding:5rem 3rem;
+        text-align:center; position:relative; overflow:hidden;
+        background:var(--card);
+    }
+    .cta-card::before {
+        content:''; position:absolute; inset:0;
+        background:radial-gradient(ellipse 80% 80% at 50% 110%, rgba(79,124,255,.07) 0%, transparent 70%);
+    }
+    .cta-tag { font-family:'DM Mono',monospace; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--accent3); margin-bottom:1rem; }
+    .cta-card h2 { font-family:'Syne',sans-serif; font-size:clamp(2rem,4vw,3rem); font-weight:800; letter-spacing:-.03em; margin-bottom:1rem; position:relative; }
+    .cta-card p { color:var(--muted); margin-bottom:2rem; max-width:450px; margin-left:auto; margin-right:auto; position:relative; }
+    .cta-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; position:relative; }
+
+    /* ── FOOTER ── */
+    footer {
+        position:relative; z-index:10;
+        border-top:1px solid var(--border);
+        max-width:1200px; margin:0 auto;
+        padding:2rem;
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    footer p { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--muted); }
+    .footer-links { display:flex; gap:1.5rem; }
+    .footer-links a { font-size:.8rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+    .footer-links a:hover { color:var(--text); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(30px); transition:opacity .7s ease,transform .7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .rd1{transition-delay:.1s} .rd2{transition-delay:.2s} .rd3{transition-delay:.3s}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px) {
+        .hero { grid-template-columns:1fr; text-align:center; padding-top:120px; gap:3rem; }
+        .hero-role { justify-content:center; }
+        .hero-btns { justify-content:center; }
+        .socials { justify-content:center; }
+        .hero-right { order:-1; }
+        .photo-wrap { width:240px; height:240px; }
+        .fc-1,.fc-2,.fc-3 { display:none; }
+        .about-grid, .project-feature { grid-template-columns:1fr; }
+        .skills-grid { grid-template-columns:1fr; }
+        footer { flex-direction:column; gap:1rem; text-align:center; }
+        .stats-inner { grid-template-columns:1fr; }
+        .stat-item::after { display:none; }
+    }
+    @media(max-width:600px) {
+        .nav-links { display:none; }
+        .cta-card { padding:3rem 1.5rem; }
+        .section,  .stats-bar, .cta-wrap { padding-left:1.25rem; padding-right:1.25rem; }
+    }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingOverlay" class="loading-overlay" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; height: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 9999999 !important; background-color: rgba(10, 10, 10, 0.8) !important; overflow: hidden !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-        <div class="loading-content">
-            <div class="loading-logo">
-                <svg width="50" height="50" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                    <img src="favicon.png" alt="Bimochan Acharya Logo" width="300">
-                    <defs>
-                        <linearGradient id="loadingLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3b82f6"/>
-                            <stop offset="100%" style="stop-color:#1d4ed8"/>
-                        </linearGradient>
-                    </defs>
-                    <circle cx="20" cy="20" r="20" fill="url(#loadingLogoGradient)"/>
-                    <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                </svg>
-            </div>
-            <div class="loading-text">
-                <h3>Loading Portfolio</h3>
-                <p>Please wait while we prepare your experience</p>
-            </div>
-            <div class="loading-progress">
-                <div class="loading-progress-bar"></div>
-            </div>
-            <div class="loading-dots">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-            </div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div id="sp"></div>
+<div class="mesh"></div>
+<div class="grid-lines"></div>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a class="logo" href="/">
+            <div class="logo-badge">BA</div>
+            <span class="logo-text">Bimochan Acharya</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="/project.html">Projects</a></li>
+            <li><a href="/education.html">Education</a></li>
+        </ul>
+        <a href="/contact.html" class="nav-cta">Contact →</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="hero">
+    <div class="hero-left">
+        <div class="hero-eyebrow">Available for work</div>
+        <h1 class="hero-name">
+            Hi, I'm<br>
+            <span class="grad">Bimochan<br>Acharya</span>
+        </h1>
+        <div class="hero-role">Full Stack Developer</div>
+        <p class="hero-desc">
+            I build <strong>fast, beautiful web applications</strong> using Python, Django, Flask, and modern JavaScript. From backend APIs to polished frontend interfaces.
+        </p>
+        <div class="hero-btns">
+            <a href="/project.html" class="btn-main"><i class="bi bi-grid"></i> View Projects</a>
+            <a href="/contact.html" class="btn-ghost"><i class="bi bi-envelope"></i> Get in Touch</a>
+        </div>
+        <div class="socials">
+            <a href="https://github.com/Bimochanacharya06" target="_blank" class="social-link" title="GitHub"><i class="bi bi-github"></i></a>
+            <a href="https://www.linkedin.com/in/bimochan-acharya-75a085370/" target="_blank" class="social-link" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="https://www.facebook.com/bimochan.acharya.7" target="_blank" class="social-link" title="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="https://www.instagram.com/bimochan_acharya/" target="_blank" class="social-link" title="Instagram"><i class="bi bi-instagram"></i></a>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <div class="custom-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6"/>
-                                <stop offset="100%" style="stop-color:#1d4ed8"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="20" cy="20" r="20" fill="url(#logoGradient)"/>
-                        <text x="20" y="28" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="700" font-size="14">BA</text>
-                    </svg>
-                </div>
-                <span class="brand-text">Bimochan Acharya</span>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#skills">Skills</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/project.html">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/education.html">Education</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact.html">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="theme-toggle" id="themeToggle">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
+    <div class="hero-right">
+        <div class="photo-wrap">
+            <div class="photo-glow"></div>
+            <div class="photo-ring"></div>
+            <div class="photo-ring-mask"></div>
+            <img src="/static/img/photo.jpeg" alt="Bimochan Acharya" class="photo-img" onerror="this.style.display='none';document.querySelector('.photo-placeholder').style.display='flex'">
+            <div class="photo-placeholder" style="display:none">BA</div>
         </div>
-    </nav>
+        <div class="float-card fc-1"><i class="bi bi-code-slash"></i> Full Stack</div>
+        <div class="float-card fc-2"><i class="bi bi-server"></i> Backend</div>
+        <div class="float-card fc-3"><i class="bi bi-palette2"></i> Frontend</div>
+    </div>
+</section>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="container">
-            <div class="row align-items-center min-vh-100">
-                <div class="col-lg-6 order-2 order-lg-1">
-                    <div class="hero-content" data-aos="fade-up" data-aos-delay="200">
-                        <div class="hero-greeting">
-                            <span class="greeting-text">Hello, I'm</span>
-                        </div>
-                        <h1 class="hero-name">
-                            <span class="text-gradient">Bimochan Acharya</span>
-                        </h1>
-                        <h2 class="hero-title">
-                            <span class="typing-text">Full Stack Developer</span>
-                        </h2>
-                        <p class="hero-description">
-                            I create innovative web applications using modern technologies like Python, Django, 
-                            Flask, and JavaScript. Passionate about turning ideas into digital reality.
-                        </p>
-                        <div class="hero-buttons">
-                            <a href="/contact.html" class="btn btn-primary">
-                                <i class="bi bi-envelope"></i>
-                                Get In Touch
-                            </a>
-                        </div>
-                        <div class="social-links">
-                            <a href="https://github.com/Bimochanacharya06" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub Profile">
-                                <i class="bi bi-github"></i>
-                            </a>
-                            <a href="https://www.linkedin.com/in/bimochan-acharya-75a085370/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn Profile">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
-                            <a href="https://www.facebook.com/bimochan.acharya.7" target="_blank" rel="noopener noreferrer" title="Facebook" aria-label="Facebook Profile">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="https://www.instagram.com/bimochan_acharya/" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram Profile">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 order-1 order-lg-2">
-                    <div class="hero-image" data-aos="fade-left" data-aos-delay="300">
-                        <div class="image-container">
-                             <img src="/static/img/photo.jpeg" style="width:250px;height:250px;border-radius:60%;object-fit:cover;">
-<!--                             <img src="/static/img/photo.jpeg" alt="Bimochan Acharya Picture" class="photo-img" loading="eager" fetchpriority="high" width="400" height="400"> -->
-                            <div class="image-glow"></div>
-                        </div>
-                        <div class="floating-elements">
-                            <div class="floating-card card-1">
-                                <i class="bi bi-code-slash"></i>
-                                <span>Full Stack</span>
-                            </div>
-                            <div class="floating-card card-2">
-                                <i class="bi bi-server"></i>
-                                <span>Backend</span>
-                            </div>
-                            <div class="floating-card card-3">
-                                <i class="bi bi-palette"></i>
-                                <span>Frontend</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- STATS -->
+<div class="stats-bar reveal">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <span class="stat-num">3+</span>
+            <span class="stat-label">Years Experience</span>
         </div>
-        <div class="scroll-indicator">
-            <a href="#about" aria-label="Scroll to About section">
-                <div class="scroll-mouse">
-                    <div class="scroll-wheel"></div>
-                </div>
-            </a>
+        <div class="stat-item">
+            <span class="stat-num">20+</span>
+            <span class="stat-label">Projects Completed</span>
         </div>
-    </section>
+        <div class="stat-item">
+            <span class="stat-num">100%</span>
+            <span class="stat-label">Client Satisfaction</span>
+        </div>
+    </div>
+</div>
 
-    <!-- About Section -->
-    <section id="about" class="section about-section">
-        <div class="container">
-            <div class="section-header" data-aos="fade-up">
-                <h2 class="section-title">About Me</h2>
-                <p class="section-subtitle">Get to know me better</p>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="about-content" data-aos="fade-up" data-aos-delay="100">
-                        <h3>I'm a passionate Full Stack Developer</h3>
-                        <p>
-                            I'm Bimochan, a passionate full-stack developer with expertise in modern web technologies. 
-                            I specialize in creating dynamic, responsive web applications using Python, Django, Flask, 
-                            and JavaScript. My journey in web development started during my school days, and I've been 
-                            continuously expanding my skills ever since.
-                        </p>
-                        <p>
-                            I excel at building user-friendly interfaces and robust backend systems. Whether it's 
-                            developing RESTful APIs, creating interactive user experiences, or optimizing database 
-                            performance, I'm committed to delivering high-quality solutions that exceed expectations.
-                        </p>
-                        <div class="about-stats">
-                            <div class="stat-item" data-aos="zoom-in" data-aos-delay="200">
-                                <h4>3+</h4>
-                                <span>Years Experience</span>
-                            </div>
-                            <div class="stat-item" data-aos="zoom-in" data-aos-delay="300">
-                                <h4>20+</h4>
-                                <span>Projects Completed</span>
-                            </div>
-                            <div class="stat-item" data-aos="zoom-in" data-aos-delay="400">
-                                <h4>100%</h4>
-                                <span>Client Satisfaction</span>
-                            </div>
-                        </div>
-                    </div>
+<!-- ABOUT -->
+<section id="about" class="section">
+    <div class="section-label reveal">About</div>
+    <div class="about-grid">
+        <div class="about-text reveal">
+            <h2 class="section-title">Passionate about building the web</h2>
+            <p>I'm Bimochan, a <strong>full-stack developer</strong> from Sindupalchok, Nepal. My journey in web development started during school and I haven't stopped since.</p>
+            <p>I specialize in <strong>Python, Django, and Flask</strong> for the backend, paired with clean, responsive frontends. Whether it's RESTful APIs, social platforms, or interactive games — I love solving real problems with clean code.</p>
+            <p>I'm always learning, always building.</p>
+        </div>
+        <div class="contact-cards reveal rd1">
+            <div class="contact-card">
+                <div class="cc-icon"><i class="bi bi-envelope"></i></div>
+                <div>
+                    <div class="cc-label">Email</div>
+                    <div class="cc-value"><a href="mailto:bimochan081b@asm.edu.np">bimochan081b@asm.edu.np</a></div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="contact-info" data-aos="fade-left" data-aos-delay="200">
-                        <h3>Contact Information</h3>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-envelope"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Email</h5>
-                                <p><a href="mailto:bimochan081b@asm.edu.np" class="anchor_all">bimochan081b@asm.edu.np</a></p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-telephone"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Phone</h5>
-                                <p><a href="tel to:+9779869667953" class="anchor_all">+977 9869667953</a></p>
-                            </div>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">
-                                <i class="bi bi-geo-alt"></i>
-                            </div>
-                            <div class="contact-details">
-                                <h5>Location</h5>
-                                <p>Indrawati-5, sindupalchok, Nepal</p>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <div class="contact-card">
+                <div class="cc-icon"><i class="bi bi-telephone"></i></div>
+                <div>
+                    <div class="cc-label">Phone</div>
+                    <div class="cc-value"><a href="tel:+9779869667953">+977 9869667953</a></div>
+                </div>
+            </div>
+            <div class="contact-card">
+                <div class="cc-icon"><i class="bi bi-geo-alt"></i></div>
+                <div>
+                    <div class="cc-label">Location</div>
+                    <div class="cc-value">Indrawati-5, Sindupalchok, Nepal</div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="section skills-section">
-        <div class="container">
-            <div class="section-header" data-aos="fade-up">
-                <h2 class="section-title">Skills & Technologies</h2>
-                <p class="section-subtitle">Technologies I work with</p>
-            </div>
-            <div class="skills-grid">
-                <div class="skill-category" data-aos="fade-up" data-aos-delay="100">
-                    <h3>Frontend</h3>
-                    <div class="tech-stack">
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="150">
-                            <img src="/static/img/html.jpg" alt="HTML5" title="HTML5" width="40" height="40" loading="lazy">
-                            <span>HTML5</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="200">
-                            <img src="/static/img/css.png" alt="CSS3" title="CSS3" width="40" height="40" loading="lazy">
-                            <span>CSS3</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="250">
-                            <img src="/static/img/js.jpg" alt="JavaScript" title="JavaScript" width="40" height="40" loading="lazy">
-                            <span>JavaScript</span>
-                        </div>
-                      
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="300">
-                            <i class="fab fa-bootstrap"></i>
-                            <span>Bootstrap</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="skill-category" data-aos="fade-up" data-aos-delay="200">
-                    <h3>Backend</h3>
-                    <div class="tech-stack">
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="250">
-                            <img src="/static/img/python.png" alt="Python" title="Python" width="40" height="40" loading="lazy">
-                            <span>Python</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="300">
-                            <img src="/static/img/django.png" alt="Django" title="Django" width="40" height="40" loading="lazy">
-                            <span>Django</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="350">
-                            <img src="/static/img/unnamed.png" alt="Flask" title="Flask" width="40" height="40" loading="lazy">
-                            <span>Flask</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="skill-category" data-aos="fade-up" data-aos-delay="300">
-                    <h3>Database</h3>
-                    <div class="tech-stack">
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="350">
-                            <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="MySQL" width="40" height="40" loading="lazy">
-                            <span>MySQL</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="400">
-                            <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mongodb/mongodb-original-wordmark.svg" alt="MongoDB" width="40" height="40" loading="lazy">
-                            <span>MongoDB</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="450">
-                            <i class="fas fa-database"></i>
-                            <span>SQLite</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="skill-category" data-aos="fade-up" data-aos-delay="400">
-                    <h3>Tools & Others</h3>
-                    <div class="tech-stack">
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="450">
-                            <img src="https://camo.githubusercontent.com/ff5301ef7472dbdf522b776167a8af8c326299fe8175e53f6b052bbcc04533e3/68747470733a2f2f7777772e766563746f726c6f676f2e7a6f6e652f6c6f676f732f6769742d73636d2f6769742d73636d2d69636f6e2e737667" alt="Git" width="40" height="40" loading="lazy">
-                            <span>Git</span>
-                        </div>
-                        <div class="tech-item" data-aos="zoom-in" data-aos-delay="500">
-                            <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg" alt="Linux" width="40" height="40" loading="lazy">
-                            <span>Linux</span>
-                        </div>
-                    </div>
-                </div>
+<!-- SKILLS -->
+<section id="skills" class="section">
+    <div class="section-label reveal">Skills</div>
+    <h2 class="section-title reveal">Technologies I work with</h2>
+    <div class="skills-grid reveal rd1">
+        <div class="skill-cat">
+            <div class="skill-cat-title">Frontend</div>
+            <div class="skills-row">
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="">HTML5</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="">CSS3</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="">JavaScript</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" alt="">Bootstrap</div>
             </div>
         </div>
-    </section>
+        <div class="skill-cat">
+            <div class="skill-cat-title">Backend</div>
+            <div class="skills-row">
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="">Python</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" alt="">Django</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" alt="">Flask</div>
+            </div>
+        </div>
+        <div class="skill-cat">
+            <div class="skill-cat-title">Database</div>
+            <div class="skills-row">
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="">MySQL</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="">MongoDB</div>
+                <div class="skill-pill"><i class="bi bi-database"></i>SQLite</div>
+            </div>
+        </div>
+        <div class="skill-cat">
+            <div class="skill-cat-title">Tools</div>
+            <div class="skills-row">
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="">Git</div>
+                <div class="skill-pill"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" alt="">Linux</div>
+                <div class="skill-pill"><i class="bi bi-github"></i>GitHub</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <!-- Featured Projects Section -->
-    <section class="section featured-projects">
-        <div class="container">
-            <div class="section-header" data-aos="fade-up">
-                <h2 class="section-title">Featured Projects</h2>
-                <p class="section-subtitle">Some of my recent work</p>
+<!-- FEATURED PROJECT -->
+<section class="section">
+    <div class="section-label reveal">Work</div>
+    <h2 class="section-title reveal">Featured Project</h2>
+    <div class="project-feature reveal rd1">
+        <div class="pf-visual">
+            <div class="pf-glow"></div>
+            <i class="bi bi-people-fill"></i>
         </div>
-            <div class="col-lg-6 mb-4">
-                    <div class="project-card">
-                        <div class="project-image">
-                            <div class="project-placeholder">
-                                <i class="bi bi-controller"></i>
-                                <span>RPS Game</span>
-                            </div>
-                            <div class="project-overlay">
-                                <div class="project-links">
-                                    <a href="/game.html" target="_blank" title="Play Game">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                               </div>
-                           </div>
-                       </div>
-                        <div class="project-content">
-                            <h3>Rock Paper Scissors Game</h3>
-                            <p>An interactive web-based game with score tracking, smooth animations, and engaging user experience.</p>
-                            <div class="project-tech">
-                                <span>HTML5</span>
-                                <span>CSS3</span>
-                                <span>JavaScript</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        </section>  
-            <!-- <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="project-card" data-aos="fade-up" data-aos-delay="100">
-                        <div class="project-image">
-                            <div class="project-placeholder">
-                                <i class="bi bi-code-slash"></i>
-                                <span>GREED Platform</span>
-                            </div>
-                            <div class="project-overlay">
-                                <div class="project-links">
-                                    <a href="https://github.com/gaurablohani01/GREED" target="_blank" title="View Code" aria-label="View GREED Platform code on GitHub">
-                                        <i class="bi bi-github"></i>
-                                    </a>
-                                    <a href="#" title="Live Demo" aria-label="GREED Platform live demo">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3>GREED Learning Platform</h3>
-                            <p>An innovative educational platform built with Django and modern web technologies.</p>
-                            <div class="project-tech">
-                                <span>Python</span>
-                                <span>Django</span>
-                                <span>JavaScript</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="project-card" data-aos="fade-up" data-aos-delay="200">
-                        <div class="project-image">
-                            <div class="project-placeholder">
-                                <i class="bi bi-people-fill"></i>
-                                <span>Ensue Social</span>
-                            </div>
-                            <div class="project-overlay">
-                                <div class="project-links">
-                                    <a href="https://github.com/gaurablohani01" target="_blank" title="View Code" aria-label="View Ensue Social code on GitHub">
-                                        <i class="bi bi-github"></i>
-                                    </a>
-                                    <a href="https://ensue.pythonanywhere.com/" target="_blank" title="Live Demo" aria-label="Ensue Social live demo">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3>Ensue Social Media</h3>
-                            <p>A complete social media platform with real-time features and user interactions.</p>
-                            <div class="project-tech">
-                                <span>Django</span>
-                                <span>Python</span>
-                                <span>SQLite</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="project-card" data-aos="fade-up" data-aos-delay="300">
-                        <div class="project-image">
-                            <div class="project-placeholder">
-                                <i class="bi bi-play-circle-fill"></i>
-                                <span>Netflix Clone</span>
-                            </div>
-                            <div class="project-overlay">
-                                <div class="project-links">
-                                    <a href="#" title="View Code" aria-label="View Netflix Clone code on GitHub">
-                                        <i class="bi bi-github"></i>
-                                    </a>
-                                    <a href="/netflix-clone/index.html" target="_blank" title="Live Demo" aria-label="Netflix Clone live demo">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <h3>Netflix Clone</h3>
-                            <p>A pixel-perfect Netflix interface clone with responsive design and animations.</p>
-                            <div class="project-tech">
-                                <span>HTML5</span>
-                                <span>CSS3</span>
-                                <span>JavaScript</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="pf-body">
+            <div class="pf-tag">● Live</div>
+            <div class="pf-title">Ensue Social Media</div>
+            <p class="pf-desc">A full-featured social platform with user authentication, post creation, comments, and real-time interactions — built end-to-end with Django and Python.</p>
+            <div class="pf-tech">
+                <span>Django</span><span>Python</span><span>SQLite</span><span>Bootstrap</span>
             </div>
-            <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="400">
-                <a href="/project.html" class="btn btn-outline-primary">
-                    View All Projects
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
+            <a href="https://ensue.pythonanywhere.com/" target="_blank" class="pf-link">View Live <i class="bi bi-arrow-right"></i></a>
         </div>
-    </section> -->
+    </div>
+    <div class="view-all-wrap reveal">
+        <a href="/project.html" class="view-all">View All Projects <i class="bi bi-arrow-right"></i></a>
+    </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; <span class="current-year"></span> Bimochan Acharya. All rights reserved.</p>
-                </div>
-                <div class="footer-links">
-                    <a href="/C:\Users\Acer\OneDrive\Documents\bimochan\contact.html" aria-label="Contact page" class="anchor_all">Contact</a>
-                    <a href="/project.html" aria-label="Projects page" class="anchor_all">Projects</a>
-                    <a href="/C:\Users\Acer\OneDrive\Documents\bimochan\education.html" aria-label="Education page" class="anchor_all">Education</a>
-                    <a href="#home" aria-label="Back to top" class="back-to-top ">
-                        <i class="bi bi-arrow-up-circle"></i>
-                    </a>
-                </div>
-            </div>
+<!-- CTA -->
+<div class="cta-wrap">
+    <div class="cta-card reveal">
+        <div class="cta-tag">Let's Work Together</div>
+        <h2>Have a project in mind?</h2>
+        <p>I'm open to freelance work, collaborations, and full-time opportunities. Let's build something great.</p>
+        <div class="cta-btns">
+            <a href="/contact.html" class="btn-main"><i class="bi bi-envelope"></i> Get in Touch</a>
+            <a href="/project.html" class="btn-ghost"><i class="bi bi-grid"></i> See My Work</a>
         </div>
-    </footer>
+    </div>
+</div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="/static/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script>
-        // Initialize AOS animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ensure page loads at the top
-            window.scrollTo(0, 0);
-            
-            AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
-                once: true,
-                mirror: false,
-                disable: window.innerWidth < 768 ? 'mobile' : false // Disable on mobile for better performance
-            });
-            
-            // Update copyright year
-            const yearElements = document.querySelectorAll('.current-year');
-            yearElements.forEach(el => {
-                el.textContent = new Date().getFullYear();
-            });
-            
-            // Add smooth scrolling to all links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        window.scrollTo({
-                            top: target.offsetTop - 80, // Adjust for navbar height
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-            
-            // Close navbar when clicking a nav item on mobile
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-            const menuToggle = document.querySelector('.navbar-toggler');
-            const navbarCollapse = document.querySelector('.navbar-collapse');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 992) {
-                        bootstrap.Collapse.getInstance(navbarCollapse)?.hide();
-                    }
-                });
-            });
-        });
-        
-        // Improved loading overlay handling
-        window.addEventListener('load', function() {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) {
-                // Make sure the overlay is correctly positioned
-                loadingOverlay.style.position = 'fixed';
-                loadingOverlay.style.top = '0';
-                loadingOverlay.style.left = '0';
-                loadingOverlay.style.right = '0';
-                loadingOverlay.style.bottom = '0';
-                loadingOverlay.style.zIndex = '9999999';
-                loadingOverlay.style.width = '100%';
-                loadingOverlay.style.height = '100%';
-                loadingOverlay.style.display = 'flex';
-                loadingOverlay.style.alignItems = 'center';
-                loadingOverlay.style.justifyContent = 'center';
-            }
-        });
-    </script>
-    <script>
-        // Consolidated loader script
-        (function() {
-            // Set initial body state - lock scrolling
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-            
-            const initialScroll = window.scrollY;
-            
-            // Function to fade out loading screen
-            function hideLoadingScreen() {
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                if (!loadingOverlay) return;
-                
-                // Add fade-out class and animate blur
-                loadingOverlay.classList.add('hidden');
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.backdropFilter = 'blur(0px)';
-                loadingOverlay.style.webkitBackdropFilter = 'blur(0px)';
-                loadingOverlay.style.transition = 'opacity 0.5s ease, backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease';
-                
-                // Reset body state completely
-                document.documentElement.style.overflow = '';
-                document.documentElement.style.height = '';
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.width = '';
-                document.body.style.height = '';
-                document.body.style.top = '';
-                document.body.style.touchAction = '';
-                document.body.classList.add('loaded');
-                
-                // Double check that all pointer events work
-                document.body.style.pointerEvents = 'auto';
-                
-                // Restore scroll position
-                window.scrollTo(0, initialScroll);
-                
-                // Remove overlay completely from the DOM after transition
-                setTimeout(function() {
-                    if (loadingOverlay && loadingOverlay.parentNode) {
-                        loadingOverlay.parentNode.removeChild(loadingOverlay);
-                    }
-                }, 500);
-            }
-            
-            // When DOM is loaded
-            document.addEventListener('DOMContentLoaded', function() {
-                // Position the overlay properly
-                const loadingOverlay = document.getElementById('loadingOverlay');
-                if (loadingOverlay) {
-                    loadingOverlay.style.position = 'fixed';
-                    loadingOverlay.style.top = '0';
-                    loadingOverlay.style.left = '0';
-                }
-            });
-            
-            // When everything is loaded
-            window.addEventListener('load', function() {
-                // Add a slight delay to ensure everything is ready
-                setTimeout(hideLoadingScreen, 500);
-            });
-            
-            // Fallback timeout in case load event doesn't fire
-            setTimeout(hideLoadingScreen, 5000);
-        })();
-    </script>
+<!-- FOOTER -->
+<footer>
+    <p>&copy; <span id="yr"></span> Bimochan Acharya — All rights reserved.</p>
+    <div class="footer-links">
+        <a href="/project.html">Projects</a>
+        <a href="/education.html">Education</a>
+        <a href="/contact.html">Contact</a>
+    </div>
+</footer>
+
+<script>
+    // Cursor
+    const cur = document.getElementById('cursor');
+    const ring = document.getElementById('ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; cur.style.transform=`translate(${mx-5}px,${my-5}px)`; });
+    (function animRing(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.transform=`translate(${rx-16}px,${ry-16}px)`; requestAnimationFrame(animRing); })();
+
+    // Scroll progress
+    const sp = document.getElementById('sp');
+    window.addEventListener('scroll',()=>{ sp.style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%'; });
+
+    // Reveal
+    const io = new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{ a.addEventListener('click',e=>{ const t=document.querySelector(a.getAttribute('href')); if(t){e.preventDefault();window.scrollTo({top:t.offsetTop-80,behavior:'smooth'}); }}); });
+
+    // Year
+    document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
