@@ -1,0 +1,6 @@
+django>=4.2
+djangorestframework>=3.14
+django-cors-headers>=4.3
+anthropic>=0.25
+python-dotenv>=1.0
+gunicorn>=21.0
