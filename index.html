@@ -858,5 +858,589 @@
 
     document.getElementById('yr').textContent = new Date().getFullYear();
 </script>
+    <!--
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║  BIMO AI CHAT WIDGET                                         ║
+  ║  Paste this snippet just before </body> on every page        ║
+  ║  Set API_BASE_URL to your Django server URL                  ║
+  ╚═══════════════════════════════════════════════════════════════╝
+-->
+
+<!-- ── FONTS (skip if already loaded on the page) ── -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── CHAT WIDGET STYLES ────────────────────────────────────────── */
+:root {
+  --cw-accent:   #4f7cff;
+  --cw-accent2:  #b06cff;
+  --cw-accent3:  #06d6a0;
+  --cw-radius:   18px;
+  --cw-speed:    0.28s;
+}
+
+/* Dark defaults — respects page [data-theme="light"] */
+.cw-wrap {
+  --cw-bg:          #0d0d18;
+  --cw-surface:     #12121f;
+  --cw-border:      rgba(255,255,255,0.08);
+  --cw-text:        #e8e8f0;
+  --cw-muted:       #666680;
+  --cw-user-bg:     linear-gradient(135deg, #4f7cff, #b06cff);
+  --cw-bot-bg:      #1a1a2e;
+  --cw-input-bg:    rgba(255,255,255,0.05);
+  --cw-shadow:      0 32px 80px rgba(0,0,0,0.55);
+  --cw-bubble-bg:   rgba(6,6,9,0.85);
+}
+
+[data-theme="light"] .cw-wrap {
+  --cw-bg:          #ffffff;
+  --cw-surface:     #f4f5f8;
+  --cw-border:      rgba(0,0,0,0.09);
+  --cw-text:        #111120;
+  --cw-muted:       #7a7a94;
+  --cw-user-bg:     linear-gradient(135deg, #4f7cff, #b06cff);
+  --cw-bot-bg:      #e8ecff;
+  --cw-input-bg:    rgba(0,0,0,0.04);
+  --cw-shadow:      0 24px 64px rgba(0,0,0,0.14);
+  --cw-bubble-bg:   rgba(244,245,248,0.92);
+}
+
+/* Trigger bubble */
+.cw-trigger {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 8000;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cw-accent), var(--cw-accent2));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(79,124,255,0.45), 0 0 0 0 rgba(79,124,255,0.3);
+  transition: transform var(--cw-speed) cubic-bezier(.34,1.56,.64,1), box-shadow var(--cw-speed);
+  animation: cw-breathe 3s ease-in-out infinite;
+}
+.cw-trigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px rgba(79,124,255,0.55);
+  animation: none;
+}
+.cw-trigger.open { animation: none; }
+@keyframes cw-breathe {
+  0%,100% { box-shadow: 0 8px 30px rgba(79,124,255,.45), 0 0 0 0 rgba(79,124,255,.3); }
+  50%      { box-shadow: 0 8px 30px rgba(79,124,255,.45), 0 0 0 10px rgba(79,124,255,0); }
+}
+
+.cw-trigger-icon, .cw-trigger-close {
+  position: absolute;
+  transition: opacity var(--cw-speed), transform var(--cw-speed);
+  color: white;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cw-trigger-close { opacity: 0; transform: rotate(-90deg) scale(.5); }
+.cw-trigger.open .cw-trigger-icon  { opacity: 0; transform: rotate(90deg) scale(.5); }
+.cw-trigger.open .cw-trigger-close { opacity: 1; transform: rotate(0deg) scale(1); }
+
+/* Unread badge */
+.cw-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cw-accent3);
+  border: 2px solid var(--cw-bg, #060609);
+  font-size: .6rem; font-weight: 700; color: #000;
+  display: none;
+  align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  animation: cw-pop .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+.cw-badge.show { display: flex; }
+@keyframes cw-pop { from{transform:scale(0)} to{transform:scale(1)} }
+
+/* Panel */
+.cw-panel {
+  position: fixed;
+  bottom: calc(1.75rem + 68px);
+  right: 1.75rem;
+  z-index: 8000;
+  width: min(380px, calc(100vw - 2rem));
+  height: min(560px, calc(100vh - 120px));
+  background: var(--cw-bg);
+  border: 1px solid var(--cw-border);
+  border-radius: var(--cw-radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--cw-shadow);
+  transform-origin: bottom right;
+  transform: scale(.88) translateY(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--cw-speed) cubic-bezier(.34,1.56,.64,1), opacity var(--cw-speed);
+}
+.cw-panel.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Header */
+.cw-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--cw-border);
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(79,124,255,.08), rgba(176,108,255,.05));
+}
+.cw-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--cw-accent), var(--cw-accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: .85rem; color: white; flex-shrink: 0;
+  position: relative;
+}
+.cw-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--cw-accent3);
+  border: 2px solid var(--cw-bg);
+}
+.cw-header-info { flex: 1; min-width: 0; }
+.cw-header-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .88rem; font-weight: 700; color: var(--cw-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cw-header-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem; color: var(--cw-accent3); letter-spacing: .08em;
+  display: flex; align-items: center; gap: .3rem; margin-top: .1rem;
+}
+.cw-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cw-accent3); animation: cw-breathe 2s ease-in-out infinite; }
+.cw-header-close {
+  background: none; border: none; color: var(--cw-muted); cursor: pointer;
+  font-size: 1.1rem; padding: .25rem; border-radius: 6px;
+  display: flex; align-items: center;
+  transition: color .2s, background .2s;
+}
+.cw-header-close:hover { color: var(--cw-text); background: var(--cw-input-bg); }
+
+/* Messages */
+.cw-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  scroll-behavior: smooth;
+}
+.cw-messages::-webkit-scrollbar { width: 4px; }
+.cw-messages::-webkit-scrollbar-track { background: transparent; }
+.cw-messages::-webkit-scrollbar-thumb { background: var(--cw-border); border-radius: 4px; }
+
+/* Message bubbles */
+.cw-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 86%;
+  animation: cw-msgIn .3s ease both;
+}
+@keyframes cw-msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.cw-msg.user { align-self: flex-end; align-items: flex-end; }
+.cw-msg.bot  { align-self: flex-start; align-items: flex-start; }
+
+.cw-bubble {
+  padding: .65rem .9rem;
+  border-radius: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .84rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.cw-msg.user .cw-bubble {
+  background: var(--cw-user-bg);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.cw-msg.bot .cw-bubble {
+  background: var(--cw-bot-bg);
+  color: var(--cw-text);
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--cw-border);
+}
+.cw-msg-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem; color: var(--cw-muted);
+  margin-top: .22rem; padding: 0 .15rem;
+}
+
+/* Typing indicator */
+.cw-typing .cw-bubble {
+  display: flex; align-items: center; gap: .32rem; padding: .7rem .9rem;
+}
+.cw-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cw-muted);
+  animation: cw-typing .9s ease-in-out infinite;
+}
+.cw-dot:nth-child(2) { animation-delay: .15s; }
+.cw-dot:nth-child(3) { animation-delay: .3s; }
+@keyframes cw-typing { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }
+
+/* Suggestions */
+.cw-suggestions {
+  padding: .6rem 1rem .2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+.cw-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .65rem;
+  padding: .3rem .75rem;
+  border-radius: 100px;
+  border: 1px solid var(--cw-border);
+  background: var(--cw-input-bg);
+  color: var(--cw-muted);
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.cw-chip:hover {
+  border-color: rgba(79,124,255,.4);
+  color: var(--cw-accent);
+  background: rgba(79,124,255,.08);
+}
+
+/* Input area */
+.cw-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: .6rem;
+  padding: .75rem 1rem;
+  border-top: 1px solid var(--cw-border);
+  flex-shrink: 0;
+}
+.cw-input {
+  flex: 1;
+  background: var(--cw-input-bg);
+  border: 1px solid var(--cw-border);
+  border-radius: 12px;
+  padding: .6rem .85rem;
+  color: var(--cw-text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .84rem;
+  outline: none;
+  resize: none;
+  max-height: 100px;
+  min-height: 38px;
+  transition: border-color .2s;
+  line-height: 1.5;
+}
+.cw-input::placeholder { color: var(--cw-muted); }
+.cw-input:focus { border-color: rgba(79,124,255,.45); }
+
+.cw-send {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--cw-accent), var(--cw-accent2));
+  border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1rem;
+  transition: transform .2s, opacity .2s;
+  box-shadow: 0 4px 14px rgba(79,124,255,.35);
+}
+.cw-send:hover { transform: translateY(-1px); }
+.cw-send:disabled { opacity: .45; cursor: default; transform: none; }
+
+/* Footer branding */
+.cw-footer {
+  padding: .35rem 1rem .55rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .56rem;
+  color: var(--cw-muted);
+  letter-spacing: .06em;
+  flex-shrink: 0;
+}
+
+/* Mobile adjustments */
+@media(max-width: 480px) {
+  .cw-panel {
+    bottom: 0; right: 0; left: 0;
+    width: 100%; border-radius: var(--cw-radius) var(--cw-radius) 0 0;
+    height: 75vh;
+  }
+  .cw-trigger { bottom: 1.25rem; right: 1.25rem; }
+}
+</style>
+
+<!-- ── WIDGET HTML ── -->
+<div class="cw-wrap" id="cwWrap">
+
+  <!-- Trigger bubble -->
+  <button class="cw-trigger" id="cwTrigger" aria-label="Open AI assistant">
+    <span class="cw-trigger-icon">
+      <!-- Sparkle SVG icon -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.3L12 17l-6.2 4 2.4-7.3L2 9.2h7.6z"/>
+      </svg>
+    </span>
+    <span class="cw-trigger-close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </span>
+    <span class="cw-badge" id="cwBadge">1</span>
+  </button>
+
+  <!-- Chat panel -->
+  <div class="cw-panel" id="cwPanel" role="dialog" aria-label="Chat with Bimo AI">
+
+    <!-- Header -->
+    <div class="cw-header">
+      <div class="cw-avatar">B</div>
+      <div class="cw-header-info">
+        <div class="cw-header-name">Bimo — Portfolio AI</div>
+        <div class="cw-header-status"><span class="cw-status-dot"></span>Online · Ask me anything</div>
+      </div>
+      <button class="cw-header-close" id="cwClose" aria-label="Close chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="cw-messages" id="cwMessages">
+      <!-- Welcome message injected by JS -->
+    </div>
+
+    <!-- Suggestions -->
+    <div class="cw-suggestions" id="cwSuggestions">
+      <button class="cw-chip" data-q="What projects has Bimochan built?">🗂 Projects</button>
+      <button class="cw-chip" data-q="What are his technical skills?">⚡ Skills</button>
+      <button class="cw-chip" data-q="Is he available for freelance work?">💼 Availability</button>
+      <button class="cw-chip" data-q="How can I contact Bimochan?">📬 Contact</button>
+    </div>
+
+    <!-- Input -->
+    <div class="cw-input-area">
+      <textarea
+        class="cw-input"
+        id="cwInput"
+        placeholder="Ask me about Bimochan…"
+        rows="1"
+        aria-label="Message input"
+      ></textarea>
+      <button class="cw-send" id="cwSend" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="cw-footer">Powered by Claude AI · Bimochan Acharya</div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  // ── CONFIG — change this to your Django server URL ──────────────────────
+  const API_BASE_URL = 'http://127.0.0.1:8000';  // e.g. 'https://api.bimochanacharya.com.np'
+  const API_ENDPOINT = API_BASE_URL + '/api/chat/';
+
+  // ── STATE ────────────────────────────────────────────────────────────────
+  let isOpen = false;
+  let isLoading = false;
+  let history = [];   // [{ role: 'user'|'assistant', content: '...' }]
+  let hasOpened = false;
+
+  // ── ELEMENTS ─────────────────────────────────────────────────────────────
+  const trigger   = document.getElementById('cwTrigger');
+  const panel     = document.getElementById('cwPanel');
+  const closeBtn  = document.getElementById('cwClose');
+  const messages  = document.getElementById('cwMessages');
+  const input     = document.getElementById('cwInput');
+  const sendBtn   = document.getElementById('cwSend');
+  const badge     = document.getElementById('cwBadge');
+  const suggs     = document.getElementById('cwSuggestions');
+
+  // ── HELPERS ──────────────────────────────────────────────────────────────
+  function timeStr() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function scrollToBottom() {
+    setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 50);
+  }
+
+  function addMessage(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = 'cw-msg ' + role;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'cw-bubble';
+    // Render newlines
+    bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+    const time = document.createElement('div');
+    time.className = 'cw-msg-time';
+    time.textContent = timeStr();
+
+    wrap.appendChild(bubble);
+    wrap.appendChild(time);
+    messages.appendChild(wrap);
+    scrollToBottom();
+    return wrap;
+  }
+
+  function showTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'cw-msg bot cw-typing';
+    wrap.id = 'cwTyping';
+    wrap.innerHTML = '<div class="cw-bubble"><div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div></div>';
+    messages.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('cwTyping');
+    if (el) el.remove();
+  }
+
+  function hideSuggestions() {
+    suggs.style.display = 'none';
+  }
+
+  // ── OPEN / CLOSE ─────────────────────────────────────────────────────────
+  function openChat() {
+    isOpen = true;
+    trigger.classList.add('open');
+    panel.classList.add('open');
+    badge.classList.remove('show');
+    input.focus();
+
+    if (!hasOpened) {
+      hasOpened = true;
+      // Welcome message
+      addMessage('bot',
+        "👋 Hey there! I'm Bimo, Bimochan's AI assistant.\n\nAsk me anything about his projects, skills, or how to get in touch!"
+      );
+    }
+  }
+
+  function closeChat() {
+    isOpen = false;
+    trigger.classList.remove('open');
+    panel.classList.remove('open');
+  }
+
+  trigger.addEventListener('click', () => { isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+
+  // Show badge after 3 seconds if not opened
+  setTimeout(() => {
+    if (!hasOpened) badge.classList.add('show');
+  }, 3000);
+
+  // Close on outside click
+  document.addEventListener('click', e => {
+    if (isOpen && !panel.contains(e.target) && !trigger.contains(e.target)) {
+      closeChat();
+    }
+  });
+
+  // ── SEND MESSAGE ─────────────────────────────────────────────────────────
+  async function sendMessage(text) {
+    text = text.trim();
+    if (!text || isLoading) return;
+
+    hideSuggestions();
+    isLoading = true;
+    sendBtn.disabled = true;
+    input.value = '';
+    input.style.height = 'auto';
+
+    addMessage('user', text);
+    history.push({ role: 'user', content: text });
+
+    showTyping();
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: history.slice(-10) }),
+      });
+
+      removeTyping();
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        addMessage('bot', err.error || 'Something went wrong. Please try again.');
+        return;
+      }
+
+      const data = await res.json();
+      if (data.ok && data.reply) {
+        addMessage('bot', data.reply);
+        history.push({ role: 'assistant', content: data.reply });
+        // Keep history from growing too large
+        if (history.length > 20) history = history.slice(-20);
+      } else {
+        addMessage('bot', data.error || 'Sorry, I could not get a response.');
+      }
+
+    } catch (err) {
+      removeTyping();
+      addMessage('bot', '⚠️ Could not reach the server. Make sure the Django backend is running.');
+    } finally {
+      isLoading = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  // ── INPUT HANDLING ────────────────────────────────────────────────────────
+  sendBtn.addEventListener('click', () => sendMessage(input.value));
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(input.value);
+    }
+  });
+
+  // Auto-resize textarea
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  });
+
+  // ── SUGGESTION CHIPS ──────────────────────────────────────────────────────
+  suggs.querySelectorAll('.cw-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const q = chip.dataset.q;
+      if (q) sendMessage(q);
+    });
+  });
+
+})();
+</script>
 </body>
 </html>
