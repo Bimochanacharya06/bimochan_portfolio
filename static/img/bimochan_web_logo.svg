@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 60" width="260" height="60">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&amp;display=swap');
+    </style>
+
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <linearGradient id="letterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="50%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+
+    <radialGradient id="glowBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ─── ICON MARK (left) ─── -->
+
+  <!-- Ambient glow blob -->
+  <circle cx="30" cy="30" r="26" fill="url(#glowBg)"/>
+
+  <!-- Outer ring -->
+  <circle cx="30" cy="30" r="24"
+    fill="none"
+    stroke="url(#ringGrad)"
+    stroke-width="1.5"
+    stroke-dasharray="12 4 3 4"
+    opacity="0.9"/>
+
+  <!-- Inner ring -->
+  <circle cx="30" cy="30" r="18"
+    fill="none"
+    stroke="url(#ringGrad)"
+    stroke-width="0.6"
+    opacity="0.3"/>
+
+  <!-- Dark inner circle -->
+  <circle cx="30" cy="30" r="16"
+    fill="#0a0e1a"/>
+
+  <!-- B lettermark -->
+  <text
+    x="30" y="36.5"
+    font-family="'Cinzel', 'Palatino Linotype', serif"
+    font-size="22"
+    font-weight="700"
+    fill="url(#letterGrad)"
+    text-anchor="middle"
+    filter="url(#glow)">B</text>
+
+  <!-- Orbit dot top -->
+  <circle cx="30" cy="6.5" r="2.8"
+    fill="#0ea5e9"
+    filter="url(#glow)"
+    opacity="0.95"/>
+
+  <!-- Orbit dot small bottom-right -->
+  <circle cx="51.5" cy="38" r="1.5"
+    fill="#7c3aed"
+    opacity="0.7"/>
+
+  <!-- ─── WORDMARK (right) ─── -->
+
+  <!-- BIMOCHAN -->
+  <text
+    x="68" y="28"
+    font-family="'Cinzel', 'Palatino Linotype', serif"
+    font-size="18"
+    font-weight="700"
+    letter-spacing="2"
+    fill="url(#textGrad)"
+    filter="url(#softglow)">BIMOCHAN</text>
+
+  <!-- Thin divider line -->
+  <line x1="68" y1="34" x2="252" y2="34"
+    stroke="url(#ringGrad)"
+    stroke-width="0.7"
+    opacity="0.4"/>
+
+  <!-- Diamond accent on divider -->
+  <rect x="155" y="31.3" width="5" height="5"
+    fill="#0ea5e9"
+    transform="rotate(45 157.5 33.8)"
+    opacity="0.8"
+    filter="url(#softglow)"/>
+
+  <!-- ACHARYA -->
+  <text
+    x="68" y="47"
+    font-family="'Cinzel', 'Palatino Linotype', serif"
+    font-size="11"
+    font-weight="400"
+    letter-spacing="7"
+    fill="url(#ringGrad)"
+    opacity="0.9">ACHARYA</text>
+
+</svg>
