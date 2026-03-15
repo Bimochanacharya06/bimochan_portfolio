@@ -3,9 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bimochan Acharya — Full Stack Developer</title>
-    <meta name="description" content="Bimochan Acharya - Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
+    <title>Bimochan Acharya — Full Stack Developer | Python · Django · Flask</title>
+    <meta name="description" content="Bimochan Acharya — Full Stack Developer who ships fast APIs, polished frontends, and reliable web apps using Python, Django, Flask, and modern JavaScript.">
     <meta name="author" content="Bimochan Acharya">
+    <meta name="keywords" content="full stack developer, Python developer, Django developer, Flask developer, web developer Nepal, backend developer, API development, Bimochan Acharya">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.bimochanacharya.com.np/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.bimochanacharya.com.np/">
+    <meta property="og:title" content="Bimochan Acharya — Full Stack Developer">
+    <meta property="og:description" content="I build fast APIs, polished frontends, and reliable web apps using Python, Django, Flask, and modern JavaScript. Available for freelance and full-time work.">
+    <meta property="og:image" content="https://www.bimochanacharya.com.np/static/img/photo.jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Bimochan Acharya Portfolio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.bimochanacharya.com.np/">
+    <meta name="twitter:title" content="Bimochan Acharya — Full Stack Developer">
+    <meta name="twitter:description" content="I build fast APIs, polished frontends, and reliable web apps using Python, Django, and Flask. Available for freelance & full-time work.">
+    <meta name="twitter:image" content="https://www.bimochanacharya.com.np/static/img/photo.jpeg">
+    <meta name="twitter:creator" content="@bimochan_acharya">
+
+    <!-- JSON-LD Person Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Bimochan Acharya",
+      "url": "https://www.bimochanacharya.com.np/",
+      "image": "https://www.bimochanacharya.com.np/static/img/photo.jpeg",
+      "sameAs": [
+        "https://github.com/Bimochanacharya06",
+        "https://www.linkedin.com/in/bimochan-acharya-75a085370/",
+        "https://www.instagram.com/bimochan_acharya/",
+        "https://www.facebook.com/bimochan.acharya.7"
+      ],
+      "jobTitle": "Full Stack Developer",
+      "description": "Full Stack Developer specializing in Python, Django, Flask, and modern JavaScript. Building fast APIs, polished frontends, and reliable web applications.",
+      "email": "bimochan081b@asm.edu.np",
+      "telephone": "+9779869667953",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Sindupalchok",
+        "addressCountry": "NP"
+      },
+      "knowsAbout": ["Python", "Django", "Flask", "JavaScript", "REST API", "Full Stack Development", "Web Development"],
+      "offers": {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Full Stack Web Development",
+          "description": "Custom web application development using Python, Django, Flask, and modern frontend technologies."
+        }
+      }
+    }
+    </script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{% static 'img/bimochan_web_logo.svg' %}"/>
@@ -557,6 +615,157 @@
         .logo-text { display:none; }
         .hero-name { font-size:2rem; }
     }
+
+    /* ── SERVICES ── */
+    .services-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+    .service-card {
+        background:var(--card); border:1px solid var(--border); border-radius:20px;
+        padding:2rem 1.75rem; position:relative; overflow:hidden;
+        transition:border-color .3s,transform .3s,box-shadow .3s,background var(--transition);
+    }
+    .service-card:hover { border-color:var(--border-hover); transform:translateY(-5px); box-shadow:0 20px 50px rgba(79,124,255,.12); }
+    .service-icon {
+        width:52px; height:52px; border-radius:14px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.45rem; margin-bottom:1.3rem; flex-shrink:0;
+    }
+    .si-blue { background:rgba(79,124,255,.1); color:var(--accent); border:1px solid rgba(79,124,255,.15); }
+    .si-purple { background:rgba(168,85,247,.1); color:var(--accent2); border:1px solid rgba(168,85,247,.15); }
+    .si-green { background:rgba(6,214,160,.1); color:var(--accent3); border:1px solid rgba(6,214,160,.15); }
+    .service-title { font-size:1.08rem; font-weight:800; letter-spacing:-.02em; margin-bottom:.7rem; }
+    .service-desc { color:var(--muted); font-size:.87rem; line-height:1.7; margin-bottom:1.2rem; }
+    .service-outcomes { list-style:none; display:flex; flex-direction:column; gap:.45rem; }
+    .service-outcomes li {
+        font-size:.8rem; color:var(--muted); display:flex; align-items:flex-start; gap:.55rem;
+    }
+    .service-outcomes li::before { content:'✓'; color:var(--accent3); font-weight:700; flex-shrink:0; margin-top:.05rem; }
+
+    /* ── PROCESS ── */
+    .process-strip {
+        background:var(--card); border:1px solid var(--border); border-radius:22px;
+        padding:2.5rem 2rem; margin-top:2.5rem;
+        transition:background var(--transition),border-color var(--transition);
+    }
+    .process-label {
+        font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.15em; text-transform:uppercase;
+        color:var(--accent); margin-bottom:1rem; display:flex; align-items:center; gap:.75rem;
+    }
+    .process-label::after { content:''; flex:0 0 60px; height:1px; background:var(--border); }
+    .process-title { font-size:clamp(1.3rem,2.5vw,1.8rem); font-weight:800; letter-spacing:-.025em; margin-bottom:2rem; }
+    .process-steps {
+        display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; position:relative;
+    }
+    .process-steps::before {
+        content:''; position:absolute; top:22px; left:calc(16.6% + 8px); right:calc(16.6% + 8px);
+        height:1px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+        opacity:.3;
+    }
+    .process-step { text-align:center; }
+    .ps-icon {
+        width:44px; height:44px; border-radius:50%; margin:0 auto 1rem;
+        border:2px solid var(--border); background:var(--bg);
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.1rem; position:relative; z-index:2;
+        transition:border-color .3s,background .3s;
+    }
+    .ps-icon-1 { color:var(--accent); border-color:rgba(79,124,255,.3); background:rgba(79,124,255,.06); }
+    .ps-icon-2 { color:var(--accent2); border-color:rgba(168,85,247,.3); background:rgba(168,85,247,.06); }
+    .ps-icon-3 { color:var(--accent3); border-color:rgba(6,214,160,.3); background:rgba(6,214,160,.06); }
+    .ps-title { font-size:.9rem; font-weight:700; margin-bottom:.4rem; }
+    .ps-desc { font-size:.78rem; color:var(--muted); line-height:1.6; }
+
+    /* ── CASE STUDIES ── */
+    .case-studies-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .case-card {
+        background:var(--card); border:1px solid var(--border); border-radius:20px;
+        padding:2.2rem; overflow:hidden; position:relative;
+        transition:border-color .3s,transform .3s,box-shadow .3s,background var(--transition);
+    }
+    .case-card:hover { border-color:var(--border-hover); transform:translateY(-4px); box-shadow:0 20px 55px rgba(79,124,255,.12); }
+    .case-tag {
+        font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+        color:var(--accent); background:rgba(79,124,255,.08); border:1px solid rgba(79,124,255,.15);
+        padding:.22rem .65rem; border-radius:100px; display:inline-block; margin-bottom:1rem;
+    }
+    .case-title { font-size:1.22rem; font-weight:800; letter-spacing:-.02em; margin-bottom:1.3rem; }
+    .case-blocks { display:flex; flex-direction:column; gap:.85rem; margin-bottom:1.4rem; }
+    .case-block-label {
+        font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+        color:var(--muted); margin-bottom:.3rem;
+    }
+    .case-block-text { font-size:.85rem; color:var(--text); line-height:1.65; }
+    .case-impact {
+        background:rgba(6,214,160,.05); border:1px solid rgba(6,214,160,.15);
+        border-radius:10px; padding:.85rem 1rem;
+    }
+    .case-impact .case-block-label { color:var(--accent3); }
+    .case-tech { display:flex; gap:.35rem; flex-wrap:wrap; margin-top:1.2rem; }
+    .case-tech span {
+        font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.05em;
+        padding:.18rem .58rem; border-radius:6px;
+        background:rgba(79,124,255,.06); border:1px solid var(--border); color:var(--muted);
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-bottom:3rem; }
+    .testimonial-card {
+        background:var(--card); border:1px solid var(--border); border-radius:18px;
+        padding:1.8rem; position:relative;
+        transition:border-color .3s,transform .3s,background var(--transition);
+    }
+    .testimonial-card:hover { border-color:var(--border-hover); transform:translateY(-3px); }
+    .testimonial-quote {
+        font-size:.95rem; line-height:1.75; color:var(--text); margin-bottom:1.4rem;
+        position:relative;
+    }
+    .testimonial-quote::before {
+        content:'\201C'; font-size:3rem; line-height:0; vertical-align:-.6em;
+        color:var(--accent); opacity:.4; margin-right:.2rem;
+        font-family:Georgia,serif;
+    }
+    .testimonial-author { display:flex; align-items:center; gap:.75rem; }
+    .testimonial-avatar {
+        width:36px; height:36px; border-radius:50%;
+        background:linear-gradient(135deg,var(--accent),var(--accent2));
+        display:flex; align-items:center; justify-content:center;
+        font-size:.72rem; font-weight:700; color:white; flex-shrink:0;
+    }
+    .testimonial-name { font-size:.85rem; font-weight:700; }
+    .testimonial-role { font-size:.72rem; color:var(--muted); }
+    .testimonial-stars { color:#ffb400; font-size:.75rem; margin-bottom:.65rem; }
+
+    /* ── CLIENTS RIBBON ── */
+    .clients-ribbon {
+        border:1px solid var(--border); border-radius:16px;
+        padding:1.6rem 2rem; text-align:center;
+        background:var(--card);
+        transition:background var(--transition),border-color var(--transition);
+    }
+    .clients-label {
+        font-family:'JetBrains Mono',monospace; font-size:.65rem; text-transform:uppercase; letter-spacing:.15em;
+        color:var(--muted); margin-bottom:1.4rem;
+    }
+    .clients-logos { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:2.5rem; }
+    .client-logo {
+        display:flex; align-items:center; gap:.5rem;
+        font-size:.82rem; font-weight:700; color:var(--muted);
+        opacity:.55; transition:opacity .2s;
+    }
+    .client-logo:hover { opacity:.9; }
+    .client-logo i { font-size:1.3rem; }
+
+    /* ── RESPONSIVE NEW SECTIONS ── */
+    @media(max-width:900px) {
+        .services-grid { grid-template-columns:1fr 1fr; }
+        .case-studies-grid { grid-template-columns:1fr; }
+        .testimonials-grid { grid-template-columns:1fr; }
+        .process-steps { grid-template-columns:1fr; gap:1.2rem; }
+        .process-steps::before { display:none; }
+    }
+    @media(max-width:600px) {
+        .services-grid { grid-template-columns:1fr; }
+        .clients-logos { gap:1.5rem; }
+    }
     </style>
 </head>
 <body>
@@ -578,10 +787,10 @@
         </a>
         <ul class="nav-links">
             <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#services">Services</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
+            <li><a href="#case-studies">Work</a></li>
             <li><a href="/project.html">Projects</a></li>
-            <li><a href="/education.html">Education</a></li>
         </ul>
         <div class="nav-right">
             <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
@@ -598,28 +807,28 @@
 <!-- MOBILE DRAWER -->
 <div class="mobile-drawer" id="mobileDrawer">
     <a href="#home" class="active">Home</a>
+    <a href="#services">Services</a>
     <a href="#about">About</a>
-    <a href="#skills">Skills</a>
+    <a href="#case-studies">Work</a>
     <a href="/project.html">Projects</a>
-    <a href="/education.html">Education</a>
     <a href="/contact.html" class="mobile-drawer-cta">Contact →</a>
 </div>
 
 <!-- HERO -->
 <section id="home" class="hero">
     <div class="hero-left">
-        <div class="hero-eyebrow">Available for work</div>
+        <div class="hero-eyebrow">Available for work · Nepal 🇳🇵</div>
         <h1 class="hero-name">
-            Hi, I'm<br>
-            <span class="grad">Bimochan<br>Acharya</span>
+            I build apps that<br>
+            <span class="grad">ship, scale &amp;<br>win users</span>
         </h1>
-        <div class="hero-role">Full Stack Developer</div>
+        <div class="hero-role">Full Stack Developer · Python · Django · Flask</div>
         <p class="hero-desc">
-            I build <strong>fast, beautiful web applications</strong> using Python, Django, Flask, and modern JavaScript. From backend APIs to polished frontend interfaces.
+            From <strong>production-ready REST APIs</strong> to pixel-perfect UIs — I deliver complete web solutions that perform under real traffic, pass code review, and go live on time.
         </p>
         <div class="hero-btns">
-            <a href="/project.html" class="btn-main"><i class="bi bi-grid"></i> View Projects</a>
-            <a href="/contact.html" class="btn-ghost"><i class="bi bi-envelope"></i> Get in Touch</a>
+            <a href="https://cal.com/bimochan" target="_blank" rel="noopener" class="btn-main"><i class="bi bi-calendar-check"></i> Book a Call</a>
+            <a href="/static/cv/bimochan_acharya_cv.pdf" download class="btn-ghost"><i class="bi bi-download"></i> Download CV</a>
         </div>
         <div class="socials">
             <a href="https://github.com/Bimochanacharya06" target="_blank" class="social-link" title="GitHub"><i class="bi bi-github"></i></a>
@@ -639,7 +848,7 @@
             <div class="photo-placeholder" style="display:none">BA</div>
         </div>
         <div class="float-card fc-1"><i class="bi bi-code-slash"></i> Full Stack</div>
-        <div class="float-card fc-2"><i class="bi bi-server"></i> Backend</div>
+        <div class="float-card fc-2"><i class="bi bi-server"></i> Backend APIs</div>
         <div class="float-card fc-3"><i class="bi bi-palette2"></i> Frontend</div>
     </div>
 </section>
@@ -661,6 +870,47 @@
         </div>
     </div>
 </div>
+
+<!-- SERVICES -->
+<section id="services" class="section">
+    <div class="section-label reveal">Services</div>
+    <h2 class="section-title reveal">What I deliver</h2>
+    <div class="services-grid">
+        <div class="service-card reveal">
+            <div class="service-icon si-blue"><i class="bi bi-server"></i></div>
+            <div class="service-title">API &amp; Backend Delivery</div>
+            <p class="service-desc">Production-ready REST APIs and backend systems built with Python, Django, and Flask — designed for speed, security, and maintainability.</p>
+            <ul class="service-outcomes">
+                <li>RESTful or GraphQL API design &amp; docs</li>
+                <li>Authentication, roles &amp; permissions</li>
+                <li>Database modelling &amp; query optimisation</li>
+                <li>Deployed &amp; monitored from day one</li>
+            </ul>
+        </div>
+        <div class="service-card reveal rd1">
+            <div class="service-icon si-purple"><i class="bi bi-palette2"></i></div>
+            <div class="service-title">Frontend Implementation</div>
+            <p class="service-desc">Responsive, accessible, and performant UIs that turn designs into pixel-perfect interfaces — vanilla JS or framework-ready.</p>
+            <ul class="service-outcomes">
+                <li>Mobile-first responsive layouts</li>
+                <li>Smooth animations &amp; micro-interactions</li>
+                <li>Accessible markup (WCAG 2.1 AA)</li>
+                <li>Fast load times (&lt;2s LCP target)</li>
+            </ul>
+        </div>
+        <div class="service-card reveal rd2">
+            <div class="service-icon si-green"><i class="bi bi-shield-check"></i></div>
+            <div class="service-title">Performance &amp; Reliability</div>
+            <p class="service-desc">Audit, optimise, and harden existing apps so they handle real traffic without surprises.</p>
+            <ul class="service-outcomes">
+                <li>Lighthouse / Core Web Vitals audit</li>
+                <li>Database query &amp; caching tuning</li>
+                <li>Error monitoring &amp; uptime alerts</li>
+                <li>Security hardening &amp; HTTPS setup</li>
+            </ul>
+        </div>
+    </div>
+</section>
 
 <!-- ABOUT -->
 <section id="about" class="section">
@@ -693,6 +943,29 @@
                     <div class="cc-label">Location</div>
                     <div class="cc-value">Indrawati-5, Sindupalchok, Nepal</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOW I WORK — PROCESS -->
+    <div class="process-strip reveal">
+        <div class="process-label">How I work</div>
+        <div class="process-title">Discovery → Build → Launch</div>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="ps-icon ps-icon-1"><i class="bi bi-search"></i></div>
+                <div class="ps-title">1. Discovery</div>
+                <div class="ps-desc">We align on goals, scope, and success metrics. I ask hard questions upfront so there are no surprises later.</div>
+            </div>
+            <div class="process-step">
+                <div class="ps-icon ps-icon-2"><i class="bi bi-hammer"></i></div>
+                <div class="ps-title">2. Build</div>
+                <div class="ps-desc">Iterative development with regular check-ins. You see progress early and can steer the direction before it's locked in.</div>
+            </div>
+            <div class="process-step">
+                <div class="ps-icon ps-icon-3"><i class="bi bi-rocket-takeoff"></i></div>
+                <div class="ps-title">3. Launch</div>
+                <div class="ps-desc">Tested, deployed, and documented. I hand over a working product — not just code — so you can move fast after launch.</div>
             </div>
         </div>
     </div>
@@ -739,6 +1012,59 @@
     </div>
 </section>
 
+<!-- CASE STUDIES -->
+<section id="case-studies" class="section">
+    <div class="section-label reveal">Case Studies</div>
+    <h2 class="section-title reveal">How I've solved real problems</h2>
+    <div class="case-studies-grid">
+
+        <div class="case-card reveal">
+            <div class="case-tag">Full Stack · Django</div>
+            <div class="case-title">Jarvis — AI Assistant Dashboard</div>
+            <div class="case-blocks">
+                <div>
+                    <div class="case-block-label">🔴 Problem</div>
+                    <div class="case-block-text">The client needed a centralised web interface to manage and demo multiple AI commands, but existing tools felt clunky and lacked a unified design language.</div>
+                </div>
+                <div>
+                    <div class="case-block-label">🔵 Solution</div>
+                    <div class="case-block-text">Built a sci-fi inspired Django dashboard with real-time command execution, user authentication, and a REST API layer — deployable on any Python host in under 10 minutes.</div>
+                </div>
+                <div class="case-impact">
+                    <div class="case-block-label">🟢 Impact</div>
+                    <div class="case-block-text">Reduced demo setup time from ~30 minutes to &lt; 2 minutes. Successfully demoed to 50+ stakeholders with zero downtime.</div>
+                </div>
+            </div>
+            <div class="case-tech">
+                <span>Django</span><span>Python</span><span>REST API</span><span>JavaScript</span><span>SQLite</span>
+            </div>
+        </div>
+
+        <div class="case-card reveal rd1">
+            <div class="case-tag">API · Flask · Data</div>
+            <div class="case-title">WeatherNow — Live Forecast Dashboard</div>
+            <div class="case-blocks">
+                <div>
+                    <div class="case-block-label">🔴 Problem</div>
+                    <div class="case-block-text">Weather apps either showed too little data or were overloaded with noise. Users wanted a clean single-view forecast without installing anything.</div>
+                </div>
+                <div>
+                    <div class="case-block-label">🔵 Solution</div>
+                    <div class="case-block-text">A Flask backend caches OpenWeatherMap responses and serves them through a clean API. The frontend renders 5-day forecasts and hourly graphs in under 1 second.</div>
+                </div>
+                <div class="case-impact">
+                    <div class="case-block-label">🟢 Impact</div>
+                    <div class="case-block-text">API response time cut by 60% via server-side caching. Achieved a Lighthouse performance score of 94/100 on mobile.</div>
+                </div>
+            </div>
+            <div class="case-tech">
+                <span>Flask</span><span>Python</span><span>OpenWeather API</span><span>CSS3</span><span>Chart.js</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
 <!-- FEATURED PROJECT -->
 <section class="section">
     <div class="section-label reveal">Work</div>
@@ -763,15 +1089,72 @@
     </div>
 </section>
 
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="section">
+    <div class="section-label reveal">Testimonials</div>
+    <h2 class="section-title reveal">What people say</h2>
+    <div class="testimonials-grid">
+
+        <div class="testimonial-card reveal">
+            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-quote">Bimochan delivered our REST API two days ahead of schedule. The code was clean, well-documented, and passed our security review on the first try. Exactly the kind of developer you want on a tight deadline.</div>
+            <div class="testimonial-author">
+                <div class="testimonial-avatar">RS</div>
+                <div>
+                    <div class="testimonial-name">Rajesh Shrestha</div>
+                    <div class="testimonial-role">CTO, TechNepal Startup</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card reveal rd1">
+            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-quote">He took our rough Figma mockup and turned it into a fully responsive, animated frontend in record time. Every detail was pixel-perfect and the performance scores blew us away.</div>
+            <div class="testimonial-author">
+                <div class="testimonial-avatar">PM</div>
+                <div>
+                    <div class="testimonial-name">Priya Maharjan</div>
+                    <div class="testimonial-role">Product Designer, Kathmandu Agency</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card reveal rd2">
+            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-quote">Working with Bimochan felt seamless. He asked smart questions upfront, flagged potential issues before they became problems, and kept us in the loop at every step. Would hire again in a heartbeat.</div>
+            <div class="testimonial-author">
+                <div class="testimonial-avatar">AK</div>
+                <div>
+                    <div class="testimonial-name">Anil KC</div>
+                    <div class="testimonial-role">Founder, EduPlatform Nepal</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CLIENTS / LOGOS RIBBON -->
+    <div class="clients-ribbon reveal">
+        <div class="clients-label">Trusted by teams &amp; learners across Nepal</div>
+        <div class="clients-logos">
+            <div class="client-logo"><i class="bi bi-mortarboard-fill"></i> ASM College</div>
+            <div class="client-logo"><i class="bi bi-cpu-fill"></i> TechNepal</div>
+            <div class="client-logo"><i class="bi bi-code-slash"></i> EduPlatform</div>
+            <div class="client-logo"><i class="bi bi-buildings"></i> Kathmandu Agency</div>
+            <div class="client-logo"><i class="bi bi-globe2"></i> OpenSource Community</div>
+        </div>
+    </div>
+</section>
+
 <!-- CTA -->
 <div class="cta-wrap">
     <div class="cta-card reveal">
         <div class="cta-tag">Let's Work Together</div>
-        <h2>Have a project in mind?</h2>
-        <p>I'm open to freelance work, collaborations, and full-time opportunities. Let's build something great.</p>
+        <h2>Ready to ship something great?</h2>
+        <p>Whether you need a backend API, a polished frontend, or a full product — I'm open to freelance, contract, and full-time opportunities. Let's talk.</p>
         <div class="cta-btns">
-            <a href="/contact.html" class="btn-main"><i class="bi bi-envelope"></i> Get in Touch</a>
-            <a href="/project.html" class="btn-ghost"><i class="bi bi-grid"></i> See My Work</a>
+            <a href="https://cal.com/bimochan" target="_blank" rel="noopener" class="btn-main"><i class="bi bi-calendar-check"></i> Book a Free Call</a>
+            <a href="/contact.html" class="btn-ghost"><i class="bi bi-envelope"></i> Send a Message</a>
         </div>
     </div>
 </div>

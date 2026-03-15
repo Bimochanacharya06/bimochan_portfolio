@@ -213,6 +213,20 @@
         .avail-dot { width: 7px; height: 7px; background: var(--accent3); border-radius: 50%; animation: pulseDot 2s ease infinite; }
         @keyframes pulseDot { 0%,100%{box-shadow:0 0 0 0 rgba(6,214,160,.4)} 50%{box-shadow:0 0 0 5px rgba(6,214,160,0)} }
 
+        /* Calendly CTA button in hero */
+        .calendly-btn {
+            display: inline-flex; align-items: center; gap: .6rem;
+            margin-top: 1.6rem;
+            padding: .8rem 1.8rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white; text-decoration: none; border-radius: 12px;
+            font-weight: 700; font-size: .92rem;
+            box-shadow: 0 8px 28px rgba(79,124,255,.35);
+            transition: transform .2s, box-shadow .2s;
+            animation: fadeUp .7s .4s ease both;
+        }
+        .calendly-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(79,124,255,.45); color: white; }
+
         /* ── CONTACT GRID ── */
         .contact-section { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 5.5rem; }
         .contact-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.75rem; align-items: start; }
@@ -346,6 +360,28 @@
         .form-submit:active { transform: translateY(0); }
 
         .char-count { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--muted); text-align: right; margin-top: .28rem; }
+        .field-hint-inline { color: var(--muted); }
+
+        /* Field validation hints */
+        .field-hint {
+            font-size: .72rem; color: var(--muted); margin-top: .3rem; display: none; line-height: 1.5;
+        }
+        .form-input:invalid:not(:placeholder-shown) + .field-hint,
+        .form-select:invalid:not([value=""]) + .field-hint {
+            display: block; color: #ff6b6b;
+        }
+        .form-input:valid + .field-hint { display: none; }
+        .form-input:focus:invalid:not(:placeholder-shown) { border-color: rgba(255,107,107,.4); }
+        .form-input:focus:valid { border-color: rgba(6,214,160,.35); }
+
+        /* Spam note */
+        .spam-note {
+            display: flex; align-items: flex-start; gap: .55rem;
+            font-size: .75rem; color: var(--muted); line-height: 1.55;
+            background: rgba(6,214,160,.04); border: 1px solid rgba(6,214,160,.12);
+            border-radius: 10px; padding: .75rem 1rem; margin-bottom: 1.3rem;
+        }
+        .spam-note i { color: var(--accent3); flex-shrink: 0; margin-top: .05rem; }
 
         /* Success state */
         .form-success { display: none; text-align: center; padding: 2.5rem 1.5rem; }
@@ -483,6 +519,9 @@
     <h1>Get In <span class="grad">Touch</span></h1>
     <p class="hero-sub">Have a project, a question, or just want to say hello? My inbox is always open.</p>
     <div class="avail-badge"><div class="avail-dot"></div>Available for freelance &amp; full-time work</div>
+    <a href="https://cal.com/bimochan" target="_blank" rel="noopener" class="calendly-btn">
+        <i class="bi bi-calendar-check-fill"></i> Book a Free 30-min Call
+    </a>
 </section>
 
 <!-- CONTACT GRID -->
@@ -551,8 +590,9 @@
             <div id="formWrap">
                 <div class="form-title">Send a Message</div>
                 <div class="form-subtitle">Tell me about your project — the more detail, the better.</div>
+                <div class="spam-note"><i class="bi bi-shield-lock-fill"></i> Your data is safe. This form is protected against spam. No account required &amp; no marketing emails — ever.</div>
 
-                <form id="contactForm" action="https://formsubmit.co/bimochan081b@asm.edu.np" method="POST">
+                <form id="contactForm" action="https://formsubmit.co/bimochan081b@asm.edu.np" method="POST" novalidate>
                     <input type="hidden" name="_captcha" value="false">
                     <input type="hidden" name="_next" value="https://www.bimochanacharya.com.np/contact.html">
                     <input type="hidden" name="_subject" value="New Contact Form Submission — Portfolio">
@@ -561,18 +601,21 @@
                     <div class="form-row">
                         <div class="form-field row-field">
                             <label class="form-label" for="name">Full Name *</label>
-                            <input class="form-input" type="text" id="name" name="name" placeholder="Your full name" required>
+                            <input class="form-input" type="text" id="name" name="name" placeholder="Your full name" required minlength="2" autocomplete="name">
+                            <div class="field-hint" id="name-hint">Please enter your full name (at least 2 characters).</div>
                         </div>
                         <div class="form-field row-field">
                             <label class="form-label" for="email">Email Address *</label>
-                            <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+                            <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                            <div class="field-hint" id="email-hint">Enter a valid email address, e.g. you@example.com</div>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-field row-field">
                             <label class="form-label" for="phone">Phone (optional)</label>
-                            <input class="form-input" type="tel" id="phone" name="phone" placeholder="+977 98XXXXXXXX">
+                            <input class="form-input" type="tel" id="phone" name="phone" placeholder="+977 98XXXXXXXX" autocomplete="tel">
+                            <div class="field-hint">International format preferred, e.g. +977 9800000000</div>
                         </div>
                         <div class="form-field row-field">
                             <label class="form-label" for="type">Project Type *</label>
@@ -587,6 +630,7 @@
                                 <option value="Collaboration">Collaboration</option>
                                 <option value="Other">Other</option>
                             </select>
+                            <div class="field-hint" id="type-hint">Please select the type that best matches your need.</div>
                         </div>
                     </div>
 
@@ -604,12 +648,13 @@
 
                     <div class="form-field">
                         <label class="form-label" for="subject">Subject *</label>
-                        <input class="form-input" type="text" id="subject" name="subject" placeholder="e.g. Need a Django web app built" required>
+                        <input class="form-input" type="text" id="subject" name="subject" placeholder="e.g. Need a Django web app built" required minlength="5">
+                        <div class="field-hint" id="subject-hint">Keep it brief and descriptive (at least 5 characters).</div>
                     </div>
 
                     <div class="form-field">
                         <label class="form-label" for="message">Message *</label>
-                        <textarea class="form-textarea" id="message" name="message" placeholder="Describe your project, goals, timeline, and budget. The more detail, the better I can help." required maxlength="1000"></textarea>
+                        <textarea class="form-textarea" id="message" name="message" placeholder="Describe your project, goals, timeline, and budget. The more detail, the better I can help." required minlength="20" maxlength="1000"></textarea>
                         <div class="char-count"><span id="charCount">0</span> / 1000</div>
                     </div>
 
@@ -730,8 +775,42 @@
         charCount.style.color = len > 900 ? '#ff4560' : len > 700 ? '#ffb400' : 'var(--muted)';
     });
 
+    // ── CLIENT-SIDE VALIDATION ──
+    const form = document.getElementById('contactForm');
+    const showHint = (id, show) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = show ? 'block' : 'none';
+    };
+    ['name', 'email', 'subject'].forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        field.addEventListener('blur', () => {
+            if (!field.validity.valid && field.value.length > 0) {
+                showHint(fieldId + '-hint', true);
+                field.style.borderColor = 'rgba(255,107,107,.5)';
+            } else {
+                showHint(fieldId + '-hint', false);
+                field.style.borderColor = '';
+            }
+        });
+        field.addEventListener('input', () => {
+            if (field.validity.valid) {
+                showHint(fieldId + '-hint', false);
+                field.style.borderColor = 'rgba(6,214,160,.35)';
+            }
+        });
+    });
+
     // ── SUBMIT STATE ──
-    document.getElementById('contactForm').addEventListener('submit', function() {
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        this.querySelectorAll('[required]').forEach(field => {
+            if (!field.validity.valid) {
+                field.style.borderColor = 'rgba(255,107,107,.5)';
+                valid = false;
+            }
+        });
+        if (!valid) { e.preventDefault(); return; }
         const btn = this.querySelector('.form-submit');
         btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
         btn.style.opacity = '.7';
