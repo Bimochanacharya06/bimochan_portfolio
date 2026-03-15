@@ -6,8 +6,12 @@
     <title>Bimochan Acharya — Full Stack Developer</title>
     <meta name="description" content="Bimochan Acharya - Full Stack Developer specializing in Python, Django, Flask, and modern web technologies.">
     <meta name="author" content="Bimochan Acharya">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{% static 'img/bimochan_web_logo.svg' %}"/>
     <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -557,9 +561,75 @@
         .logo-text { display:none; }
         .hero-name { font-size:2rem; }
     }
+
+    /* ── SKIP TO CONTENT ── */
+    .skip-link {
+        position:absolute; top:-100%; left:1rem;
+        background:var(--accent); color:#fff;
+        padding:.6rem 1.2rem; border-radius:0 0 8px 8px;
+        font-size:.85rem; font-weight:700; z-index:10000;
+        text-decoration:none; transition:top .2s;
+    }
+    .skip-link:focus { top:0; }
+
+    /* ── FOCUS OUTLINES (WCAG AA — 2px, high-contrast) ── */
+    :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+    }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* ── BACK TO TOP ── */
+    #back-to-top {
+        position:fixed; bottom:90px; right:28px;
+        width:42px; height:42px; border-radius:12px;
+        background:var(--surface); border:1px solid var(--border);
+        color:var(--text); font-size:1.1rem;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; z-index:490;
+        opacity:0; pointer-events:none;
+        transition:opacity .3s, transform .3s, border-color .2s;
+        box-shadow:0 4px 16px rgba(0,0,0,.15);
+    }
+    #back-to-top.visible { opacity:1; pointer-events:auto; }
+    #back-to-top:hover { border-color:var(--accent); transform:translateY(-3px); }
+
+    /* ── COPY EMAIL BUTTON ── */
+    .copy-email-btn {
+        display:inline-flex; align-items:center; gap:.3rem;
+        background:transparent; border:1px solid var(--border);
+        color:var(--muted); font-size:.72rem; border-radius:6px;
+        padding:.15rem .5rem; cursor:pointer;
+        transition:color .2s, border-color .2s;
+        vertical-align:middle; margin-left:.35rem;
+        font-family:inherit;
+    }
+    .copy-email-btn:hover { color:var(--accent); border-color:var(--accent); }
+    .copy-email-tooltip {
+        position:absolute; background:var(--accent); color:#fff;
+        font-size:.7rem; font-weight:600; padding:.2rem .55rem;
+        border-radius:6px; pointer-events:none;
+        opacity:0; transform:translateY(-4px);
+        transition:opacity .2s, transform .2s;
+        white-space:nowrap; z-index:100;
+    }
+    .copy-email-tooltip.show { opacity:1; transform:translateY(-28px); }
+    .cc-value { position:relative; }
+
+    /* ── PREFERS-REDUCED-MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        html { scroll-behavior: auto; }
+    }
     </style>
 </head>
 <body>
+<a href="#home" class="skip-link">Skip to main content</a>
 
 <div class="bg-animation">
     <div class="orb orb-1"></div>
@@ -634,8 +704,18 @@
             <div class="photo-glow"></div>
             <div class="photo-ring"></div>
             <div class="photo-ring-mask"></div>
-            <img src="/static/img/photo.jpeg" alt="Bimochan Acharya" class="photo-img"
-                 onerror="this.style.display='none';document.querySelector('.photo-placeholder').style.display='flex'">
+            <picture>
+                <source
+                    srcset="/static/img/photo-480w.webp 480w, /static/img/photo-800w.webp 800w, /static/img/photo-1200w.webp 1200w"
+                    sizes="(max-width:600px) 240px, 300px"
+                    type="image/webp">
+                <img src="/static/img/photo.jpeg"
+                     srcset="/static/img/photo.jpeg 960w"
+                     sizes="(max-width:600px) 240px, 300px"
+                     alt="Bimochan Acharya" class="photo-img"
+                     width="300" height="300"
+                     onerror="this.closest('picture').querySelector('source').remove();this.style.display='none';document.querySelector('.photo-placeholder').style.display='flex'">
+            </picture>
             <div class="photo-placeholder" style="display:none">BA</div>
         </div>
         <div class="float-card fc-1"><i class="bi bi-code-slash"></i> Full Stack</div>
@@ -677,7 +757,7 @@
                 <div class="cc-icon"><i class="bi bi-envelope"></i></div>
                 <div>
                     <div class="cc-label">Email</div>
-                    <div class="cc-value"><a href="mailto:bimochan081b@asm.edu.np">bimochan081b@asm.edu.np</a></div>
+                    <div class="cc-value"><a href="mailto:bimochan081b@asm.edu.np">bimochan081b@asm.edu.np</a><button class="copy-email-btn" aria-label="Copy email address" data-email="bimochan081b@asm.edu.np"><i class="bi bi-clipboard"></i> Copy</button><span class="copy-email-tooltip" aria-live="polite">Copied!</span></div>
                 </div>
             </div>
             <div class="contact-card">
@@ -857,8 +937,32 @@
     }, { passive: true });
 
     document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // ── BACK TO TOP ──
+    const btt = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+        btt.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── COPY EMAIL ──
+    document.querySelectorAll('.copy-email-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const email = btn.dataset.email;
+            navigator.clipboard.writeText(email).then(() => {
+                const tip = btn.closest('.cc-value').querySelector('.copy-email-tooltip');
+                tip.classList.add('show');
+                btn.setAttribute('aria-label', 'Email copied!');
+                setTimeout(() => {
+                    tip.classList.remove('show');
+                    btn.setAttribute('aria-label', 'Copy email address');
+                }, 2000);
+            });
+        });
+    });
 </script>
     <!-- Paste this just before </body> in your index.html -->
+<button id="back-to-top" aria-label="Back to top"><i class="bi bi-chevron-up"></i></button>
 <a href="bimo-ai-chat.html" target="_blank" style="
   position: fixed;
   bottom: 28px;

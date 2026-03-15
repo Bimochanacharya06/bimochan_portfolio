@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bimochan Acharya — Projects</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -456,9 +460,53 @@
             .cta-card { padding: 2.5rem 1.5rem; }
             footer { justify-content: center; text-align: center; }
         }
+
+        /* ── SKIP TO CONTENT ── */
+        .skip-link {
+            position:absolute; top:-100%; left:1rem;
+            background:var(--accent); color:#fff;
+            padding:.6rem 1.2rem; border-radius:0 0 8px 8px;
+            font-size:.85rem; font-weight:700; z-index:10000;
+            text-decoration:none; transition:top .2s;
+        }
+        .skip-link:focus { top:0; }
+
+        /* ── FOCUS OUTLINES ── */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        :focus:not(:focus-visible) { outline: none; }
+
+        /* ── BACK TO TOP ── */
+        #back-to-top {
+            position:fixed; bottom:28px; right:28px;
+            width:42px; height:42px; border-radius:12px;
+            background:var(--surface); border:1px solid var(--border);
+            color:var(--text); font-size:1.1rem;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; z-index:490;
+            opacity:0; pointer-events:none;
+            transition:opacity .3s, transform .3s, border-color .2s;
+            box-shadow:0 4px 16px rgba(0,0,0,.15);
+        }
+        #back-to-top.visible { opacity:1; pointer-events:auto; }
+        #back-to-top:hover { border-color:var(--accent); transform:translateY(-3px); }
+
+        /* ── PREFERS-REDUCED-MOTION ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            html { scroll-behavior: auto; }
+        }
     </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <div class="scroll-progress" id="scrollProgress"></div>
 <div class="mesh-bg"></div>
@@ -506,7 +554,7 @@
 </section>
 
 <!-- FILTER BAR -->
-<div class="filter-bar">
+<div class="filter-bar" id="main-content">
     <button class="filter-btn active" data-filter="all">All</button>
     <button class="filter-btn" data-filter="fullstack">Full Stack</button>
     <button class="filter-btn" data-filter="frontend">Frontend</button>
@@ -724,6 +772,14 @@
     });
 
     document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // ── BACK TO TOP ──
+    const btt = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+        btt.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 </script>
+<button id="back-to-top" aria-label="Back to top"><i class="bi bi-chevron-up"></i></button>
 </body>
 </html>
