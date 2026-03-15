@@ -93,10 +93,28 @@
                 align-items: center;
             }
         }
+
+        /* ── FOCUS OUTLINES ── */
+        :focus-visible {
+            outline: 2px solid #4f7cff;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        :focus:not(:focus-visible) { outline: none; }
+
+        /* ── PREFERS-REDUCED-MOTION ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 
 <body class="loaded">
+    <a href="#main-content" class="visually-hidden-focusable">Skip to main content</a>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
@@ -145,7 +163,7 @@
     </nav>
 
     <!-- Error Section -->
-    <section class="error-section">
+    <section class="error-section" id="main-content">
         <div class="container">
             <div class="error-content">
                 <div class="error-code">404</div>
