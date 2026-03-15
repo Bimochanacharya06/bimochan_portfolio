@@ -567,7 +567,7 @@
                     <div class="info-label">Email</div>
                     <div class="copy-email-wrap">
                         <span class="info-value">bimochan081b@asm.edu.np</span>
-                        <button class="copy-email-btn" aria-label="Copy email address" data-email="bimochan081b@asm.edu.np" onclick="event.preventDefault()"><i class="bi bi-clipboard"></i> Copy</button>
+                        <button class="copy-email-btn" aria-label="Copy email address" data-email="bimochan081b@asm.edu.np"><i class="bi bi-clipboard"></i> Copy</button>
                         <span class="copy-email-tooltip" aria-live="polite">Copied!</span>
                     </div>
                 </div>
@@ -829,7 +829,11 @@
             navigator.clipboard.writeText(email).then(() => {
                 const tip = btn.closest('.copy-email-wrap').querySelector('.copy-email-tooltip');
                 tip.classList.add('show');
-                setTimeout(() => tip.classList.remove('show'), 2000);
+                btn.setAttribute('aria-label', 'Email copied!');
+                setTimeout(() => {
+                    tip.classList.remove('show');
+                    btn.setAttribute('aria-label', 'Copy email address');
+                }, 2000);
             });
         });
     });

@@ -26,6 +26,7 @@ live URL after deploy.
 | `/project.html`   | ≥ 85        | ≥ 90          | ≥ 90           | ≥ 90 |
 | `/contact.html`   | ≥ 85        | ≥ 90          | ≥ 90           | ≥ 90 |
 | `/education.html` | ≥ 85        | ≥ 90          | ≥ 90           | ≥ 90 |
+| `/404.html`       | ≥ 90        | ≥ 90          | ≥ 90           | N/A  |
 
 > Run on **desktop** profile (mobile scores will vary due to network simulation).
 

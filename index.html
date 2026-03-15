@@ -952,7 +952,11 @@
             navigator.clipboard.writeText(email).then(() => {
                 const tip = btn.closest('.cc-value').querySelector('.copy-email-tooltip');
                 tip.classList.add('show');
-                setTimeout(() => tip.classList.remove('show'), 2000);
+                btn.setAttribute('aria-label', 'Email copied!');
+                setTimeout(() => {
+                    tip.classList.remove('show');
+                    btn.setAttribute('aria-label', 'Copy email address');
+                }, 2000);
             });
         });
     });
