@@ -5,7 +5,7 @@ import urllib.request
 import urllib.error
 
 
-def _resp(status_code, payload):
+def _response(status_code, payload):
     return {
         "statusCode": status_code,
         "headers": {
@@ -18,47 +18,45 @@ def _resp(status_code, payload):
     }
 
 
-def _extract_request(request):
-    """
-    Supports Vercel Python request shapes (dict-like),
-    and gracefully handles missing fields.
-    """
-    if isinstance(request, dict):
-        method = (request.get("method") or request.get("httpMethod") or "GET").upper()
-        body_raw = request.get("body") or "{}"
-        is_b64 = bool(request.get("isBase64Encoded"))
-        return method, body_raw, is_b64
-    # Fallback
-    return "GET", "{}", False
+def _get_method(req):
+    if not isinstance(req, dict):
+        return "GET"
+    return (req.get("method") or req.get("httpMethod") or "GET").upper()
+
+
+def _get_json_body(req):
+    if not isinstance(req, dict):
+        return {}
+    raw = req.get("body") or "{}"
+    if req.get("isBase64Encoded"):
+        raw = base64.b64decode(raw).decode("utf-8", errors="ignore")
+    try:
+        return json.loads(raw or "{}")
+    except Exception:
+        return None
 
 
 def handler(request):
     try:
-        method, body_raw, is_b64 = _extract_request(request)
+        method = _get_method(request)
 
-        # CORS preflight
         if method == "OPTIONS":
-            return _resp(200, {"ok": True})
+            return _response(200, {"ok": True})
 
-        # Only POST supported
         if method != "POST":
-            return _resp(405, {"error": "Method Not Allowed. Use POST."})
+            return _response(405, {"error": f"Method {method} not allowed. Use POST."})
 
-        if is_b64:
-            body_raw = base64.b64decode(body_raw).decode("utf-8", errors="ignore")
-
-        try:
-            body = json.loads(body_raw or "{}")
-        except Exception:
-            return _resp(400, {"error": "Invalid JSON body"})
+        body = _get_json_body(request)
+        if body is None:
+            return _response(400, {"error": "Invalid JSON body"})
 
         api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
         if not api_key:
-            return _resp(500, {"error": "ANTHROPIC_API_KEY not set in Vercel environment variables"})
+            return _response(500, {"error": "ANTHROPIC_API_KEY not set in Vercel environment variables"})
 
         messages = body.get("messages", [])
         if not isinstance(messages, list):
-            return _resp(400, {"error": "messages must be an array"})
+            return _response(400, {"error": "messages must be an array"})
 
         payload = {
             "model": "claude-sonnet-4-20250514",
@@ -85,27 +83,27 @@ def handler(request):
             method="POST"
         )
 
-        with urllib.request.urlopen(req, timeout=180) as response:
-            raw = response.read().decode("utf-8", errors="ignore")
+        with urllib.request.urlopen(req, timeout=180) as r:
+            raw = r.read().decode("utf-8", errors="ignore")
 
         try:
             data = json.loads(raw)
         except Exception:
-            return _resp(502, {"error": "Invalid JSON from Anthropic", "raw": raw[:500]})
+            return _response(502, {"error": "Invalid JSON from Anthropic", "raw": raw[:500]})
 
         content = data.get("content", [])
         reply = "".join(
-            block.get("text", "")
-            for block in content
-            if isinstance(block, dict) and block.get("type") == "text"
+            b.get("text", "")
+            for b in content
+            if isinstance(b, dict) and b.get("type") == "text"
         ).strip()
 
         search_used = any(
-            isinstance(block, dict) and block.get("type") == "tool_use"
-            for block in content
+            isinstance(b, dict) and b.get("type") == "tool_use"
+            for b in content
         )
 
-        return _resp(200, {
+        return _response(200, {
             "reply": reply or "No response.",
             "search_used": search_used
         })
@@ -115,7 +113,6 @@ def handler(request):
             err = e.read().decode("utf-8", errors="ignore")
         except Exception:
             err = str(e)
-        return _resp(getattr(e, "code", 500), {"error": err})
-
+        return _response(getattr(e, "code", 500), {"error": err})
     except Exception as e:
-        return _resp(500, {"error": str(e)})
+        return _response(500, {"error": str(e)})
