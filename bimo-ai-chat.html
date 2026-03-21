@@ -8,11 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 
-  <!-- Libraries FIRST -->
+  <!-- Library scripts first -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-  <!-- Hard fallbacks (prevents 'marked is not defined') -->
+  <!-- Hard fallbacks -->
   <script>
     if (typeof marked === "undefined") {
       window.marked = {
@@ -160,7 +160,6 @@
     .spill{display:inline-flex;align-items:center;gap:5px;font-size:9px;padding:3px 8px;border-radius:999px;width:fit-content}
     .spill-search{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.28);color:var(--search-clr)}
     .spill-code{background:rgba(124,111,255,.08);border:1px solid rgba(124,111,255,.22);color:var(--accent)}
-    .spill-mem{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:var(--mem-clr)}
 
     .bubble h1,.bubble h2,.bubble h3{font-family:'Syne',sans-serif;margin:10px 0 6px}
     .bubble h1{font-size:16px}.bubble h2{font-size:14px}.bubble h3{font-size:13px;color:var(--accent)}
@@ -266,7 +265,7 @@ const CHAT_STORE_KEY="bimo_chat_sessions_v2";
 
 let history=[],searchOn=true,codeOn=true,loading=false;
 let sessions=[],currentSessionId=null;
-let activeController=null; // kept for UI compatibility
+let activeController=null;
 let lastUserPrompt="";
 
 try{sessions=JSON.parse(localStorage.getItem(CHAT_STORE_KEY)||"[]")}catch{sessions=[]}
@@ -388,25 +387,19 @@ Code mode: ${codeOn?"on":"off"}
 Be concise, clear, and practical.`;
 }
 
-/* JSON-safe request helper (fixes Unexpected end of JSON input) */
-async function postJSON(url, payload){
-  const res = await fetch(url,{
+async function postJSON(url,payload){
+  const res=await fetch(url,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
   });
 
-  const raw = await res.text();
-  let data = {};
-  try{
-    data = raw ? JSON.parse(raw) : {};
-  }catch{
-    throw new Error(`Invalid JSON from ${url}. Status ${res.status}. Body: ${raw.slice(0,220)}`);
-  }
+  const raw=await res.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}
+  catch{throw new Error(`Invalid JSON from ${url}. Status ${res.status}. Body: ${raw.slice(0,220)}`)}
 
-  if(!res.ok){
-    throw new Error(data.error || `Server ${res.status}`);
-  }
+  if(!res.ok) throw new Error(data.error||`Server ${res.status}`);
   return data;
 }
 
@@ -453,7 +446,6 @@ async function sendMessage(regenText=null){
 }
 
 function stopGenerating(){
-  // non-stream mode: just unlock UI
   loading=false;sendBtn.disabled=false;stopBtn.classList.add("hide");regenBtn.classList.remove("hide");
   toast("Stopped");
 }
