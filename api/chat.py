@@ -9,69 +9,68 @@ def _response(status_code, payload):
     return {
         "statusCode": status_code,
         "headers": {
-            "Content-Type": "application/json; charset=utf-8",
+            "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "POST, OPTIONS",
             "Access-Control-Allow-Headers": "Content-Type"
         },
-        "body": json.dumps(payload, ensure_ascii=False)
+        "body": json.dumps(payload)
     }
-
-
-def _get_method(req):
-    if not isinstance(req, dict):
-        return "GET"
-    return (req.get("method") or req.get("httpMethod") or "GET").upper()
-
-
-def _get_json_body(req):
-    if not isinstance(req, dict):
-        return {}
-    raw = req.get("body") or "{}"
-    if req.get("isBase64Encoded"):
-        raw = base64.b64decode(raw).decode("utf-8", errors="ignore")
-    try:
-        return json.loads(raw or "{}")
-    except Exception:
-        return None
 
 
 def handler(request):
     try:
-        method = _get_method(request)
+        # ✅ safer method detection
+        method = getattr(request, "method", None)
+        if not method and isinstance(request, dict):
+            method = request.get("method") or request.get("httpMethod")
+        method = (method or "GET").upper()
 
         if method == "OPTIONS":
             return _response(200, {"ok": True})
 
         if method != "POST":
-            return _response(405, {"error": f"Method {method} not allowed. Use POST."})
+            return _response(405, {"error": f"Method {method} not allowed"})
 
-        body = _get_json_body(request)
-        if body is None:
+        # ✅ safer body parsing
+        raw_body = None
+        if hasattr(request, "body"):
+            raw_body = request.body
+        elif isinstance(request, dict):
+            raw_body = request.get("body")
+
+        if isinstance(raw_body, bytes):
+            raw_body = raw_body.decode("utf-8")
+
+        if isinstance(request, dict) and request.get("isBase64Encoded"):
+            raw_body = base64.b64decode(raw_body).decode("utf-8")
+
+        try:
+            body = json.loads(raw_body or "{}")
+        except Exception:
             return _response(400, {"error": "Invalid JSON body"})
 
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+        # ✅ API key check
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
         if not api_key:
-            return _response(500, {"error": "ANTHROPIC_API_KEY not set in Vercel environment variables"})
+            return _response(500, {"error": "Missing ANTHROPIC_API_KEY"})
 
         messages = body.get("messages", [])
         if not isinstance(messages, list):
-            return _response(400, {"error": "messages must be an array"})
+            return _response(400, {"error": "messages must be array"})
 
+        # ✅ safer model
         payload = {
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": 4096 if body.get("code_mode") else 1024,
-            "system": body.get("system", ""),
+            "model": "claude-3-5-sonnet-latest",
+            "max_tokens": 1024,
             "messages": messages
         }
 
-        if body.get("web_search"):
-            payload["tools"] = [{
-                "type": "web_search_20250305",
-                "name": "web_search",
-                "max_uses": 3
-            }]
+        # optional system prompt
+        if body.get("system"):
+            payload["system"] = body["system"]
 
+        # API request
         req = urllib.request.Request(
             "https://api.anthropic.com/v1/messages",
             data=json.dumps(payload).encode("utf-8"),
@@ -83,36 +82,19 @@ def handler(request):
             method="POST"
         )
 
-        with urllib.request.urlopen(req, timeout=180) as r:
-            raw = r.read().decode("utf-8", errors="ignore")
+        with urllib.request.urlopen(req, timeout=60) as r:
+            raw = r.read().decode("utf-8")
 
-        try:
-            data = json.loads(raw)
-        except Exception:
-            return _response(502, {"error": "Invalid JSON from Anthropic", "raw": raw[:500]})
+        data = json.loads(raw)
 
-        content = data.get("content", [])
-        reply = "".join(
-            b.get("text", "")
-            for b in content
-            if isinstance(b, dict) and b.get("type") == "text"
-        ).strip()
+        reply = ""
+        for block in data.get("content", []):
+            if block.get("type") == "text":
+                reply += block.get("text", "")
 
-        search_used = any(
-            isinstance(b, dict) and b.get("type") == "tool_use"
-            for b in content
-        )
-
-        return _response(200, {
-            "reply": reply or "No response.",
-            "search_used": search_used
-        })
+        return _response(200, {"reply": reply.strip()})
 
     except urllib.error.HTTPError as e:
-        try:
-            err = e.read().decode("utf-8", errors="ignore")
-        except Exception:
-            err = str(e)
-        return _response(getattr(e, "code", 500), {"error": err})
+        return _response(e.code, {"error": e.read().decode("utf-8")})
     except Exception as e:
         return _response(500, {"error": str(e)})
