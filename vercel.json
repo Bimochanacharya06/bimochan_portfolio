@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/chat.py": {
-      "runtime": "python3.11",
-      "maxDuration": 60
-    }
-  },
   "routes": [
     {
       "src": "/api/chat",
