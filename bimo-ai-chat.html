@@ -8,11 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
 
-  <!-- Load libs first (no defer) -->
+  <!-- Libraries FIRST -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-  <!-- Fallbacks so app never crashes if CDN fails -->
+  <!-- Hard fallbacks (prevents 'marked is not defined') -->
   <script>
     if (typeof marked === "undefined") {
       window.marked = {
@@ -29,7 +29,7 @@
     if (typeof hljs === "undefined") {
       window.hljs = {
         getLanguage: () => false,
-        highlight: (codeObj) => ({ value: codeObj?.code || "" }),
+        highlight: (obj) => ({ value: (obj && obj.code) ? obj.code : "" }),
         highlightAuto: (code) => ({ value: code || "" })
       };
       console.warn("highlight.js CDN unavailable. Fallback highlighter enabled.");
@@ -218,7 +218,7 @@
       <div class="logo">B<div class="logo-ping"></div></div>
       <div class="hinfo">
         <div class="hname">Bimo AI — Portfolio Assistant</div>
-        <div class="hsub">Streaming · Regenerate · Stop · History · Auto Theme</div>
+        <div class="hsub">Premium UI · Stable JSON mode · Regenerate · Stop · History</div>
       </div>
       <div class="hactions">
         <button class="hbtn" onclick="newChat()">New Chat</button>
@@ -227,11 +227,11 @@
 
     <div class="hero" id="heroCard">
       <div class="hero-title">Welcome 👋</div>
-      <div class="hero-sub">Ask for code, debugging, architecture, or live web research.</div>
+      <div class="hero-sub">Ask for coding help, debugging, architecture, or web-aware prompts.</div>
       <div class="hero-actions">
         <button class="hero-btn primary" onclick="sendChip('Build a complete Django REST API with JWT auth and CRUD operations')">Build API</button>
         <button class="hero-btn" onclick="sendChip('Debug this and explain: \n\n```python\n\n```')">Debug</button>
-        <button class="hero-btn" onclick="sendChip('Search: latest web dev trends 2026')">Search</button>
+        <button class="hero-btn" onclick="sendChip('Search latest frontend trends and summarize')">Search</button>
       </div>
     </div>
 
@@ -263,16 +263,13 @@
 const API_URL="/api/chat";
 const THEME_KEY="bimo_theme_v1";
 const CHAT_STORE_KEY="bimo_chat_sessions_v2";
-const MEM_KEY="bimo_memory_v2";
 
 let history=[],searchOn=true,codeOn=true,loading=false;
 let sessions=[],currentSessionId=null;
-let memory=[];
-let activeController=null;
+let activeController=null; // kept for UI compatibility
 let lastUserPrompt="";
 
 try{sessions=JSON.parse(localStorage.getItem(CHAT_STORE_KEY)||"[]")}catch{sessions=[]}
-try{memory=JSON.parse(localStorage.getItem(MEM_KEY)||"[]")}catch{memory=[]}
 
 marked.setOptions({breaks:true,gfm:true});
 
@@ -338,13 +335,12 @@ function newChat(){
   history=[];currentSessionId=null;messagesEl.innerHTML="";
   heroCard.classList.remove("hide");appendWelcome();persistCurrent();renderHistory();
 }
-function appendWelcome(){appendMsg("bot","Hey! I’m **Bimo AI**. Tell me what you want to build and I’ll help step-by-step.");}
+function appendWelcome(){appendMsg("bot","Hey! I’m **Bimo AI**. Ask me anything and I’ll help step-by-step.");}
 function toggleSidebar(){sidebar.classList.toggle("open")}
 function toggleSearch(){searchOn=!searchOn;const b=document.getElementById("searchToggle");b.textContent=`🔍 Search: ${searchOn?"ON":"OFF"}`;b.className="itoggle"+(searchOn?" on":"")}
 function toggleCode(){codeOn=!codeOn;const b=document.getElementById("codeToggle");b.textContent=`💻 Code: ${codeOn?"ON":"OFF"}`;b.className="itoggle"+(codeOn?" on":"")}
 function sendChip(t){inputEl.value=t;resize();sendMessage()}
 function wantsSearch(t){return searchOn && /search:|latest|current|2025|2026|news|today|price|who is|recent|trend/i.test(t)}
-function wantsCode(t){return codeOn && /write|build|create|code|implement|function|class|api|script|django|flask|javascript|python|debug|fix|error/i.test(t)}
 
 function sanitizeHTML(html){
   const d=new DOMParser().parseFromString(html,"text/html");
@@ -377,9 +373,8 @@ function appendMsg(role,content,opts={}){
   const div=document.createElement("div");
   div.className=`msg ${role}${opts.typing?" typing":""}`;
   let pills="";
-  if(opts.searching)pills+=`<div class="spill spill-search">🔍 Searching web…</div>`;
-  if(opts.memory)pills+=`<div class="spill spill-mem">🧠 Memory…</div>`;
-  if(opts.coding)pills+=`<div class="spill spill-code">💻 Code mode…</div>`;
+  if(opts.searching)pills+=`<div class="spill spill-search">🔍 Search mode</div>`;
+  if(opts.coding)pills+=`<div class="spill spill-code">💻 Code mode</div>`;
   const inner=opts.typing?`<div class="dots"><span></span><span></span><span></span></div>`:(opts.raw?escapeHtml(content):renderMd(content));
   const copyBtn=(role==="bot"&&!opts.typing)?`<button class="meta-btn" onclick="copyAnswer(this)">Copy answer</button>`:"";
   div.innerHTML=`<div class="mavatar">${role==="bot"?"B":"U"}</div><div class="bwrap">${pills}<div class="bubble">${inner}</div>${!opts.typing?`<div class="mmeta">${timeNow()} · 🔒 Secure ${copyBtn}</div>`:""}</div>`;
@@ -388,66 +383,31 @@ function appendMsg(role,content,opts={}){
 
 function buildSystem(){
   return `You are Bimo AI assistant.
-Code mode: ${codeOn?"on":"off"}
 Search mode: ${searchOn?"on":"off"}
-Be concise and helpful.`;
+Code mode: ${codeOn?"on":"off"}
+Be concise, clear, and practical.`;
 }
 
-async function streamAssistantResponse(payload,typingEl,willCode){
-  let full="";
-  const botEl=appendMsg("bot","",{raw:true});
-  const bubble=botEl.querySelector(".bubble");
-  const meta=botEl.querySelector(".mmeta");
-  bubble.textContent="";
-  meta.innerHTML=`${timeNow()} · ⏳ Generating...`;
-
-  activeController=new AbortController();
-  const res=await fetch(API_URL,{
+/* JSON-safe request helper (fixes Unexpected end of JSON input) */
+async function postJSON(url, payload){
+  const res = await fetch(url,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({...payload,stream:true}),
-    signal:activeController.signal
+    body:JSON.stringify(payload)
   });
 
+  const raw = await res.text();
+  let data = {};
+  try{
+    data = raw ? JSON.parse(raw) : {};
+  }catch{
+    throw new Error(`Invalid JSON from ${url}. Status ${res.status}. Body: ${raw.slice(0,220)}`);
+  }
+
   if(!res.ok){
-    const t=await res.text();
-    throw new Error(t || `Server ${res.status}`);
+    throw new Error(data.error || `Server ${res.status}`);
   }
-  if(!res.body) throw new Error("No stream body");
-
-  if(typingEl && typingEl.parentNode) typingEl.remove();
-
-  const reader=res.body.getReader();
-  const decoder=new TextDecoder();
-  let buffer="";
-
-  while(true){
-    const {value,done}=await reader.read();
-    if(done) break;
-
-    buffer += decoder.decode(value,{stream:true});
-    const lines=buffer.split("\n");
-    buffer=lines.pop()||"";
-
-    for(const line of lines){
-      if(!line.trim()) continue;
-      let obj=null;
-      try{ obj=JSON.parse(line); }catch{ continue; }
-
-      if(obj.type==="delta"){
-        full += obj.text || "";
-        bubble.innerHTML=renderMd(full);
-        messagesEl.scrollTop=messagesEl.scrollHeight;
-      }else if(obj.type==="done"){
-        meta.innerHTML=`${timeNow()}${willCode?" · 💻 Code":""} · 🔒 Secure <button class="meta-btn" onclick="copyAnswer(this)">Copy answer</button>`;
-      }else if(obj.type==="error"){
-        throw new Error(obj.error || "Streaming error");
-      }
-    }
-  }
-
-  if(!full.trim()) full="No response.";
-  return full;
+  return data;
 }
 
 async function sendMessage(regenText=null){
@@ -464,24 +424,23 @@ async function sendMessage(regenText=null){
   lastUserPrompt=text;
   persistCurrent();
 
-  const willSearch=wantsSearch(text),willCode=wantsCode(text);
-  const typingEl=appendMsg("bot","",{typing:true,searching:willSearch,memory:memory.length>0,coding:willCode});
+  const willSearch=wantsSearch(text);
+  const typingEl=appendMsg("bot","",{typing:true,searching:willSearch,coding:codeOn});
 
   try{
-    const payload={messages:history,web_search:willSearch,code_mode:codeOn,system:buildSystem()};
-    let reply="";
+    const payload={
+      messages:history,
+      web_search:willSearch,
+      code_mode:codeOn,
+      system:buildSystem()
+    };
 
-    try{
-      reply=await streamAssistantResponse(payload,typingEl,willCode);
-    }catch(streamErr){
-      if(typingEl && typingEl.parentNode) typingEl.remove();
-      const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-      const data=await res.json();
-      if(!res.ok) throw new Error(data.error||`Server ${res.status}`);
-      reply=data.reply||"No response.";
-      appendMsg("bot",reply,{coded:willCode,searched:!!data.search_used});
-    }
+    const data=await postJSON(API_URL,payload);
 
+    if(typingEl && typingEl.parentNode) typingEl.remove();
+
+    const reply=data.reply||"No response.";
+    appendMsg("bot",reply,{searched:!!data.search_used,coded:codeOn});
     history.push({role:"assistant",content:reply});
     persistCurrent();
     regenBtn.classList.remove("hide");
@@ -494,8 +453,9 @@ async function sendMessage(regenText=null){
 }
 
 function stopGenerating(){
-  if(activeController){activeController.abort();activeController=null;toast("Generation stopped");}
+  // non-stream mode: just unlock UI
   loading=false;sendBtn.disabled=false;stopBtn.classList.add("hide");regenBtn.classList.remove("hide");
+  toast("Stopped");
 }
 function regenerateLast(){
   if(!lastUserPrompt){toast("No previous prompt");return;}
