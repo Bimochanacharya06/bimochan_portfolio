@@ -1,60 +1,60 @@
 import os
 import json
-from http.server import BaseHTTPRequestHandler
 import urllib.request
 import urllib.error
 
 
-class handler(BaseHTTPRequestHandler):
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
+def _response(status, data, headers=None):
+    base_headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+    }
+    if headers:
+        base_headers.update(headers)
+    return {
+        "statusCode": status,
+        "headers": base_headers,
+        "body": json.dumps(data, ensure_ascii=False)
+    }
 
-    def do_POST(self):
-        try:
-            length = int(self.headers.get("Content-Length", 0))
-            raw = self.rfile.read(length) if length > 0 else b"{}"
-            body = json.loads(raw)
 
-            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-            if not api_key:
-                self._json(500, {"error": "ANTHROPIC_API_KEY not set in Vercel environment variables"})
-                return
+def handler(request):
+    try:
+        method = request.get("method", "GET").upper() if isinstance(request, dict) else "GET"
 
-            wants_stream = bool(body.get("stream"))
+        if method == "OPTIONS":
+            return _response(200, {"ok": True})
 
-            payload = {
-                "model": "claude-sonnet-4-20250514",
-                "max_tokens": 4096 if body.get("code_mode") else 1024,
-                "system": body.get("system", ""),
-                "messages": body.get("messages", []),
-            }
+        if method != "POST":
+            return _response(405, {"error": "Method Not Allowed. Use POST."})
 
-            if body.get("web_search"):
-                payload["tools"] = [{
-                    "type": "web_search_20250305",
-                    "name": "web_search",
-                    "max_uses": 3
-                }]
+        body_raw = request.get("body", "{}") if isinstance(request, dict) else "{}"
+        if request.get("isBase64Encoded") if isinstance(request, dict) else False:
+            import base64
+            body_raw = base64.b64decode(body_raw).decode("utf-8", errors="ignore")
 
-            if wants_stream:
-                self._stream_anthropic(api_key, payload)
-            else:
-                self._json_anthropic(api_key, payload)
+        body = json.loads(body_raw or "{}")
 
-        except urllib.error.HTTPError as e:
-            try:
-                err = e.read().decode("utf-8", errors="ignore")
-            except Exception:
-                err = str(e)
-            self._json(getattr(e, "code", 500), {"error": err})
-        except Exception as e:
-            self._json(500, {"error": str(e)})
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            return _response(500, {"error": "ANTHROPIC_API_KEY not set in Vercel environment variables"})
 
-    def _json_anthropic(self, api_key, payload):
+        payload = {
+            "model": "claude-sonnet-4-20250514",
+            "max_tokens": 4096 if body.get("code_mode") else 1024,
+            "system": body.get("system", ""),
+            "messages": body.get("messages", [])
+        }
+
+        if body.get("web_search"):
+            payload["tools"] = [{
+                "type": "web_search_20250305",
+                "name": "web_search",
+                "max_uses": 3
+            }]
+
         req = urllib.request.Request(
             "https://api.anthropic.com/v1/messages",
             data=json.dumps(payload).encode("utf-8"),
@@ -75,89 +75,14 @@ class handler(BaseHTTPRequestHandler):
             if block.get("type") == "text"
         )
         search_used = any(block.get("type") == "tool_use" for block in data.get("content", []))
-        self._json(200, {"reply": reply or "No response.", "search_used": search_used})
 
-    def _stream_anthropic(self, api_key, payload):
-        # Enable Anthropic streaming
-        stream_payload = dict(payload)
-        stream_payload["stream"] = True
+        return _response(200, {"reply": reply or "No response.", "search_used": search_used})
 
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=json.dumps(stream_payload).encode("utf-8"),
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-                "accept": "text/event-stream"
-            },
-            method="POST"
-        )
-
-        # Return NDJSON stream to browser
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "no-cache, no-transform")
-        self.send_header("Connection", "keep-alive")
-        self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
-        self.end_headers()
-
+    except urllib.error.HTTPError as e:
         try:
-            with urllib.request.urlopen(req, timeout=300) as r:
-                for raw_line in r:
-                    line = raw_line.decode("utf-8", errors="ignore").strip()
-                    if not line:
-                        continue
-
-                    # Anthropic SSE lines are like: "data: {...}"
-                    if not line.startswith("data: "):
-                        continue
-
-                    data_str = line[6:].strip()
-                    if data_str == "[DONE]":
-                        self._write_ndjson({"type": "done"})
-                        break
-
-                    try:
-                        evt = json.loads(data_str)
-                    except Exception:
-                        continue
-
-                    evt_type = evt.get("type")
-
-                    # token/text delta
-                    if evt_type == "content_block_delta":
-                        delta = evt.get("delta", {})
-                        text = delta.get("text", "")
-                        if text:
-                            self._write_ndjson({"type": "delta", "text": text})
-
-                    # end event
-                    elif evt_type == "message_stop":
-                        self._write_ndjson({"type": "done"})
-
-        except BrokenPipeError:
-            # client aborted (Stop button)
-            return
-        except Exception as e:
-            try:
-                self._write_ndjson({"type": "error", "error": str(e)})
-            except Exception:
-                pass
-
-    def _write_ndjson(self, obj):
-        chunk = (json.dumps(obj, ensure_ascii=False) + "\n").encode("utf-8")
-        self.wfile.write(chunk)
-        self.wfile.flush()
-
-    def _json(self, status, data):
-        body = json.dumps(data).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(body)
-
-    def log_message(self, *args):
-        pass
+            err = e.read().decode("utf-8", errors="ignore")
+        except Exception:
+            err = str(e)
+        return _response(getattr(e, "code", 500), {"error": err})
+    except Exception as e:
+        return _response(500, {"error": str(e)})
