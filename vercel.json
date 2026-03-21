@@ -1,14 +1,17 @@
 {
   "version": 2,
-  "functions": {
-    "api/chat.py": {
-      "runtime": "@vercel/python@4.7.1"
-    }
-  },
-  "rewrites": [
+  "outputDirectory": ".",
+  "routes": [
     {
-      "source": "/api/chat",
-      "destination": "/api/chat.py"
+      "src": "/api/chat",
+      "dest": "/api/chat.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
