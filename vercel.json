@@ -1,17 +1,8 @@
 {
   "version": 2,
-  "outputDirectory": ".",
-  "routes": [
-    {
-      "src": "/api/chat",
-      "dest": "/api/chat.py"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+  "functions": {
+    "api/chat.py": {
+      "runtime": "python3.11"
     }
-  ]
+  }
 }
