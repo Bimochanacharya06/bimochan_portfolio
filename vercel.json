@@ -4,5 +4,8 @@
     "api/chat.py": {
       "runtime": "python3.11"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat" }
+  ]
 }

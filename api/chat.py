@@ -92,7 +92,7 @@ def handler(request):
             if block.get("type") == "text":
                 reply += block.get("text", "")
 
-        return _response(200, {"reply": reply.strip()})
+        return _response(200, {"reply": reply.strip(), "search_used": False})
 
     except urllib.error.HTTPError as e:
         return _response(e.code, {"error": e.read().decode("utf-8")})
