@@ -1,97 +1,96 @@
-import os, json, base64, urllib.request, urllib.error
+from http.server import BaseHTTPRequestHandler
+import json, os, urllib.request, urllib.error, base64
 
-def _resp(code, body):
-    return {
-        "statusCode": code,
-        "headers": {
-            "Content-Type": "application/json; charset=utf-8",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type"
-        },
-        "body": json.dumps(body, ensure_ascii=False)
-    }
+class handler(BaseHTTPRequestHandler):
 
-def _method(req):
-    if isinstance(req, dict):
-        return (req.get("method") or req.get("httpMethod") or "GET").upper()
-    return "GET"
+    def do_OPTIONS(self):
+        self._cors(200)
 
-def _body(req):
-    if not isinstance(req, dict):
-        return {}
-    raw = req.get("body") or "{}"
-    if req.get("isBase64Encoded"):
-        raw = base64.b64decode(raw).decode("utf-8", "ignore")
-    try:
-        return json.loads(raw or "{}")
-    except Exception:
-        return None
+    def do_POST(self):
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(length).decode("utf-8", "ignore")
+            try:
+                body = json.loads(raw or "{}")
+            except Exception:
+                return self._json(400, {"error": "Invalid JSON body"})
 
-def handler(request):
-    try:
-        m = _method(request)
-        if m == "OPTIONS":
-            return _resp(200, {"ok": True})
-        if m != "POST":
-            return _resp(405, {"error": f"Method {m} not allowed. Use POST."})
+            api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+            if not api_key:
+                return self._json(500, {"error": "ANTHROPIC_API_KEY not set"})
 
-        body = _body(request)
-        if body is None:
-            return _resp(400, {"error": "Invalid JSON body"})
+            messages = body.get("messages", [])
+            if not isinstance(messages, list):
+                return self._json(400, {"error": "messages must be an array"})
 
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-        if not api_key:
-            return _resp(500, {"error": "ANTHROPIC_API_KEY not set"})
+            payload = {
+                "model": "claude-3-5-sonnet-latest",
+                "max_tokens": 4096 if body.get("code_mode") else 1024,
+                "system": body.get("system", ""),
+                "messages": messages
+            }
 
-        messages = body.get("messages", [])
-        if not isinstance(messages, list):
-            return _resp(400, {"error": "messages must be an array"})
+            if body.get("web_search"):
+                payload["tools"] = [{
+                    "type": "web_search_20250305",
+                    "name": "web_search",
+                    "max_uses": 3
+                }]
 
-        payload = {
-            "model": "claude-3-5-sonnet-latest",
-            "max_tokens": 4096 if body.get("code_mode") else 1024,
-            "system": body.get("system", ""),
-            "messages": messages
-        }
+            req = urllib.request.Request(
+                "https://api.anthropic.com/v1/messages",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json"
+                },
+                method="POST"
+            )
 
-        if body.get("web_search"):
-            payload["tools"] = [{
-                "type": "web_search_20250305",
-                "name": "web_search",
-                "max_uses": 3
-            }]
+            with urllib.request.urlopen(req, timeout=180) as r:
+                data = json.loads(r.read().decode("utf-8", "ignore"))
 
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            method="POST"
-        )
+            reply = "".join(
+                b.get("text", "")
+                for b in data.get("content", [])
+                if isinstance(b, dict) and b.get("type") == "text"
+            ).strip()
 
-        with urllib.request.urlopen(req, timeout=180) as r:
-            data = json.loads(r.read().decode("utf-8", "ignore"))
+            search_used = any(
+                isinstance(b, dict) and b.get("type") == "tool_use"
+                for b in data.get("content", [])
+            )
 
-        reply = "".join(
-            b.get("text", "")
-            for b in data.get("content", [])
-            if isinstance(b, dict) and b.get("type") == "text"
-        ).strip()
+            return self._json(200, {"reply": reply or "No response.", "search_used": search_used})
 
-        search_used = any(
-            isinstance(b, dict) and b.get("type") == "tool_use"
-            for b in data.get("content", [])
-        )
+        except urllib.error.HTTPError as e:
+            try:
+                err = e.read().decode("utf-8", "ignore")
+            except Exception:
+                err = str(e)
+            return self._json(getattr(e, "code", 500), {"error": err})
 
-        return _resp(200, {"reply": reply or "No response.", "search_used": search_used})
+        except Exception as e:
+            return self._json(500, {"error": str(e)})
 
-    except urllib.error.HTTPError as e:
-        try: err = e.read().decode("utf-8", "ignore")
-        except Exception: err = str(e)
-        return _resp(getattr(e, "code", 500), {"error": err})
-    except Exception as e:
-        return _resp(500, {"error": str(e)})
+    def do_GET(self):
+        self._json(405, {"error": "Method GET not allowed. Use POST."})
+
+    def _cors(self, code):
+        self.send_response(code)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def _json(self, code, body):
+        data = json.dumps(body, ensure_ascii=False).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
