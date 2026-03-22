@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/chat.py": {
+      "runtime": "python3.12"
+    }
+  },
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat.py" }
   ]
