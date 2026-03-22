@@ -251,6 +251,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- CHOICES -->
     <div class="choices reveal rd2">
         <button class="choice-btn" data-choice="rock">
@@ -561,5 +562,32 @@ document.addEventListener('keydown',e=>{
 
 document.getElementById('yr').textContent=new Date().getFullYear();
 </script>
+=======
+    <script>
+        // Add this logic inside your existing displayMessage function
+function checkSecretAchievements() {
+    if (userScore === 3) {
+        // Trigger enterprise-level visual feedback
+        const body = document.body;
+        body.style.transition = "filter 0.5s ease";
+        body.style.filter = "hue-rotate(90deg)";
+        
+        const msg = document.querySelector("#gameMessage");
+        msg.innerHTML = "🏆 ARCHIEVEMENT UNLOCKED: Senior Developer Mode!";
+        
+        // Use your existing confetti function
+        for(let i=0; i<3; i++) setTimeout(confetti, i*500); 
+        
+        setTimeout(() => { body.style.filter = "none"; }, 3000);
+    }
+}
+
+// Call this at the end of your userWin condition in displayMessage
+        // Update current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+    <script src="/static/main.js"></script>
+    <script src="/static/game.js"></script>
+>>>>>>> 709d19d (remove vercel.json and fix deployment)
 </body>
 </html>
