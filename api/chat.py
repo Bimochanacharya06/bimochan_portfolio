@@ -24,7 +24,7 @@ class handler(BaseHTTPRequestHandler):
                 return self._json(400, {"error": "messages must be an array"})
 
             payload = {
-                "model": "claude-3-5-sonnet-latest",
+                "model": "claude-sonnet-4-5",
                 "max_tokens": 4096 if body.get("code_mode") else 1024,
                 "system": body.get("system", ""),
                 "messages": messages
