@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler
-import json, os, urllib.request, urllib.error, base64
+import json, os, urllib.request, urllib.error
 
 class handler(BaseHTTPRequestHandler):
 
@@ -62,7 +62,10 @@ class handler(BaseHTTPRequestHandler):
                 for b in data.get("content", [])
             )
 
-            return self._json(200, {"reply": reply or "No response.", "search_used": search_used})
+            return self._json(200, {
+                "reply": reply or "No response.",
+                "search_used": search_used
+            })
 
         except urllib.error.HTTPError as e:
             try:
