@@ -35,16 +35,39 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 @media(min-width:940px){.app{height:95vh;max-height:960px;margin:2.5vh auto;border-radius:26px;border:1px solid var(--bdr2);box-shadow:0 0 0 1px #ffffff05,0 40px 100px #00000075}}
 
 /* HEADER */
-.hd{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gh);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--bdr)}
+.hd{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:16px 20px;background:var(--gh);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--bdr); z-index: 100;}
 .logo{width:40px;height:40px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;position:relative;box-shadow:0 4px 20px #7c3aed44}
 .ldot{position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:#34d399;border:2px solid var(--bg);animation:lp 2.2s ease-in-out infinite}
 @keyframes lp{0%,100%{box-shadow:0 0 0 0 #34d39970}60%{box-shadow:0 0 0 6px #34d39900}}
 .hi{flex:1;min-width:0}
 .hn{font-size:15px;font-weight:600;color:var(--tx)}
 .hs{font-size:10px;margin-top:1px;font-family:'Fira Code',monospace;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hbs{display:flex;gap:6px}
-.hb{font-size:11px;padding:6px 12px;border-radius:999px;border:1px solid var(--bdr2);background:var(--gb);color:var(--tx2);cursor:pointer;transition:.18s;white-space:nowrap}
-.hb:hover{border-color:var(--ac);color:var(--ac);background:rgba(167,139,250,.12)}
+
+/* HEADER BUTTONS & DROPDOWN MENU */
+.hbs{display:flex;gap:8px; align-items:center;}
+.hb{display:flex;align-items:center;justify-content:center;width:36px;height:36px;font-size:16px;border-radius:50%;border:1px solid var(--bdr2);background:var(--gb);color:var(--tx2);cursor:pointer;transition:all 0.2s ease;}
+.hb:hover{border-color:var(--ac);color:var(--ac);background:rgba(167,139,250,.12);transform:translateY(-2px)}
+.hb.pill{width:auto;padding:0 16px;border-radius:999px;font-size:13px;font-weight:500;}
+
+.menu-wrap { position: relative; }
+.menu-drop { 
+  position: absolute; top: 120%; right: 0; 
+  background: var(--bot); border: 1px solid var(--bdr2); 
+  border-radius: 14px; padding: 8px; 
+  display: flex; flex-direction: column; gap: 4px; 
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+  min-width: 160px; 
+  opacity: 0; pointer-events: none; transform: translateY(-10px); transition: 0.2s ease;
+}
+.menu-drop.show { opacity: 1; pointer-events: all; transform: translateY(0); }
+.menu-drop button { 
+  background: transparent; border: none; color: var(--tx2); 
+  text-align: left; padding: 10px 14px; border-radius: 8px; 
+  cursor: pointer; font-size: 13px; font-family: 'Outfit', sans-serif; transition: 0.2s; 
+}
+.menu-drop button:hover { background: rgba(255,255,255,0.05); color: var(--ac); }
+.menu-drop button.danger:hover { color: var(--dg); background: rgba(248,113,113,0.1); }
+.menu-div { height: 1px; background: var(--bdr2); margin: 4px 0; }
 
 /* SESSION BAR */
 .sb{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:5px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--bdr);font-family:'Fira Code',monospace;font-size:10px;color:var(--mu);overflow-x:auto;white-space:nowrap}
@@ -52,9 +75,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 
 /* MESSAGES */
 .msgs{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-.msgs::-webkit-scrollbar{width:4px}
+.msgs::-webkit-scrollbar{width:6px}
 .msgs::-webkit-scrollbar-track{background:transparent}
-.msgs::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+.msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:10px}
+.msgs::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,0.5)}
 
 /* WELCOME */
 .wc{margin:auto 0;padding:24px 12px;text-align:center;animation:fu .5s ease both}
@@ -80,7 +104,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .bw{display:flex;flex-direction:column;gap:5px;min-width:0}
 
 /* BUBBLES */
-.bub{padding:13px 16px;border-radius:18px;font-size:14px;line-height:1.78;word-break:break-word}
+.bub{padding:14px 18px;border-radius:18px;font-size:14.5px;line-height:1.6;letter-spacing:0.2px;word-break:break-word}
 .bot .bub{background:var(--bot);border:1px solid var(--bdr2);border-top-left-radius:5px;color:var(--tx)}
 .user .bub{background:linear-gradient(135deg,#6d28d9,#7c3aed);border:1px solid rgba(167,139,250,.2);border-top-right-radius:5px;color:#fff;box-shadow:0 4px 20px #7c3aed35}
 .stream-cur::after{content:'▋';animation:bk .7s step-end infinite;color:var(--ac);font-size:13px}
@@ -95,7 +119,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .bot .bub strong{color:#fff;font-weight:600}
 .bot .bub em{color:var(--tx2)}
 .bot .bub a{color:var(--ac);text-decoration:none}.bot .bub a:hover{text-decoration:underline}
-.bot .bub blockquote{border-left:3px solid var(--ac);padding-left:12px;margin:9px 0;color:var(--tx2);font-style:italic}
 .bot .bub table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
 .bot .bub th{background:rgba(167,139,250,.15);padding:8px 12px;color:var(--ac);font-weight:600;border:1px solid var(--bdr2);text-align:left}
 .bot .bub td{padding:7px 12px;border:1px solid var(--bdr);color:var(--tx2)}
@@ -115,14 +138,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .cblk pre{margin:0!important;background:#07051a!important;padding:16px!important;overflow-x:auto}
 .cblk pre code{font-size:12.5px!important;font-family:'Fira Code',monospace!important;line-height:1.65!important}
 
-/* META */
+/* META & PILLS */
 .mm{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:10px;color:var(--mu);font-family:'Fira Code',monospace}
 .msg.user .mm{justify-content:flex-end}
 .mb{font-size:10px;padding:3px 9px;border-radius:999px;border:1px solid var(--bdr);background:rgba(255,255,255,.04);color:var(--tx2);cursor:pointer;transition:.15s}
 .mb:hover{border-color:var(--ac);color:var(--ac)}
 .mb.ok{border-color:var(--ac3)!important;color:var(--ac3)!important}
-
-/* TYPING */
 .tw{display:flex;align-items:center;gap:6px;padding:14px 18px;background:var(--bot);border:1px solid var(--bdr2);border-radius:18px;border-top-left-radius:5px;width:fit-content}
 .td{width:7px;height:7px;border-radius:50%;animation:td 1.4s ease-in-out infinite}
 .td:nth-child(1){background:var(--ac);animation-delay:0s}
@@ -130,24 +151,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .td:nth-child(3){background:var(--ac3);animation-delay:.4s}
 @keyframes td{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-7px);opacity:1}}
 
-/* PILLS */
 .pl{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 9px;border-radius:999px;font-family:'Fira Code',monospace;margin-bottom:4px;width:fit-content}
 .pl-s{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--wn)}
 .pl-c{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.22);color:var(--ac)}
 
-/* INPUT ZONE */
-.iz{flex-shrink:0;background:var(--gi);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--bdr);padding-bottom:env(safe-area-inset-bottom,0)}
-.it{display:flex;align-items:center;gap:7px;padding:9px 16px 4px;flex-wrap:wrap}
+/* INPUT ZONE & ATTACHMENTS */
+.iz{flex-shrink:0;background:var(--gi);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--bdr);padding-bottom:env(safe-area-inset-bottom,0);padding-top:8px;}
+.it{display:flex;align-items:center;gap:7px;padding:9px 16px 0px;flex-wrap:wrap}
 .tog{font-size:10px;padding:5px 11px;border-radius:999px;border:1px solid var(--bdr);background:rgba(255,255,255,.04);color:var(--mu);cursor:pointer;transition:.18s}
 .tog.on{border-color:rgba(52,211,153,.4);color:var(--ac3);background:rgba(52,211,153,.07)}
 .icc{font-size:10px;color:var(--mu);margin-left:auto;font-family:'Fira Code',monospace}
-.ir{display:flex;align-items:flex-end;gap:9px;padding:8px 16px 12px}
-.ifl{flex:1;background:rgba(255,255,255,.08);border:1px solid var(--bdr2);border-radius:15px;padding:11px 15px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:14px;resize:none;min-height:46px;max-height:140px;outline:none;transition:border-color .2s,background .2s;line-height:1.5}
+
+/* File Pill */
+.att-pill{display:inline-flex;align-items:center;gap:8px;font-size:11px;padding:6px 12px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:8px;color:var(--ac);margin:8px 20px 0;font-family:'Fira Code',monospace}
+.att-pill button{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.att-pill button:hover{color:var(--dg)}
+
+.ir{display:flex;align-items:center;gap:10px;padding:8px 20px 16px}
+.icon-btn{background:transparent;border:none;color:var(--mu);font-size:20px;cursor:pointer;transition:all 0.2s;padding:8px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.icon-btn:hover{color:var(--ac);background:rgba(255,255,255,0.05);}
+
+.ifl{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:14px 18px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:15px;resize:none;min-height:50px;max-height:140px;outline:none;transition:all 0.3s ease;line-height:1.5;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);}
 .ifl::placeholder{color:var(--mu)}
-.ifl:focus{border-color:rgba(167,139,250,.5);background:rgba(255,255,255,.1)}
-.snd{width:46px;height:46px;border-radius:13px;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 20px #7c3aed45;transition:.2s}
+.ifl:focus{border-color:var(--ac);background:rgba(255,255,255,.08);box-shadow:0 0 0 4px rgba(167,139,250,.15);}
+.snd{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 20px #7c3aed45;transition:.2s;}
 .snd:hover{transform:scale(1.07)}.snd:active{transform:scale(.96)}.snd:disabled{opacity:.45;transform:none;cursor:not-allowed}
-.stp,.rgn{height:46px;border-radius:13px;padding:0 14px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:.18s;flex-shrink:0}
+.stp,.rgn{height:50px;border-radius:25px;padding:0 16px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:.18s;flex-shrink:0}
 .stp{border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.07);color:var(--dg)}
 .rgn{border:1px solid rgba(167,139,250,.28);background:rgba(167,139,250,.07);color:var(--ac)}
 .rgn:hover{background:rgba(167,139,250,.15)}
@@ -162,117 +191,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .tst{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1638ee;backdrop-filter:blur(16px);border:1px solid var(--bdr2);border-radius:12px;padding:9px 16px;font-size:12px;color:var(--tx);opacity:0;transition:.22s;pointer-events:none;z-index:400;white-space:nowrap}
 .tst.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ════════════════════════════
-   LIVE PREVIEW PANEL — FIXED
-════════════════════════════ */
-#pvPanel{
-  position:fixed;inset:0;z-index:500;
-  display:flex;flex-direction:column;
-  background:#07051a;
-  transform:translateY(100%);
-  transition:transform .32s cubic-bezier(.4,0,.2,1);
-}
+/* PREVIEW PANEL */
+#pvPanel{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:#07051a;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
 #pvPanel.open{transform:translateY(0)}
-
-/* top bar */
-.pv-hd{
-  flex-shrink:0;display:flex;align-items:center;gap:10px;
-  padding:11px 16px;background:#0d0b21;
-  border-bottom:1px solid var(--bdr2);
-}
+.pv-hd{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:11px 16px;background:#0d0b21;border-bottom:1px solid var(--bdr2);}
 .pv-title{flex:1;font-size:13px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pv-tabs{display:flex;gap:5px}
-.pvtab{
-  font-size:11px;padding:5px 12px;border-radius:8px;
-  border:1px solid var(--bdr);background:rgba(255,255,255,.04);
-  color:var(--tx2);cursor:pointer;transition:.15s;
-}
+.pvtab{font-size:11px;padding:5px 12px;border-radius:8px;border:1px solid var(--bdr);background:rgba(255,255,255,.04);color:var(--tx2);cursor:pointer;transition:.15s;}
 .pvtab:hover{border-color:var(--ac);color:var(--ac)}
 .pvtab.on{border-color:var(--ac3);color:var(--ac3);background:rgba(52,211,153,.1)}
-.pv-close{
-  flex-shrink:0;font-size:11px;padding:6px 13px;border-radius:999px;
-  border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);
-  color:var(--dg);cursor:pointer;transition:.15s;
-}
+.pv-close{flex-shrink:0;font-size:11px;padding:6px 13px;border-radius:999px;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);color:var(--dg);cursor:pointer;transition:.15s;}
 .pv-close:hover{background:rgba(248,113,113,.18)}
-
-/* toolbar */
-.pv-bar{
-  flex-shrink:0;display:flex;align-items:center;gap:10px;
-  padding:8px 16px;background:#0d0b21;
-  border-bottom:1px solid var(--bdr2);
-}
-.pv-run{
-  font-size:11px;padding:7px 20px;border-radius:999px;
-  background:linear-gradient(135deg,#7c3aed,#db2777);
-  border:none;color:#fff;cursor:pointer;font-weight:600;
-  box-shadow:0 3px 14px #7c3aed40;transition:.18s;
-}
+.pv-bar{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:8px 16px;background:#0d0b21;border-bottom:1px solid var(--bdr2);}
+.pv-run{font-size:11px;padding:7px 20px;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#db2777);border:none;color:#fff;cursor:pointer;font-weight:600;box-shadow:0 3px 14px #7c3aed40;transition:.18s;}
 .pv-run:hover{transform:scale(1.04);box-shadow:0 5px 20px #7c3aed55}
 .pv-hint{font-size:10px;color:var(--mu);font-family:'Fira Code',monospace}
-.pv-badge{
-  margin-left:auto;font-size:10px;font-family:'Fira Code',monospace;
-  padding:3px 10px;border-radius:999px;
-  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--ac3);
-  display:none;
-}
+.pv-badge{margin-left:auto;font-size:10px;font-family:'Fira Code',monospace;padding:3px 10px;border-radius:999px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--ac3);display:none;}
 .pv-badge.show{display:inline-block}
+.pv-body{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden;}
+.pv-code{display:flex;flex-direction:column;border-right:1px solid var(--bdr2);min-height:0;overflow:hidden;}
+.pv-code-label{flex-shrink:0;padding:5px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--bdr);font-size:10px;color:var(--mu);font-family:'Fira Code',monospace;}
+#pvCode{flex:1;background:#07051a;color:var(--tx);font-family:'Fira Code',monospace;font-size:12.5px;padding:14px;border:none;outline:none;resize:none;line-height:1.65;overflow:auto;min-height:0;tab-size:2;-moz-tab-size:2;}
+.pv-prev{display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.pv-prev-label{flex-shrink:0;padding:5px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--bdr);font-size:10px;color:var(--mu);font-family:'Fira Code',monospace;}
+#pvFrame{flex:1;border:none;background:#ffffff;display:block;width:100%;min-height:0;}
 
-/* split body — KEY: must fill remaining height */
-.pv-body{
-  flex:1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  min-height:0; /* critical for flex children */
-  overflow:hidden;
-}
-
-/* code pane */
-.pv-code{
-  display:flex;flex-direction:column;
-  border-right:1px solid var(--bdr2);
-  min-height:0;overflow:hidden;
-}
-.pv-code-label{
-  flex-shrink:0;padding:5px 14px;
-  background:rgba(255,255,255,.025);
-  border-bottom:1px solid var(--bdr);
-  font-size:10px;color:var(--mu);font-family:'Fira Code',monospace;
-}
-#pvCode{
-  flex:1;
-  background:#07051a;color:var(--tx);
-  font-family:'Fira Code',monospace;font-size:12.5px;
-  padding:14px;border:none;outline:none;resize:none;
-  line-height:1.65;overflow:auto;
-  min-height:0;
-  tab-size:2;-moz-tab-size:2;
-}
-
-/* preview pane */
-.pv-prev{
-  display:flex;flex-direction:column;
-  min-height:0;overflow:hidden;
-}
-.pv-prev-label{
-  flex-shrink:0;padding:5px 14px;
-  background:rgba(255,255,255,.025);
-  border-bottom:1px solid var(--bdr);
-  font-size:10px;color:var(--mu);font-family:'Fira Code',monospace;
-}
-#pvFrame{
-  flex:1;border:none;background:#ffffff;
-  display:block;width:100%;
-  min-height:0;
-}
-
-/* mobile: stack vertically */
-@media(max-width:640px){
-  .pv-body{grid-template-columns:1fr;grid-template-rows:40% 60%}
-  .pv-code{border-right:none;border-bottom:1px solid var(--bdr2)}
-}
-
-/* SHARE SHEET */
+/* MODALS */
 .ovl{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.25s}
 .ovl.open{opacity:1;pointer-events:all}
 .sht{width:100%;max-width:520px;background:#130f2c;border:1px solid var(--bdr2);border-radius:24px 24px 0 0;padding:20px 20px 28px;transform:translateY(30px);transition:.25s}
@@ -285,7 +229,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .sbt.cl{background:rgba(255,255,255,.07);border:1px solid var(--bdr);color:var(--tx2)}
 .sbt.go{background:linear-gradient(135deg,#7c3aed,#db2777);border:none;color:#fff}
 
-/* CONFIRM */
 .cov{position:fixed;inset:0;z-index:350;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s;padding:20px}
 .cov.open{opacity:1;pointer-events:all}
 .cbx{background:#130f2c;border:1px solid var(--bdr2);border-radius:18px;padding:24px;max-width:340px;width:100%;text-align:center;transform:scale(.95);transition:.2s}
@@ -298,7 +241,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .cbt.dg{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.28);color:var(--dg)}
 
 .hide{display:none!important}
-@media(max-width:640px){.app{height:100dvh;border-radius:0}.msgs{padding:12px 10px}.ir{padding:7px 12px 10px}.it{padding:8px 12px 2px}.msg.user{max-width:88%}}
+@media(max-width:640px){
+  .app{height:100dvh;border-radius:0}
+  .pv-body{grid-template-columns:1fr;grid-template-rows:40% 60%}
+  .pv-code{border-right:none;border-bottom:1px solid var(--bdr2)}
+  .msgs{padding:12px 10px}
+  .ir{padding:7px 12px 10px; gap:6px;}
+  .it{padding:8px 12px 2px}
+  .msg.user{max-width:88%}
+  .hb.pill { display: none; } /* Hide text pill on mobile, keep plus icon */
+}
 </style>
 </head>
 <body>
@@ -308,13 +260,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 <div class="app">
   <div class="hd">
     <div class="logo">B<div class="ldot"></div></div>
-    <div class="hi"><div class="hn">Bimo AI</div><div class="hs">portfolio assistant · v3.0</div></div>
+    <div class="hi"><div class="hn">Bimo AI</div><div class="hs">portfolio assistant · v4.0</div></div>
+    
+    <!-- CLEAN HEADER & DROPDOWN MENU -->
     <div class="hbs">
-      <button class="hb" onclick="exportPDF()">📄 PDF</button>
-      <button class="hb" onclick="shareAll()">↗ Share</button>
-      <button class="hb" onclick="confirmClear()">🗑</button>
-      <button class="hb" onclick="newChat()">＋ New</button>
+      <button class="hb pill" onclick="newChat()">✨ New Chat</button>
+      <div class="menu-wrap">
+        <button class="hb" onclick="toggleMenu(event)" title="Options">⋮</button>
+        <div class="menu-drop" id="headMenu">
+          <button onclick="exportPDF()">📄 Export to PDF</button>
+          <button onclick="shareAll()">↗️ Share Chat</button>
+          <div class="menu-div"></div>
+          <button onclick="confirmClear()" class="danger">🗑️ Clear History</button>
+        </div>
+      </div>
     </div>
+
   </div>
 
   <div class="sb">
@@ -323,22 +284,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
     <span><span class="sd" style="background:#a78bfa"></span><span id="ml">Search ON · Code ON</span></span>
     <span>·</span>
     <span><span class="sd" style="background:#60a5fa"></span>claude-sonnet-4-5</span>
-    <span>·</span>
-    <span><span class="sd" style="background:#f472b6"></span>⚡ stream · 🌟 particles · 🎨 preview · 📄 pdf</span>
   </div>
 
   <div class="msgs" id="msgs" role="log" aria-live="polite">
     <div class="wc" id="wc">
       <div class="wi">✦</div>
       <h2>Hey, I'm Bimo AI 👋</h2>
-      <p>Ask about Bimochan's skills, projects, coding, or search the web. Replies stream in real-time!</p>
+      <p>Ask about Bimochan's skills or upload code files.</p>
       <div class="chips">
         <button class="chip p" onclick="chip('Who is Bimochan Acharya? Tell me about his skills.')">👤 About Bimochan</button>
         <button class="chip" onclick="chip('What projects has Bimochan built?')">🛠 Projects</button>
         <button class="chip g" onclick="chip('Search latest web development trends 2026')">🔍 Trends</button>
         <button class="chip b" onclick="chip('Build a beautiful glassmorphism card UI with HTML CSS and JavaScript. Make it complete and self-contained.')">🎨 Code Preview</button>
-        <button class="chip" onclick="chip('Build a REST API with Python FastAPI and JWT auth')">⚡ Build API</button>
-        <button class="chip p" onclick="chip('How can I contact Bimochan for freelance work?')">📬 Contact</button>
       </div>
     </div>
   </div>
@@ -351,8 +308,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
       <button class="tog on" id="ct" onclick="togCode()">💻 Code ON</button>
       <div class="icc" id="cc">0 / 2000</div>
     </div>
+    
+    <!-- FILE ATTACHMENT PILL -->
+    <div id="attachPill" class="att-pill hide">
+      <span id="attName">📄 file.js</span>
+      <button onclick="clearFile()" title="Remove file">✕</button>
+    </div>
+
     <div class="ir">
-      <textarea class="ifl" id="inp" rows="1" maxlength="2000" placeholder="Ask about Bimochan, coding, or anything…"></textarea>
+      <button class="icon-btn" onclick="document.getElementById('fileInp').click()" title="Attach text or code file">📎</button>
+      <input type="file" id="fileInp" class="hide" onchange="handleFile(this)" accept=".txt,.js,.py,.html,.css,.json,.md,.csv">
+      
+      <textarea class="ifl" id="inp" rows="1" maxlength="2000" placeholder="Ask anything or attach a file…"></textarea>
+      
       <button class="rgn hide" id="rb" onclick="regen()">↺</button>
       <button class="stp hide" id="spb" onclick="stop_()">■</button>
       <button class="snd" id="sndb" onclick="send()">
@@ -363,7 +331,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
   </div>
 </div>
 
-<!-- ══ LIVE CODE PREVIEW PANEL ══ -->
+<!-- LIVE PREVIEW PANEL -->
 <div id="pvPanel">
   <div class="pv-hd">
     <div class="pv-title" id="pvTitle">🎨 Live Code Preview</div>
@@ -445,10 +413,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 })();
 
 // ══ APP STATE ══
-const API="/api/chat",SK="bimo_v3";
+const API="/api/chat",SK="bimo_v4";
 marked.setOptions({breaks:true,gfm:true});
 let hist=[],srch=true,code=true,busy=false,lastP="",stopStream=false;
 let sess=[],cid=null;
+let attachedText="", attachedName=""; 
+
 try{sess=JSON.parse(localStorage.getItem(SK)||"[]")}catch{sess=[]}
 
 const $=id=>document.getElementById(id);
@@ -461,7 +431,16 @@ function tnow(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function uid(){return"s"+Date.now()+Math.random().toString(36).slice(2,6)}
 
-// ══ SESSIONS ══
+// DROPDOWN MENU
+function toggleMenu(e){
+  e.stopPropagation();
+  $("headMenu").classList.toggle("show");
+}
+document.addEventListener("click", (e) => {
+  if(!e.target.closest('.menu-wrap')) $("headMenu").classList.remove("show");
+});
+
+// ══ MEMORY & SESSIONS ══
 function saveS(){localStorage.setItem(SK,JSON.stringify(sess))}
 function getS(){return sess.find(s=>s.id===cid)||null}
 function persist(){
@@ -475,36 +454,76 @@ function updBar(){
   $("ml").textContent=`Search ${srch?"ON":"OFF"} · Code ${code?"ON":"OFF"}`;
 }
 
-// ══ SCROLL ══
+// ══ INBUILT AUTO-MEMORY EXTRACTOR ══
+function extractMemory(txt) {
+  let p = JSON.parse(localStorage.getItem("bimo_auto_memory") || '{"name":"","facts":[]}');
+  let updated = false;
+
+  // Extract name (e.g., "my name is Alex")
+  const nameMatch = txt.match(/(?:my name is|i am|i'm) ([a-zA-Z\s]{2,20})/i);
+  if (nameMatch && !txt.toLowerCase().includes("looking for")) {
+    p.name = nameMatch[1].trim();
+    updated = true;
+    toast("✨ Bimo remembered your name!");
+  }
+
+  // Extract preferences (e.g., "remember that I prefer short answers")
+  const factMatch = txt.match(/(?:remember that|i want you to remember) (.+)/i);
+  if (factMatch) {
+    let newFact = factMatch[1].trim();
+    if (!p.facts.includes(newFact)) {
+      p.facts.push(newFact);
+      // Keep only last 3 facts to avoid bloated prompts
+      if (p.facts.length > 3) p.facts.shift(); 
+      updated = true;
+      toast("🧠 Added to Bimo's permanent memory!");
+    }
+  }
+
+  if(updated) localStorage.setItem("bimo_auto_memory", JSON.stringify(p));
+}
+
+// ══ FILE UPLOAD ══
+function handleFile(el){
+  const f = el.files[0]; if(!f) return;
+  if(f.size > 200000) { toast("File too large! Max 200KB."); return; }
+  const r = new FileReader();
+  r.onload = e => {
+    attachedText = e.target.result;
+    attachedName = f.name;
+    $("attName").textContent = "📄 " + f.name;
+    $("attachPill").classList.remove("hide");
+    toast("File attached! 📎");
+    el.value = ""; 
+  };
+  r.readAsText(f);
+}
+function clearFile(){
+  attachedText=""; attachedName="";
+  $("attachPill").classList.add("hide");
+}
+
+// ══ MODALS & MISC ══
 function scrollBot(){msgsEl.scrollTop=msgsEl.scrollHeight}
 msgsEl.addEventListener("scroll",()=>{
   const near=msgsEl.scrollHeight-msgsEl.scrollTop-msgsEl.clientHeight<120;
   $("scb").classList.toggle("show",!near&&msgsEl.scrollHeight>msgsEl.clientHeight+200);
 });
-
-// ══ MODALS ══
 function open_(id){$(id).classList.add("open")}
 function close_(id){$(id).classList.remove("open")}
-function confirmClear(){if(hist.length)open_("confirmModal");else toast("Nothing to clear")}
+function confirmClear(){if(hist.length)open_("confirmModal");else toast("Nothing to clear"); $("headMenu").classList.remove("show");}
 function doClear(){close_("confirmModal");newChat()}
-
-// ══ NEW CHAT ══
 function newChat(){
   hist=[];cid=null;msgsEl.innerHTML="";
   const w=document.createElement("div");w.className="wc";w.id="wc";
-  w.innerHTML=`<div class="wi">✦</div><h2>Hey, I'm Bimo AI 👋</h2><p>Ask me about Bimochan's skills, projects, or any coding question!</p><div class="chips"><button class="chip p" onclick="chip('Who is Bimochan Acharya?')">👤 About</button><button class="chip" onclick="chip('What projects has Bimochan built?')">🛠 Projects</button><button class="chip g" onclick="chip('Search latest web dev trends 2026')">🔍 Trends</button><button class="chip b" onclick="chip('Build a glassmorphism card UI in HTML CSS JS. Make it complete and self-contained.')">🎨 Preview</button></div>`;
+  w.innerHTML=`<div class="wi">✦</div><h2>Hey, I'm Bimo AI 👋</h2><p>Ask me about Bimochan's skills or upload code files!</p><div class="chips"><button class="chip p" onclick="chip('Who is Bimochan Acharya?')">👤 About</button><button class="chip" onclick="chip('What projects has Bimochan built?')">🛠 Projects</button><button class="chip g" onclick="chip('Search latest web dev trends 2026')">🔍 Trends</button><button class="chip b" onclick="chip('Build a glassmorphism card UI in HTML CSS JS.')">🎨 Preview</button></div>`;
   msgsEl.appendChild(w);persist();toast("New chat started");
 }
 function chip(t){inp.value=t;rsz();send()}
-function togSearch(){
-  srch=!srch;const b=$("st");b.textContent=`🔍 Search ${srch?"ON":"OFF"}`;b.className="tog"+(srch?" on":"");updBar();toast(srch?"Web search ON":"Web search OFF");
-}
-function togCode(){
-  code=!code;const b=$("ct");b.textContent=`💻 Code ${code?"ON":"OFF"}`;b.className="tog"+(code?" on":"");updBar();toast(code?"Code mode ON":"Code mode OFF");
-}
+function togSearch(){srch=!srch;const b=$("st");b.textContent=`🔍 Search ${srch?"ON":"OFF"}`;b.className="tog"+(srch?" on":"");updBar();toast(srch?"Web search ON":"Web search OFF");}
+function togCode(){code=!code;const b=$("ct");b.textContent=`💻 Code ${code?"ON":"OFF"}`;b.className="tog"+(code?" on":"");updBar();toast(code?"Code mode ON":"Code mode OFF");}
 function wantsSrch(t){return srch&&/search:|latest|current|2025|2026|news|today|price|who is|recent|trend/i.test(t)}
 
-// ══ SANITIZE ══
 function san(html){
   const d=new DOMParser().parseFromString(html,"text/html");
   d.querySelectorAll("script,iframe,object,embed").forEach(n=>n.remove());
@@ -515,27 +534,19 @@ function san(html){
   }));
   return d.body.innerHTML;
 }
-
-// ══ RENDER MARKDOWN ══
 function isPreviewable(lang){return["html","css","javascript","js","jsx","htm"].includes((lang||"").toLowerCase())}
-
 function renderMd(txt){
   const p=(txt||"").replace(/```(\w*)\n?([\s\S]*?)```/g,(_,lang,c)=>{
     const l=(lang||"text").toLowerCase(),raw=(c||"").trim();
     const hl=hljs.getLanguage(l)?hljs.highlight(raw,{language:l}).value:hljs.highlightAuto(raw).value;
     const enc=encodeURIComponent(raw);
-    const pvBtn=isPreviewable(l)
-      ?`<button class="cblk-btn prev" onclick="pvOpen(decodeURIComponent('${enc}'),'${l}')">▶ Preview</button>`:"";
+    const pvBtn=isPreviewable(l)?`<button class="cblk-btn prev" onclick="pvOpen(decodeURIComponent('${enc}'),'${l}')">▶ Preview</button>`:"";
     return`<div class="cblk"><div class="cblk-hd"><span class="clang">${l.toUpperCase()}</span><div class="cblk-btns">${pvBtn}<button class="cblk-btn" onclick="cpCode(this,decodeURIComponent('${enc}'))">Copy</button></div></div><pre><code>${hl}</code></pre></div>`;
   });
   return san(marked.parse(p));
 }
+async function cpCode(btn,code){try{await navigator.clipboard.writeText(code);btn.textContent="✓";setTimeout(()=>btn.textContent="Copy",1400)}catch{}}
 
-async function cpCode(btn,code){
-  try{await navigator.clipboard.writeText(code);btn.textContent="✓";setTimeout(()=>btn.textContent="Copy",1400)}catch{}
-}
-
-// ══ STREAMING TYPEWRITER ══
 function typewrite(bub,full,speed=5){
   return new Promise(res=>{
     bub.classList.add("stream-cur");
@@ -548,7 +559,6 @@ function typewrite(bub,full,speed=5){
       }
       const chunk=Math.min(4,full.length-i);
       built+=full.slice(i,i+chunk);i+=chunk;
-      // render partial — only parse markdown on newlines for perf
       bub.innerHTML=san(marked.parse(built));
       msgsEl.scrollTop=msgsEl.scrollHeight;
       setTimeout(tick,speed);
@@ -557,13 +567,14 @@ function typewrite(bub,full,speed=5){
   });
 }
 
-// ══ APPEND MSG ══
 function appendMsg(role,content,opts={}){
   const wc=$("wc");if(wc&&role==="user")wc.style.display="none";
   const div=document.createElement("div");div.className=`msg ${role}`;
   let pills="";
   if(opts.searching)pills+=`<div class="pl pl-s">🔍 searching…</div>`;
   if(opts.coding)pills+=`<div class="pl pl-c">💻 code mode</div>`;
+  if(opts.attached)pills+=`<div class="pl pl-c">📎 attached: ${opts.attached}</div>`;
+
   const inner=opts.typing
     ?`<div class="tw"><div class="td"></div><div class="td"></div><div class="td"></div></div>`
     :`<div class="bub">${opts.raw?esc(content):renderMd(content)}</div>`;
@@ -573,132 +584,71 @@ function appendMsg(role,content,opts={}){
   msgsEl.appendChild(div);msgsEl.scrollTop=msgsEl.scrollHeight;return div;
 }
 
-async function cpAns(btn){
-  const b=btn.closest(".bw")?.querySelector(".bub");if(!b)return;
-  try{await navigator.clipboard.writeText(b.innerText||"");btn.textContent="✓";btn.classList.add("ok");setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("ok")},1400)}catch{}
-}
-function shrAns(btn){
-  const b=btn.closest(".bw")?.querySelector(".bub");if(!b)return;
-  $("shareTxt").value=b.innerText||"";open_("shareModal");
-}
-function shareAll(){
-  if(!hist.length){toast("No messages yet");return}
-  $("shareTxt").value=hist.map(m=>`${m.role==="user"?"You":"Bimo AI"}: ${m.content}`).join("\n\n---\n\n");
-  open_("shareModal");
-}
-async function copyShare(){
-  try{await navigator.clipboard.writeText($("shareTxt").value);toast("✓ Copied!");close_("shareModal")}catch{toast("Failed")}
-}
+async function cpAns(btn){const b=btn.closest(".bw")?.querySelector(".bub");if(!b)return;try{await navigator.clipboard.writeText(b.innerText||"");btn.textContent="✓";btn.classList.add("ok");setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("ok")},1400)}catch{}}
+function shrAns(btn){const b=btn.closest(".bw")?.querySelector(".bub");if(!b)return;$("shareTxt").value=b.innerText||"";open_("shareModal");}
+function shareAll(){if(!hist.length){toast("No messages yet");return}$("shareTxt").value=hist.map(m=>`${m.role==="user"?"You":"Bimo AI"}: ${m.content}`).join("\n\n---\n\n");open_("shareModal");$("headMenu").classList.remove("show");}
+async function copyShare(){try{await navigator.clipboard.writeText($("shareTxt").value);toast("✓ Copied!");close_("shareModal")}catch{toast("Failed")}}
 
-// ══ PDF EXPORT ══
 function exportPDF(){
   if(!hist.length){toast("No messages to export");return}
+  $("headMenu").classList.remove("show");
   toast("📄 Generating PDF…");
   const w=window.open("","_blank","width=820,height=900");
   if(!w){toast("Allow popups to export PDF");return}
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bimo AI Export</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#fff;color:#1a1a2e;padding:40px;max-width:720px;margin:0 auto}
-  .eh{text-align:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #7c3aed}
-  .eh h1{font-size:24px;color:#7c3aed;margin-bottom:4px}.eh p{font-size:12px;color:#888}
-  .mb{margin-bottom:18px;padding:14px 16px;border-radius:12px}
-  .mb.u{background:#f0ebff;border-left:4px solid #7c3aed}.mb.b{background:#f8f9ff;border-left:4px solid #34d399}
-  .ml{font-size:11px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-  .mc{font-size:13px;line-height:1.7;color:#1a1a2e;white-space:pre-wrap;word-break:break-word}
-  .ef{text-align:center;margin-top:32px;font-size:11px;color:#aaa;padding-top:16px;border-top:1px solid #eee}
-  @media print{body{padding:20px}}</style></head><body>
-  <div class="eh"><h1>Bimo AI — Chat Export</h1><p>Exported ${new Date().toLocaleString()} · bimochanacharya.com.np</p></div>
-  ${hist.map(m=>`<div class="mb ${m.role==="user"?"u":"b"}"><div class="ml">${m.role==="user"?"You":"Bimo AI"}</div><div class="mc">${esc(m.content)}</div></div>`).join("")}
-  <div class="ef">Bimochan Acharya · bimochanacharya.com.np</div>
-  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bimo AI Export</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:#fff;color:#1a1a2e;padding:40px;max-width:720px;margin:0 auto}.eh{text-align:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #7c3aed}.eh h1{font-size:24px;color:#7c3aed;margin-bottom:4px}.eh p{font-size:12px;color:#888}.mb{margin-bottom:18px;padding:14px 16px;border-radius:12px}.mb.u{background:#f0ebff;border-left:4px solid #7c3aed}.mb.b{background:#f8f9ff;border-left:4px solid #34d399}.ml{font-size:11px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}.mc{font-size:13px;line-height:1.7;color:#1a1a2e;white-space:pre-wrap;word-break:break-word}.ef{text-align:center;margin-top:32px;font-size:11px;color:#aaa;padding-top:16px;border-top:1px solid #eee}@media print{body{padding:20px}}</style></head><body><div class="eh"><h1>Bimo AI — Chat Export</h1><p>Exported ${new Date().toLocaleString()} · bimochanacharya.com.np</p></div>${hist.map(m=>`<div class="mb ${m.role==="user"?"u":"b"}"><div class="ml">${m.role==="user"?"You":"Bimo AI"}</div><div class="mc">${esc(m.content)}</div></div>`).join("")}<div class="ef">Bimochan Acharya · bimochanacharya.com.np</div><script>window.onload=()=>window.print()<\/script></body></html>`);
   w.document.close();
 }
 
-// ══ LIVE PREVIEW — FULLY WORKING ══
-function pvOpen(rawCode, lang){
-  // put code in editor
-  $("pvCode").value=rawCode;
-  $("pvTitle").textContent=`🎨 Live Preview — ${(lang||"HTML").toUpperCase()}`;
-  // open panel
-  $("pvPanel").classList.add("open");
-  // run immediately
-  setTimeout(pvRun, 100);
-}
+function pvOpen(rawCode, lang){$("pvCode").value=rawCode;$("pvTitle").textContent=`🎨 Live Preview — ${(lang||"HTML").toUpperCase()}`;$("pvPanel").classList.add("open");setTimeout(pvRun, 100);}
+function pvClose(){$("pvPanel").classList.remove("open");$("pvFrame").srcdoc="";}
+function pvRun(){const code=$("pvCode").value.trim();if(!code){toast("Nothing to run");return}const frame=$("pvFrame");frame.srcdoc=code;const badge=$("pvBadge");badge.classList.add("show");setTimeout(()=>badge.classList.remove("show"),2000);toast("▶ Preview updated");}
+function pvTab(tab,btn){document.querySelectorAll(".pvtab").forEach(t=>t.classList.remove("on"));btn.classList.add("on");const cp=$("pvCodePane"),pp=$("pvPrevPane"),body=$("pvBody");if(tab==="split"){body.style.gridTemplateColumns="1fr 1fr";body.style.gridTemplateRows="";cp.style.display="flex";pp.style.display="flex";}else if(tab==="code"){body.style.gridTemplateColumns="1fr";cp.style.display="flex";pp.style.display="none";}else{body.style.gridTemplateColumns="1fr";cp.style.display="none";pp.style.display="flex";}}
 
-function pvClose(){
-  $("pvPanel").classList.remove("open");
-  // clear iframe to stop any scripts
-  $("pvFrame").srcdoc="";
-}
-
-function pvRun(){
-  const code=$("pvCode").value.trim();
-  if(!code){toast("Nothing to run");return}
-  const frame=$("pvFrame");
-  // use srcdoc — most reliable cross-origin method
-  frame.srcdoc=code;
-  // show badge
-  const badge=$("pvBadge");
-  badge.classList.add("show");
-  setTimeout(()=>badge.classList.remove("show"),2000);
-  toast("▶ Preview updated");
-}
-
-function pvTab(tab,btn){
-  // update active tab
-  document.querySelectorAll(".pvtab").forEach(t=>t.classList.remove("on"));
-  btn.classList.add("on");
-  const cp=$("pvCodePane"),pp=$("pvPrevPane"),body=$("pvBody");
-  if(tab==="split"){
-    body.style.gridTemplateColumns="1fr 1fr";
-    body.style.gridTemplateRows="";
-    cp.style.display="flex";pp.style.display="flex";
-  } else if(tab==="code"){
-    body.style.gridTemplateColumns="1fr";
-    cp.style.display="flex";pp.style.display="none";
-  } else {
-    body.style.gridTemplateColumns="1fr";
-    cp.style.display="none";pp.style.display="flex";
-  }
-}
-
-// Ctrl+Enter to run preview
-document.addEventListener("keydown",e=>{
-  if($("pvPanel").classList.contains("open")&&(e.ctrlKey||e.metaKey)&&e.key==="Enter"){
-    e.preventDefault();pvRun();
-  }
-  if((e.ctrlKey||e.metaKey)&&e.key==="k"&&!$("pvPanel").classList.contains("open")){
-    e.preventDefault();inp.focus();toast("⌨ focused");
-  }
-});
-
-// ══ SYSTEM PROMPT ══
+// SYSTEM PROMPT BUILDER (Includes Auto-Memory)
 function sysPrompt(){
+  const p = JSON.parse(localStorage.getItem("bimo_auto_memory")||'{"name":"","facts":[]}');
+  let memoryContext = "";
+  if(p.name) memoryContext += `\nThe user's name is: ${p.name}. Talk to them directly using their name.`;
+  if(p.facts && p.facts.length > 0) memoryContext += `\nUSER FACTS TO REMEMBER: ${p.facts.join("; ")}. Strictly adhere to these facts when responding.`;
+
   return`You are Bimo AI on Bimochan Acharya's portfolio (bimochanacharya.com.np).
-
-About Bimochan Acharya:
+About Bimochan:
 - Full-stack developer & CS student in Nepal
-- Skills: Python, JavaScript, TypeScript, React, Django, FastAPI, Node.js, HTML/CSS, SQL, Git
-- Passionate about clean modern web apps and AI tools
+- Skills: Python, JS, React, Django, FastAPI, Node, SQL
 - Contact: bimochan081b@asm.edu.np
+${memoryContext}
 
-Your behavior:
+Behavior:
 - Web search: ${srch?"ON":"OFF"}
-- Code mode: ${code?"ON — write complete working code":"OFF"}
-- Be friendly, concise, practical
-- For HTML/CSS/JS: write COMPLETE self-contained code (include all tags from <!DOCTYPE html>) so it can be previewed directly in an iframe`;
+- Code mode: ${code?"ON (write COMPLETE HTML/JS/CSS for preview)":"OFF"}`;
 }
 
-// ══ SEND ══
+// ══ SEND MESSAGE ══
 async function send(regenTxt=null){
   const txt=(regenTxt??inp.value).trim();
-  if(!txt||busy)return;
-  if(!regenTxt){inp.value="";rsz();$("cc").textContent="0 / 2000"}
+  if(!txt && !attachedText) return; 
+  if(busy) return;
+  
+  if(!regenTxt){
+    extractMemory(txt); // Check and save memory invisibly before sending
+    inp.value="";rsz();$("cc").textContent="0 / 2000"
+  }
   busy=true;stopStream=false;
   $("sndb").disabled=true;$("spb").classList.remove("hide");$("rb").classList.add("hide");
-  appendMsg("user",txt,{raw:true});
-  hist.push({role:"user",content:txt});lastP=txt;persist();
+  
+  appendMsg("user",txt || "(Sent an attachment)", {raw:true, attached: attachedName||false});
+  
+  let backendPayload = txt;
+  if(attachedText) {
+    backendPayload = `[User attached file: ${attachedName}]\n\`\`\`\n${attachedText}\n\`\`\`\n\nUser Message: ${txt}`;
+    clearFile(); 
+  }
+  
+  hist.push({role:"user",content:backendPayload}); lastP=backendPayload; persist();
+  
   const ws=wantsSrch(txt);
   const te=appendMsg("bot","",{typing:true,searching:ws,coding:code});
+  
   try{
     const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({messages:hist,web_search:ws,code_mode:code,system:sysPrompt()})});
@@ -707,16 +657,17 @@ async function send(regenTxt=null){
     try{data=raw?JSON.parse(raw):{}}catch{throw new Error("Invalid server response")}
     if(!res.ok)throw new Error(data.error||`Server error ${res.status}`);
     if(te?.parentNode)te.remove();
+    
     const reply=data.reply||"No response.";
-    // build streaming bubble
     const div=document.createElement("div");div.className="msg bot";
     const bub=document.createElement("div");bub.className="bub";
     const bw=document.createElement("div");bw.className="bw";
     const av=document.createElement("div");av.className="av";av.textContent="B";
     bw.appendChild(bub);div.appendChild(av);div.appendChild(bw);
     msgsEl.appendChild(div);msgsEl.scrollTop=msgsEl.scrollHeight;
+    
     await typewrite(bub,reply,5);
-    // meta row
+    
     const mm=document.createElement("div");mm.className="mm";
     mm.innerHTML=`${tnow()} · 🔒 <button class="mb" onclick="cpAns(this)">Copy</button><button class="mb" onclick="shrAns(this)">Share</button>`;
     bw.appendChild(mm);
@@ -739,15 +690,22 @@ function regen(){
   send(lastP);
 }
 
-// ══ INPUT ══
+// EVENTS
 inp.addEventListener("input",()=>{rsz();$("cc").textContent=`${inp.value.length} / 2000`});
 inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+document.addEventListener("keydown",e=>{
+  if($("pvPanel").classList.contains("open")&&(e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();pvRun();}
+  if((e.ctrlKey||e.metaKey)&&e.key==="k"&&!$("pvPanel").classList.contains("open")){e.preventDefault();inp.focus();toast("⌨ focused");}
+});
 
-// ══ INIT ══
+// INIT
 window.addEventListener("load",()=>{
   if(sess.length){
     const s=sess[0];cid=s.id;hist=[...(s.messages||[])];
-    if(hist.length){$("wc").style.display="none";hist.forEach(m=>appendMsg(m.role==="assistant"?"bot":"user",m.content,{raw:m.role==="user"}))}
+    if(hist.length){
+      $("wc").style.display="none";
+      hist.forEach(m=>appendMsg(m.role==="assistant"?"bot":"user",m.content,{raw:m.role==="user"}))
+    }
   }
   updBar();inp.focus();
 });
