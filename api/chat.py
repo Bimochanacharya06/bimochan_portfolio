@@ -1,6 +1,12 @@
 from http.server import BaseHTTPRequestHandler
 import json, os, urllib.request, urllib.error
 
+# Import DuckDuckGo for the actual web search
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    DDGS = None
+
 class handler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
@@ -10,6 +16,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", 0))
             raw = self.rfile.read(length).decode("utf-8", "ignore")
+            
             try:
                 body = json.loads(raw or "{}")
             except Exception:
@@ -17,50 +24,93 @@ class handler(BaseHTTPRequestHandler):
 
             api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
             if not api_key:
-                return self._json(500, {"error": "ANTHROPIC_API_KEY not set"})
+                return self._json(500, {"error": "ANTHROPIC_API_KEY not set in Vercel"})
 
             messages = body.get("messages", [])
             if not isinstance(messages, list):
                 return self._json(400, {"error": "messages must be an array"})
 
+            # Prepare the request for Claude
             payload = {
-                "model": "claude-sonnet-4-5",
+                "model": "claude-3-5-sonnet-20241022", # Correct model name
                 "max_tokens": 4096 if body.get("code_mode") else 1024,
                 "system": body.get("system", ""),
                 "messages": messages
             }
 
+            # If web search is ON, give Claude the search tool
             if body.get("web_search"):
                 payload["tools"] = [{
-                    "type": "web_search_20250305",
-                    "name": "web_search",
-                    "max_uses": 3
+                    "name": "search_web",
+                    "description": "Search the web for current events, news, or specific real-time facts.",
+                    "input_schema": {
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string", "description": "The search query to look up."}
+                        },
+                        "required": ["query"]
+                    }
                 }]
 
-            req = urllib.request.Request(
-                "https://api.anthropic.com/v1/messages",
-                data=json.dumps(payload).encode("utf-8"),
-                headers={
-                    "x-api-key": api_key,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json"
-                },
-                method="POST"
-            )
+            # HELPER FUNCTION: Make the HTTP call to Anthropic
+            def call_anthropic(current_payload):
+                req = urllib.request.Request(
+                    "https://api.anthropic.com/v1/messages",
+                    data=json.dumps(current_payload).encode("utf-8"),
+                    headers={
+                        "x-api-key": api_key,
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json"
+                    },
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    return json.loads(r.read().decode("utf-8", "ignore"))
 
-            with urllib.request.urlopen(req, timeout=180) as r:
-                data = json.loads(r.read().decode("utf-8", "ignore"))
+            # --- 1ST API CALL ---
+            data = call_anthropic(payload)
+            search_used = False
 
+            # Check if Claude wants to search the web
+            tool_use_block = next((b for b in data.get("content", []) if b.get("type") == "tool_use"), None)
+            
+            if tool_use_block and tool_use_block.get("name") == "search_web":
+                search_used = True
+                query = tool_use_block["input"].get("query", "")
+                
+                # Perform the actual web search
+                search_results = "No results."
+                if DDGS:
+                    try:
+                        results = DDGS().text(query, max_results=3)
+                        if results:
+                            search_results = "\n\n".join([f"Title: {r['title']}\nInfo: {r['body']}" for r in results])
+                    except Exception as e:
+                        search_results = f"Search failed: {str(e)}"
+
+                # Add Claude's tool request to history
+                messages.append({"role": "assistant", "content": data["content"]})
+                
+                # Add the actual search results to history
+                messages.append({
+                    "role": "user",
+                    "content": [{
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block["id"],
+                        "content": search_results
+                    }]
+                })
+                
+                # --- 2ND API CALL --- (Claude reads results and generates final answer)
+                payload["messages"] = messages
+                data = call_anthropic(payload)
+
+            # Extract final text
             reply = "".join(
                 b.get("text", "")
                 for b in data.get("content", [])
                 if isinstance(b, dict) and b.get("type") == "text"
             ).strip()
-
-            search_used = any(
-                isinstance(b, dict) and b.get("type") == "tool_use"
-                for b in data.get("content", [])
-            )
 
             return self._json(200, {
                 "reply": reply or "No response.",
