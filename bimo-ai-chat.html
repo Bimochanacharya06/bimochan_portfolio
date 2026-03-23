@@ -138,6 +138,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .cblk pre{margin:0!important;background:#07051a!important;padding:16px!important;overflow-x:auto}
 .cblk pre code{font-size:12.5px!important;font-family:'Fira Code',monospace!important;line-height:1.65!important}
 
+/* TERMINAL OUTPUT */
+.term-out {
+  background: #050414;
+  color: #34d399;
+  font-family: 'Fira Code', monospace;
+  font-size: 12.5px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--bdr2);
+  white-space: pre-wrap;
+  display: none;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.term-out.err { color: var(--dg); }
+
 /* META & PILLS */
 .mm{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:10px;color:var(--mu);font-family:'Fira Code',monospace}
 .msg.user .mm{justify-content:flex-end}
@@ -162,7 +177,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
 .tog.on{border-color:rgba(52,211,153,.4);color:var(--ac3);background:rgba(52,211,153,.07)}
 .icc{font-size:10px;color:var(--mu);margin-left:auto;font-family:'Fira Code',monospace}
 
-/* File Pill */
 .att-pill{display:inline-flex;align-items:center;gap:8px;font-size:11px;padding:6px 12px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:8px;color:var(--ac);margin:8px 20px 0;font-family:'Fira Code',monospace}
 .att-pill button{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
 .att-pill button:hover{color:var(--dg)}
@@ -249,7 +263,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
   .ir{padding:7px 12px 10px; gap:6px;}
   .it{padding:8px 12px 2px}
   .msg.user{max-width:88%}
-  .hb.pill { display: none; } /* Hide text pill on mobile, keep plus icon */
+  .hb.pill { display: none; }
 }
 </style>
 </head>
@@ -290,10 +304,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Outfit',
     <div class="wc" id="wc">
       <div class="wi">✦</div>
       <h2>Hey, I'm Bimo AI 👋</h2>
-      <p>Ask about Bimochan's skills or upload code files.</p>
+      <p>Ask about Bimochan's skills, upload code files, or run Python right here!</p>
       <div class="chips">
         <button class="chip p" onclick="chip('Who is Bimochan Acharya? Tell me about his skills.')">👤 About Bimochan</button>
-        <button class="chip" onclick="chip('What projects has Bimochan built?')">🛠 Projects</button>
+        <button class="chip" onclick="chip('Write a Python script to reverse a string')">🐍 Python Test</button>
         <button class="chip g" onclick="chip('Search latest web development trends 2026')">🔍 Trends</button>
         <button class="chip b" onclick="chip('Build a beautiful glassmorphism card UI with HTML CSS and JavaScript. Make it complete and self-contained.')">🎨 Code Preview</button>
       </div>
@@ -459,7 +473,6 @@ function extractMemory(txt) {
   let p = JSON.parse(localStorage.getItem("bimo_auto_memory") || '{"name":"","facts":[]}');
   let updated = false;
 
-  // Extract name (e.g., "my name is Alex")
   const nameMatch = txt.match(/(?:my name is|i am|i'm) ([a-zA-Z\s]{2,20})/i);
   if (nameMatch && !txt.toLowerCase().includes("looking for")) {
     p.name = nameMatch[1].trim();
@@ -467,13 +480,11 @@ function extractMemory(txt) {
     toast("✨ Bimo remembered your name!");
   }
 
-  // Extract preferences (e.g., "remember that I prefer short answers")
   const factMatch = txt.match(/(?:remember that|i want you to remember) (.+)/i);
   if (factMatch) {
     let newFact = factMatch[1].trim();
     if (!p.facts.includes(newFact)) {
       p.facts.push(newFact);
-      // Keep only last 3 facts to avoid bloated prompts
       if (p.facts.length > 3) p.facts.shift(); 
       updated = true;
       toast("🧠 Added to Bimo's permanent memory!");
@@ -516,7 +527,7 @@ function doClear(){close_("confirmModal");newChat()}
 function newChat(){
   hist=[];cid=null;msgsEl.innerHTML="";
   const w=document.createElement("div");w.className="wc";w.id="wc";
-  w.innerHTML=`<div class="wi">✦</div><h2>Hey, I'm Bimo AI 👋</h2><p>Ask me about Bimochan's skills or upload code files!</p><div class="chips"><button class="chip p" onclick="chip('Who is Bimochan Acharya?')">👤 About</button><button class="chip" onclick="chip('What projects has Bimochan built?')">🛠 Projects</button><button class="chip g" onclick="chip('Search latest web dev trends 2026')">🔍 Trends</button><button class="chip b" onclick="chip('Build a glassmorphism card UI in HTML CSS JS.')">🎨 Preview</button></div>`;
+  w.innerHTML=`<div class="wi">✦</div><h2>Hey, I'm Bimo AI 👋</h2><p>Ask me about Bimochan's skills, upload code files, or run Python right here!</p><div class="chips"><button class="chip p" onclick="chip('Who is Bimochan Acharya?')">👤 About</button><button class="chip" onclick="chip('Write a Python script to reverse a string')">🐍 Python Test</button><button class="chip g" onclick="chip('Search latest web dev trends 2026')">🔍 Trends</button><button class="chip b" onclick="chip('Build a glassmorphism card UI in HTML CSS JS.')">🎨 Preview</button></div>`;
   msgsEl.appendChild(w);persist();toast("New chat started");
 }
 function chip(t){inp.value=t;rsz();send()}
@@ -524,27 +535,55 @@ function togSearch(){srch=!srch;const b=$("st");b.textContent=`🔍 Search ${src
 function togCode(){code=!code;const b=$("ct");b.textContent=`💻 Code ${code?"ON":"OFF"}`;b.className="tog"+(code?" on":"");updBar();toast(code?"Code mode ON":"Code mode OFF");}
 function wantsSrch(t){return srch&&/search:|latest|current|2025|2026|news|today|price|who is|recent|trend/i.test(t)}
 
+// ══ BUG FIX: SANITIZE FUNCTION ══
+// Allows 'onclick' ONLY for buttons with class 'cblk-btn' (our safe UI preview/run buttons)
 function san(html){
   const d=new DOMParser().parseFromString(html,"text/html");
   d.querySelectorAll("script,iframe,object,embed").forEach(n=>n.remove());
   d.querySelectorAll("*").forEach(el=>[...el.attributes].forEach(a=>{
     const n=a.name.toLowerCase(),v=(a.value||"").toLowerCase();
-    if(n.startsWith("on"))el.removeAttribute(a.name);
+    
+    // If it's an 'on' attribute AND it's NOT our safe custom button, remove it
+    if(n.startsWith("on") && !el.classList.contains("cblk-btn")) {
+        el.removeAttribute(a.name);
+    }
     if((n==="href"||n==="src")&&v.startsWith("javascript:"))el.removeAttribute(a.name);
   }));
   return d.body.innerHTML;
 }
-function isPreviewable(lang){return["html","css","javascript","js","jsx","htm"].includes((lang||"").toLowerCase())}
+
+// ══ RENDER MARKDOWN & ADD PLAY BUTTONS ══
+function isPreviewable(lang){return["html","css","jsx","htm"].includes((lang||"").toLowerCase())}
+function isExecutable(lang){return["python","py","javascript","js"].includes((lang||"").toLowerCase())}
+
 function renderMd(txt){
   const p=(txt||"").replace(/```(\w*)\n?([\s\S]*?)```/g,(_,lang,c)=>{
     const l=(lang||"text").toLowerCase(),raw=(c||"").trim();
     const hl=hljs.getLanguage(l)?hljs.highlight(raw,{language:l}).value:hljs.highlightAuto(raw).value;
     const enc=encodeURIComponent(raw);
-    const pvBtn=isPreviewable(l)?`<button class="cblk-btn prev" onclick="pvOpen(decodeURIComponent('${enc}'),'${l}')">▶ Preview</button>`:"";
-    return`<div class="cblk"><div class="cblk-hd"><span class="clang">${l.toUpperCase()}</span><div class="cblk-btns">${pvBtn}<button class="cblk-btn" onclick="cpCode(this,decodeURIComponent('${enc}'))">Copy</button></div></div><pre><code>${hl}</code></pre></div>`;
+    
+    let actionBtn = "";
+    if(isPreviewable(l)) {
+      actionBtn = `<button class="cblk-btn prev" onclick="pvOpen(decodeURIComponent('${enc}'),'${l}')">▶ UI Preview</button>`;
+    } else if(isExecutable(l)) {
+      actionBtn = `<button class="cblk-btn prev" onclick="runCode(this, decodeURIComponent('${enc}'), '${l}')">▶ Run Console</button>`;
+    }
+
+    return `<div class="cblk">
+      <div class="cblk-hd">
+        <span class="clang">${l.toUpperCase()}</span>
+        <div class="cblk-btns">
+          ${actionBtn}
+          <button class="cblk-btn" onclick="cpCode(this,decodeURIComponent('${enc}'))">Copy</button>
+        </div>
+      </div>
+      <pre><code>${hl}</code></pre>
+      <div class="term-out"></div>
+    </div>`;
   });
   return san(marked.parse(p));
 }
+
 async function cpCode(btn,code){try{await navigator.clipboard.writeText(code);btn.textContent="✓";setTimeout(()=>btn.textContent="Copy",1400)}catch{}}
 
 function typewrite(bub,full,speed=5){
@@ -604,7 +643,7 @@ function pvClose(){$("pvPanel").classList.remove("open");$("pvFrame").srcdoc="";
 function pvRun(){const code=$("pvCode").value.trim();if(!code){toast("Nothing to run");return}const frame=$("pvFrame");frame.srcdoc=code;const badge=$("pvBadge");badge.classList.add("show");setTimeout(()=>badge.classList.remove("show"),2000);toast("▶ Preview updated");}
 function pvTab(tab,btn){document.querySelectorAll(".pvtab").forEach(t=>t.classList.remove("on"));btn.classList.add("on");const cp=$("pvCodePane"),pp=$("pvPrevPane"),body=$("pvBody");if(tab==="split"){body.style.gridTemplateColumns="1fr 1fr";body.style.gridTemplateRows="";cp.style.display="flex";pp.style.display="flex";}else if(tab==="code"){body.style.gridTemplateColumns="1fr";cp.style.display="flex";pp.style.display="none";}else{body.style.gridTemplateColumns="1fr";cp.style.display="none";pp.style.display="flex";}}
 
-// SYSTEM PROMPT BUILDER (Includes Auto-Memory)
+// SYSTEM PROMPT BUILDER
 function sysPrompt(){
   const p = JSON.parse(localStorage.getItem("bimo_auto_memory")||'{"name":"","facts":[]}');
   let memoryContext = "";
@@ -623,6 +662,79 @@ Behavior:
 - Code mode: ${code?"ON (write COMPLETE HTML/JS/CSS for preview)":"OFF"}`;
 }
 
+// ══ LIVE CODE EXECUTION (PYTHON & JS) ══
+let pyodideReady = null;
+
+async function initPyodide() {
+  if(!window.loadPyodide) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  const pyodide = await loadPyodide();
+  pyodide.runPython(`
+    import sys, io
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+  `);
+  return pyodide;
+}
+
+async function runCode(btn, rawCode, lang) {
+  const cblk = btn.closest('.cblk');
+  const term = cblk.querySelector('.term-out');
+  term.style.display = 'block';
+  term.classList.remove('err');
+  
+  if (lang === 'javascript' || lang === 'js') {
+    term.textContent = "Running JS...\n";
+    try {
+      let output = "";
+      const ogLog = console.log;
+      console.log = (...args) => { output += args.join(" ") + "\n"; };
+      
+      const result = new Function(rawCode)();
+      if(result !== undefined) output += "\nReturned: " + result;
+      
+      console.log = ogLog; 
+      term.textContent = output || "(Executed successfully with no output)";
+    } catch (err) {
+      term.classList.add('err');
+      term.textContent = "Error:\n" + err.message;
+    }
+    return;
+  }
+
+  if (lang === 'python' || lang === 'py') {
+    term.textContent = "Loading Python Engine (WebAssembly)... ⏳\nThis takes a few seconds the first time.";
+    try {
+      if(!pyodideReady) pyodideReady = initPyodide();
+      const pyodide = await pyodideReady;
+      
+      pyodide.runPython(`sys.stdout.truncate(0); sys.stdout.seek(0)`);
+      pyodide.runPython(`sys.stderr.truncate(0); sys.stderr.seek(0)`);
+      
+      await pyodide.runPythonAsync(rawCode);
+      
+      const out = pyodide.runPython("sys.stdout.getvalue()");
+      const errOut = pyodide.runPython("sys.stderr.getvalue()");
+      
+      if(errOut) {
+        term.classList.add('err');
+        term.textContent = errOut;
+      } else {
+        term.textContent = out || "(Executed successfully with no output)";
+      }
+    } catch (err) {
+      term.classList.add('err');
+      term.textContent = "Python Error:\n" + err.message;
+    }
+  }
+}
+
 // ══ SEND MESSAGE ══
 async function send(regenTxt=null){
   const txt=(regenTxt??inp.value).trim();
@@ -630,7 +742,7 @@ async function send(regenTxt=null){
   if(busy) return;
   
   if(!regenTxt){
-    extractMemory(txt); // Check and save memory invisibly before sending
+    extractMemory(txt); 
     inp.value="";rsz();$("cc").textContent="0 / 2000"
   }
   busy=true;stopStream=false;
