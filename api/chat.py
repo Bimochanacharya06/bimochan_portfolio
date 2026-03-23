@@ -32,7 +32,7 @@ class handler(BaseHTTPRequestHandler):
 
             # Prepare the request for Claude (UPDATED MODEL NAME HERE)
             payload = {
-                "model": "claude-3-5-sonnet-20240620", 
+                "model": "claude-3-haiku-20240307", 
                 "max_tokens": 4096 if body.get("code_mode") else 1024,
                 "system": body.get("system", ""),
                 "messages": messages
