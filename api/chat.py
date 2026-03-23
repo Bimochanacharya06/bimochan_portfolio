@@ -30,9 +30,9 @@ class handler(BaseHTTPRequestHandler):
             if not isinstance(messages, list):
                 return self._json(400, {"error": "messages must be an array"})
 
-            # Prepare the request for Claude
+            # Prepare the request for Claude (UPDATED MODEL NAME HERE)
             payload = {
-                "model": "claude-3-5-sonnet-20241022", # Correct model name
+                "model": "claude-3-5-sonnet-20240620", 
                 "max_tokens": 4096 if body.get("code_mode") else 1024,
                 "system": body.get("system", ""),
                 "messages": messages
