@@ -1,21 +1,24 @@
 import json
 import os
+import sys
 import urllib.request
 import urllib.error
 import time
 import hashlib
 from datetime import datetime
+
+# Add api folder to path for imports
+sys.path.insert(0, os.path.dirname(__file__))
+
 from cache import CacheManager
 from utils import get_client_ip, rate_limit_check
 
-# Initialize cache
 cache = CacheManager()
 rate_limit_store = {}
 
 def handler(request):
-    """Vercel Serverless Function Handler"""
+    """Vercel Serverless Python Handler"""
     try:
-        # Handle preflight
         if request.method == "OPTIONS":
             return _cors_response(200, {})
 
@@ -40,7 +43,6 @@ def handler(request):
         system_prompt = body.get("system", "")
         user_messages = body.get("messages", [])
 
-        # Check cache
         full_input = json.dumps({"system": system_prompt, "messages": user_messages})
         cache_key = hashlib.md5(full_input.encode()).hexdigest()
         cached_response = cache.get(cache_key)
@@ -53,7 +55,6 @@ def handler(request):
                 "cached": True
             })
 
-        # Build messages
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -69,7 +70,6 @@ def handler(request):
             "max_tokens": 2048
         }
 
-        # Call Groq with retry
         response_text = None
         for attempt in range(3):
             try:
