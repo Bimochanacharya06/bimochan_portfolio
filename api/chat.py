@@ -11,54 +11,45 @@ class handler(BaseHTTPRequestHandler):
             raw_body = self.rfile.read(length).decode("utf-8")
             body = json.loads(raw_body or "{}")
             
-            api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+            api_key = os.environ.get("GROQ_API_KEY", "").strip()
             if not api_key:
-                return self._json(500, {"error": "GEMINI_API_KEY missing in Vercel!"})
+                return self._json(500, {"error": "GROQ_API_KEY missing in Vercel!"})
 
-            messages = body.get("messages", [])
-            gemini_messages = []
-            
-            # Format history for Gemini
-            for i, m in enumerate(messages):
-                role = "model" if m["role"] == "assistant" else "user"
-                content = m["content"]
+            # Format the messages cleanly
+            messages = []
+            if body.get("system"):
+                messages.append({"role": "system", "content": body.get("system")})
                 
-                # INJECT THE SYSTEM PROMPT INTO THE FIRST MESSAGE
-                # This perfectly bypasses Google's broken system instruction field!
-                if i == 0 and body.get("system"):
-                    content = f"System Instructions: {body.get('system')}\n\nUser Message: {content}"
-                
-                gemini_messages.append({
-                    "role": role,
-                    "parts": [{"text": content}]
-                })
+            for m in body.get("messages", []):
+                messages.append({"role": m["role"], "content": m["content"]})
 
-            payload = {"contents": gemini_messages}
+            # Standard, clean payload
+            payload = {
+                "model": "llama3-8b-8192", # Free, incredibly fast Llama 3 model
+                "messages": messages
+            }
 
-            # 100% Stable v1 endpoint (No systemInstruction field in payload)
-            url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
-            
+            url = "https://api.groq.com/openai/v1/chat/completions"
             req = urllib.request.Request(
                 url,
                 data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                },
                 method="POST"
             )
 
             with urllib.request.urlopen(req, timeout=30) as r:
                 res_data = json.loads(r.read().decode("utf-8"))
             
-            # Safely extract the text response
-            try:
-                reply_text = res_data["candidates"][0]["content"]["parts"][0]["text"]
-            except (KeyError, IndexError):
-                reply_text = "No response from Gemini."
-                
+            # Extract the response
+            reply_text = res_data["choices"][0]["message"]["content"]
             return self._json(200, {"reply": reply_text})
 
         except urllib.error.HTTPError as e:
             err = e.read().decode("utf-8")
-            return self._json(e.code, {"error": f"Google API Error: {err}"})
+            return self._json(e.code, {"error": f"Groq API Error: {err}"})
         except Exception as e:
             return self._json(500, {"error": f"Backend Error: {str(e)}"})
 
