@@ -33,8 +33,8 @@ class handler(BaseHTTPRequestHandler):
                     "parts": [{"text": body.get("system")}]
                 }
 
-            # Use the correct stable Gemini endpoint
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+            # THE FIX: Using the official 'v1' stable endpoint and exact model name
+            url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
             
             req = urllib.request.Request(
                 url,
