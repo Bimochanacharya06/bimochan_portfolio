@@ -28,8 +28,8 @@ class handler(BaseHTTPRequestHandler):
 
             payload = {"contents": gemini_messages}
             
-            if body.get("system"):
-                payload["system_instruction"] = {
+         if body.get("system"):
+                payload["systemInstruction"] = {
                     "parts": [{"text": body.get("system")}]
                 }
 
