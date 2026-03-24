@@ -45,7 +45,7 @@ class handler(BaseHTTPRequestHandler):
                 payload["tools"] = [{"googleSearch": {}}]
 
             # 5. Make the call to Google's servers
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+                       url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
             req = urllib.request.Request(
                 url,
                 data=json.dumps(payload).encode("utf-8"),
