@@ -19,22 +19,23 @@ class handler(BaseHTTPRequestHandler):
             gemini_messages = []
             
             # Format history for Gemini
-            for m in messages:
+            for i, m in enumerate(messages):
                 role = "model" if m["role"] == "assistant" else "user"
+                content = m["content"]
+                
+                # INJECT THE SYSTEM PROMPT INTO THE FIRST MESSAGE
+                # This perfectly bypasses Google's broken system instruction field!
+                if i == 0 and body.get("system"):
+                    content = f"System Instructions: {body.get('system')}\n\nUser Message: {content}"
+                
                 gemini_messages.append({
                     "role": role,
-                    "parts": [{"text": m["content"]}]
+                    "parts": [{"text": content}]
                 })
 
             payload = {"contents": gemini_messages}
-            
-            # THE FIX 1: camelCase "systemInstruction"
-            if body.get("system"):
-                payload["systemInstruction"] = {
-                    "parts": [{"text": body.get("system")}]
-                }
 
-            # THE FIX 2: Official stable 'v1' endpoint
+            # 100% Stable v1 endpoint (No systemInstruction field in payload)
             url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
             
             req = urllib.request.Request(
