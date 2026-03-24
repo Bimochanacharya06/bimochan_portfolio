@@ -1,4 +1,1 @@
-fastapi
-anthropic
-duckduckgo-search
-pydantic
+
