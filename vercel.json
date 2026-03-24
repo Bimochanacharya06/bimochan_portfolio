@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "api/chat.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.py"
+    }
+  ]
+}
