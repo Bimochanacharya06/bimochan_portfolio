@@ -1,20 +1,15 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "builds": [
-    {
-      "src": "api/*.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.11"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/api/$1.py"
     }
-  ],
-  "env": {
-    "GROQ_API_KEY": {
-      "description": "Groq API key from console.groq.com"
-    }
-  }
+  ]
 }
