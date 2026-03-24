@@ -25,7 +25,7 @@ class handler(BaseHTTPRequestHandler):
 
             # Standard, clean payload
             payload = {
-                "model": "llama3-8b-8192", 
+                "model": "llama-3.1-8b-instant",  # Updated to supported free-tier model!
                 "messages": messages
             }
 
@@ -36,7 +36,7 @@ class handler(BaseHTTPRequestHandler):
                 headers={
                     "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" # <-- This bypasses Cloudflare 1010 error!
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" # Cloudflare bypass
                 },
                 method="POST"
             )
