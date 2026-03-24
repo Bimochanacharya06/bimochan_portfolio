@@ -28,14 +28,14 @@ class handler(BaseHTTPRequestHandler):
 
             payload = {"contents": gemini_messages}
             
-            # THE FIX: Google requires camelCase "systemInstruction"
+            # THE FIX 1: camelCase "systemInstruction"
             if body.get("system"):
                 payload["systemInstruction"] = {
                     "parts": [{"text": body.get("system")}]
                 }
 
-            # Using the exact working Gemini endpoint
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            # THE FIX 2: Official stable 'v1' endpoint
+            url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
             
             req = urllib.request.Request(
                 url,
