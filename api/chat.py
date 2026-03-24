@@ -25,7 +25,7 @@ class handler(BaseHTTPRequestHandler):
 
             # Standard, clean payload
             payload = {
-                "model": "llama3-8b-8192", # Free, incredibly fast Llama 3 model
+                "model": "llama3-8b-8192", 
                 "messages": messages
             }
 
@@ -35,7 +35,8 @@ class handler(BaseHTTPRequestHandler):
                 data=json.dumps(payload).encode("utf-8"),
                 headers={
                     "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" # <-- This bypasses Cloudflare 1010 error!
                 },
                 method="POST"
             )
