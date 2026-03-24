@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler
-import json, os, urllib.request, urllib.error
+import json, os
+import google.generativeai as genai
 
 class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -11,61 +12,48 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            # 1. Read the frontend request
             length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(length).decode("utf-8"))
             
-            # 1. Check for Gemini API Key
+            # 2. Authenticate securely
             api_key = os.environ.get("GEMINI_API_KEY", "").strip()
             if not api_key:
-                self._reply(500, {"error": "GEMINI_API_KEY missing in Vercel Environment Variables!"})
+                self._reply(500, {"error": "GEMINI_API_KEY is missing in Vercel settings."})
                 return
 
-            # 2. Convert standard messages to Gemini format
-            messages = body.get("messages", [])
-            gemini_messages = []
-            for m in messages:
-                # Gemini uses 'model' instead of 'assistant'
-                role = "model" if m["role"] == "assistant" else "user"
-                gemini_messages.append({
-                    "role": role,
-                    "parts": [{"text": m["content"]}]
-                })
-
-            # 3. Prepare the Payload
-            payload = {"contents": gemini_messages}
+            genai.configure(api_key=api_key)
             
-            # Add System Prompt (Personality)
-            if body.get("system"):
-                payload["systemInstruction"] = {
-                    "parts": [{"text": body.get("system")}]
-                }
+            # 3. Format the chat history for Gemini
+            messages = body.get("messages", [])
+            if not messages:
+                self._reply(400, {"error": "No messages provided."})
+                return
 
-            # 4. Activate NATIVE Google Search if toggle is ON!
-            if body.get("web_search"):
-                payload["tools"] = [{"googleSearch": {}}]
+            history = []
+            for m in messages[:-1]: # Take all messages except the last one
+                role = "model" if m.get("role") == "assistant" else "user"
+                history.append({"role": role, "parts": [m.get("content", "")]})
+            
+            last_msg = messages[-1].get("content", "")
+            sys_inst = body.get("system", "")
 
-            # 5. Make the call to Google's servers
-                       url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
+            # 4. Initialize the official Model
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-flash",
+                system_instruction=sys_inst if sys_inst else None
             )
 
-            with urllib.request.urlopen(req, timeout=30) as r:
-                res_data = json.loads(r.read().decode("utf-8"))
-            
-            # 6. Extract the reply text and send it back to your UI
-            reply_text = res_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "No response from Gemini.")
-            
-            self._reply(200, {"reply": reply_text})
+            # 5. Send message and get reply
+            chat = model.start_chat(history=history)
+            response = chat.send_message(last_msg)
 
-        except urllib.error.HTTPError as e:
-            err = e.read().decode("utf-8")
-            self._reply(e.code, {"error": f"API Error: {err}"})
+            # 6. Send the reply back to your HTML frontend
+            self._reply(200, {"reply": response.text})
+
         except Exception as e:
-            self._reply(500, {"error": str(e)})
+            # Catch any actual errors cleanly
+            self._reply(500, {"error": f"Backend Error: {str(e)}"})
 
     def _reply(self, code, data):
         res = json.dumps(data).encode("utf-8")
