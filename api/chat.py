@@ -1,7 +1,7 @@
 import json
 import os
-from utils import get_client_ip, rate_limit_check
-from cache import CacheManager
+from .utils import get_client_ip, rate_limit_check
+from .cache import CacheManager
 
 cache = CacheManager()
 rate_limit_store = {}
