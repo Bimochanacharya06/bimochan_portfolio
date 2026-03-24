@@ -608,7 +608,7 @@ function exportPDF(){
   w.document.close();
 }
 
-function pvOpen(rawCode, lang){$("pvCode").value=rawCode;$("pvTitle").textContent=`🎨 Live Preview — ${(lang||"HTML").toUpperCase()}`;$("pvPanel").classList.add("open");setTimeout(pvRun, 100);}
+function pvOpen(rawCode, lang){$("pvCode").value=rawCode;$("pvTitle").textContent=`��� Live Preview — ${(lang||"HTML").toUpperCase()}`;$("pvPanel").classList.add("open");setTimeout(pvRun, 100);}
 function pvClose(){$("pvPanel").classList.remove("open");$("pvFrame").srcdoc="";}
 function pvRun(){const code=$("pvCode").value.trim();if(!code){toast("Nothing to run");return}const frame=$("pvFrame");frame.srcdoc=code;const badge=$("pvBadge");badge.classList.add("show");setTimeout(()=>badge.classList.remove("show"),2000);toast("▶ Preview updated");}
 function pvTab(tab,btn){document.querySelectorAll(".pvtab").forEach(t=>t.classList.remove("on"));btn.classList.add("on");const cp=$("pvCodePane"),pp=$("pvPrevPane"),body=$("pvBody");if(tab==="split"){body.style.gridTemplateColumns="1fr 1fr";body.style.gridTemplateRows="";cp.style.display="flex";pp.style.display="flex";}else if(tab==="code"){body.style.gridTemplateColumns="1fr";cp.style.display="flex";pp.style.display="none";}else{body.style.gridTemplateColumns="1fr";cp.style.display="none";pp.style.display="flex";}}
@@ -705,7 +705,7 @@ async function runCode(btn, rawCode, lang) {
   }
 }
 
-// ══ SEND MESSAGE ══
+// ══ SEND MESSAGE (UPDATED FOR PHASE 1) ══
 async function send(regenTxt=null){
   const txt=(regenTxt??inp.value).trim();
   if(!txt && !attachedText) return; 
@@ -732,15 +732,47 @@ async function send(regenTxt=null){
   const te=appendMsg("bot","",{typing:true,searching:ws,coding:code});
   
   try{
-    const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({messages:hist,web_search:ws,code_mode:code,system:sysPrompt()})});
-    const raw=await res.text();
-    let data={};
-    try{data=raw?JSON.parse(raw):{}}catch{throw new Error("Invalid server response")}
-    if(!res.ok)throw new Error(data.error||`Server error ${res.status}`);
+    const res=await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:hist,web_search:ws,code_mode:code,system:sysPrompt()})
+    });
+    
+    // ✅ PHASE 1: Handle new Vercel response format
+    let reply;
+    
+    try {
+      const responseData = await res.json();
+      
+      // Check if it's the new Vercel wrapper format
+      if(responseData.statusCode !== undefined) {
+        // Vercel wrapper format
+        if(responseData.statusCode !== 200) {
+          const errorBody = typeof responseData.body === 'string' 
+            ? JSON.parse(responseData.body) 
+            : responseData.body;
+          throw new Error(errorBody.error || `API Error: ${responseData.statusCode}`);
+        }
+        const bodyText = typeof responseData.body === 'string' 
+          ? responseData.body 
+          : JSON.stringify(responseData.body);
+        const parsedBody = JSON.parse(bodyText);
+        reply = parsedBody.reply;
+      } else {
+        // Direct format (local dev or direct API call)
+        reply = responseData.reply;
+      }
+    } catch(e) {
+      if(e.message.includes("API Error") || e.message.includes("error")) {
+        throw e;
+      }
+      throw new Error("Invalid response format from API");
+    }
+    
+    if(!reply) throw new Error("No response text received");
+    
     if(te?.parentNode)te.remove();
     
-    const reply=data.reply||"No response.";
     const div=document.createElement("div");div.className="msg bot";
     const bub=document.createElement("div");bub.className="bub";
     const bw=document.createElement("div");bw.className="bw";
@@ -755,9 +787,12 @@ async function send(regenTxt=null){
     bw.appendChild(mm);
     hist.push({role:"assistant",content:reply});persist();
     $("rb").classList.remove("hide");
+    
   }catch(err){
     if(te?.parentNode)te.remove();
-    appendMsg("bot",`⚠️ ${err.message||"Something went wrong."}`,{raw:true});
+    const errorMsg = err.message || "Unknown error occurred";
+    appendMsg("bot",`⚠️ ${errorMsg}`,{raw:true});
+    console.error("[CHAT ERROR]", err);
   }finally{
     busy=false;$("sndb").disabled=false;$("spb").classList.add("hide");inp.focus();
   }
