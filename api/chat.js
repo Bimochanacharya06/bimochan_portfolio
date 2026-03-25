@@ -15,54 +15,57 @@ module.exports = async function (req, res) {
     const system = body.system || "";
 
     // 3. Ensure the API key exists
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return res.status(200).json({ 
-        reply: "⚠️ Error: ANTHROPIC_API_KEY is missing from Vercel Environment Variables." 
+        reply: "⚠️ Error: GEMINI_API_KEY is missing from Vercel Environment Variables." 
       });
     }
 
-    // 4. Format messages (ensure no empty messages)
-    const formattedMessages = messages.filter(m => m.content && m.content.trim() !== "");
+    // 4. Format messages for Gemini (Gemini uses 'user' and 'model' instead of 'assistant')
+    const formattedMessages = messages.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    })).filter(m => m.parts[0].text && m.parts[0].text.trim() !== "");
+
     if (formattedMessages.length === 0) {
       return res.status(200).json({ reply: "⚠️ Error: No message content received." });
     }
 
-    // 5. Call Anthropic Claude API
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    // 5. Call Google Gemini API (Using Gemini 1.5 Flash - incredibly fast and free)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-2.1",
-        max_tokens: 1000, // Reduced slightly to prevent Vercel timeout
-        system: system,
-        messages: formattedMessages,
-        temperature: 0.7
+        systemInstruction: { parts: [{ text: system }] },
+        contents: formattedMessages,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000,
+        }
       })
     });
 
-    // 6. Handle API errors from Anthropic
+    // 6. Handle API errors
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Anthropic API Error:", errorText);
+      console.error("Gemini API Error:", errorText);
       return res.status(200).json({ 
-        reply: `⚠️ Anthropic API Error: ${errorText}` 
+        reply: `⚠️ Gemini API Error: ${errorText}` 
       });
     }
 
     // 7. Parse the successful response
     const data = await response.json();
 
-    // 8. Extract Claude's text response
-    if (data.content && data.content[0] && data.content[0].text) {
-      const botReply = data.content[0].text;
+    // 8. Extract Gemini's text response
+    if (data.candidates && data.candidates[0] && data.candidates[0].content.parts[0].text) {
+      const botReply = data.candidates[0].content.parts[0].text;
       return res.status(200).json({ reply: botReply });
     } else {
-      return res.status(200).json({ reply: "⚠️ Error: Claude returned an empty or unexpected response." });
+      return res.status(200).json({ reply: "⚠️ Error: Gemini returned an unexpected response format." });
     }
 
   } catch (error) {
