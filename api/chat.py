@@ -1,13 +1,31 @@
 import json
 import os
-from .utils import get_client_ip, rate_limit_check
-from .cache import CacheManager
+from utils import get_client_ip, rate_limit_check
+from cache import CacheManager
 
 cache = CacheManager()
 rate_limit_store = {}
 
-def handler(event, context):
-    """Vercel Serverless Function Handler"""
+def handler(request):
+    """Vercel Adapter -> Your existing logic"""
+    try:
+        # Convert Vercel request → AWS-style event
+        event = {
+            "httpMethod": request.method,
+            "headers": dict(request.headers),
+            "body": request.get_data(as_text=True)
+        }
+
+        # Call your original logic
+        return main_handler(event)
+
+    except Exception as e:
+        print(f"Adapter Error: {e}")
+        return _response(500, {"error": "Server Error"})
+
+
+# ✅ YOUR ORIGINAL LOGIC (unchanged concept)
+def main_handler(event):
     try:
         # 1. Only allow POST requests
         if event['httpMethod'] != "POST":
@@ -23,18 +41,22 @@ def handler(event, context):
         client_ip = get_client_ip(event['headers'])
         rate_limit = rate_limit_check(client_ip, rate_limit_store)
         if not rate_limit["allowed"]:
-            return _response(429, {"error": "Rate limited", "retry_in": rate_limit["reset_in"]})
+            return _response(429, {
+                "error": "Rate limited",
+                "retry_in": rate_limit["reset_in"]
+            })
 
-        # 4. Do API-related work (fake for now)
+        # 4. Your logic
         return _response(200, {
             "reply": f"Hello, {body['messages'][0]['content']}" if body.get("messages") else "Hello, world!",
         })
+
     except Exception as e:
         print(f"Server Error: {e}")
         return _response(500, {"error": "Server Error"})
 
+
 def _response(status_code, body):
-    """Format Vercel’s JSON response style"""
     return {
         "statusCode": status_code,
         "headers": {
