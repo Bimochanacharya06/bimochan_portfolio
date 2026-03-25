@@ -12,7 +12,11 @@ module.exports = async function (req, res) {
     }
 
     const messages = body.messages || [];
-    const system = body.system || "";
+    
+    // Fallback system prompt if none is provided
+    const system = body.system && body.system.trim() !== "" 
+      ? body.system 
+      : "You are Bimo AI, a helpful portfolio assistant for Bimochan Acharya.";
 
     // 3. Ensure the API key exists
     const apiKey = process.env.GEMINI_API_KEY;
@@ -32,8 +36,8 @@ module.exports = async function (req, res) {
       return res.status(200).json({ reply: "⚠️ Error: No message content received." });
     }
 
-    // 5. Call Google Gemini API (Using Gemini 1.5 Flash - incredibly fast and free)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 5. Call Google Gemini API (Using the rock-solid -latest endpoint)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
       method: "POST",
@@ -48,7 +52,7 @@ module.exports = async function (req, res) {
       })
     });
 
-    // 6. Handle API errors
+    // 6. Handle API errors safely
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Gemini API Error:", errorText);
@@ -65,6 +69,7 @@ module.exports = async function (req, res) {
       const botReply = data.candidates[0].content.parts[0].text;
       return res.status(200).json({ reply: botReply });
     } else {
+      console.error("Unexpected Gemini Data:", JSON.stringify(data));
       return res.status(200).json({ reply: "⚠️ Error: Gemini returned an unexpected response format." });
     }
 
