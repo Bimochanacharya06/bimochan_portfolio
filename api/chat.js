@@ -62,7 +62,7 @@ RESPONSE FORMAT FOR COMPLEX APPS:
         model: "llama-3.3-70b-versatile", // Free, incredibly fast, and smart
         messages: formattedMessages,
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 6000
       })
     });
 
