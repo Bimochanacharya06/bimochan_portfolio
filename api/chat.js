@@ -13,8 +13,6 @@ module.exports = async function (req, res) {
     }
 
     const messages = body.messages || [];
-    const messages = body.messages || [];
-
     const masterPrompt = `
 You are Bimo AI, the official portfolio assistant for Bimochan Acharya (a Full-stack developer & CS student). You are an elite, multi-domain expert AI.
 
