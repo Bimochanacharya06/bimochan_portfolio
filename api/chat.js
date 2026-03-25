@@ -1,26 +1,35 @@
 export default async function handler(req, res) {
   // 1. Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+    return res.status(405).json({ reply: 'Error: Method not allowed. Use POST.' });
   }
 
   try {
-    // 2. Extract data sent from your frontend
-    const { messages, system, web_search, code_mode } = req.body;
+    // 2. Safely parse the body (sometimes Vercel passes it as a string)
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+
+    const messages = body.messages || [];
+    const system = body.system || "";
 
     // 3. Ensure the API key exists
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ 
-        reply: "Error: ANTHROPIC_API_KEY is missing from Vercel Environment Variables." 
+      return res.status(200).json({ 
+        reply: "⚠️ Error: ANTHROPIC_API_KEY is missing from Vercel Environment Variables." 
       });
     }
 
-    // 4. Format messages for Anthropic (Claude requires alternating user/assistant roles)
-    // We filter out any potential empty messages just to be safe.
+    // 4. Format messages (ensure no empty messages)
     const formattedMessages = messages.filter(m => m.content && m.content.trim() !== "");
 
-    // 5. Call the Anthropic Claude API
+    if (formattedMessages.length === 0) {
+      return res.status(200).json({ reply: "⚠️ Error: No message content received." });
+    }
+
+    // 5. Call Anthropic Claude API
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -29,9 +38,9 @@ export default async function handler(req, res) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-3-5-haiku-20241022", // Fast and cost-effective model
-        max_tokens: 2000, // Max length of response
-        system: system, // Your custom prompt about Bimochan
+        model: "claude-3-5-haiku-20241022",
+        max_tokens: 2000,
+        system: system,
         messages: formattedMessages,
         temperature: 0.7
       })
@@ -39,10 +48,10 @@ export default async function handler(req, res) {
 
     // 6. Handle API errors from Anthropic
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Anthropic API Error:", errorData);
-      return res.status(500).json({ 
-        reply: `Anthropic API Error: ${errorData.error?.message || "Unknown error occurred"}` 
+      const errorText = await response.text();
+      console.error("Anthropic API Error:", errorText);
+      return res.status(200).json({ 
+        reply: `⚠️ Anthropic API Error: ${errorText}` 
       });
     }
 
@@ -52,16 +61,16 @@ export default async function handler(req, res) {
     // 8. Extract Claude's text response
     if (data.content && data.content[0] && data.content[0].text) {
       const botReply = data.content[0].text;
-      // Send it back to the frontend!
       return res.status(200).json({ reply: botReply });
     } else {
-      throw new Error("Claude returned an unexpected response format.");
+      return res.status(200).json({ reply: "⚠️ Error: Claude returned an empty or unexpected response." });
     }
 
   } catch (error) {
     console.error("Backend Crash:", error);
-    return res.status(500).json({ 
-      reply: `Backend Error: ${error.message}` 
+    // Send a 200 status but with an error message so the frontend doesn't throw "Invalid response format"
+    return res.status(200).json({ 
+      reply: `⚠️ Server Crash: ${error.message}` 
     });
   }
 }
