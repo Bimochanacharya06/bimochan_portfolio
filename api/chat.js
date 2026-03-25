@@ -1,11 +1,11 @@
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   // 1. Only allow POST requests
   if (req.method !== 'POST') {
-    return res.status(405).json({ reply: 'Error: Method not allowed. Use POST.' });
+    return res.status(405).json({ reply: '⚠️ Error: Method not allowed. Use POST.' });
   }
 
   try {
-    // 2. Safely parse the body (sometimes Vercel passes it as a string)
+    // 2. Safely parse the body
     let body = req.body;
     if (typeof body === 'string') {
       body = JSON.parse(body);
@@ -24,7 +24,6 @@ export default async function handler(req, res) {
 
     // 4. Format messages (ensure no empty messages)
     const formattedMessages = messages.filter(m => m.content && m.content.trim() !== "");
-
     if (formattedMessages.length === 0) {
       return res.status(200).json({ reply: "⚠️ Error: No message content received." });
     }
@@ -39,7 +38,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-3-5-haiku-20241022",
-        max_tokens: 2000,
+        max_tokens: 1000, // Reduced slightly to prevent Vercel timeout
         system: system,
         messages: formattedMessages,
         temperature: 0.7
@@ -68,9 +67,8 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Backend Crash:", error);
-    // Send a 200 status but with an error message so the frontend doesn't throw "Invalid response format"
     return res.status(200).json({ 
       reply: `⚠️ Server Crash: ${error.message}` 
     });
   }
-}
+};
