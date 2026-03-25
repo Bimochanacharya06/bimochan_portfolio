@@ -37,7 +37,7 @@ module.exports = async function (req, res) {
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-3-haiku-20240307",
+        model: "claude-3-5-sonnet-20241022",
         max_tokens: 1000, // Reduced slightly to prevent Vercel timeout
         system: system,
         messages: formattedMessages,
