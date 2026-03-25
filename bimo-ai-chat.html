@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
   <title>Bimo AI — Portfolio Assistant</title>
   
-  <!-- Fonts & Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -31,10 +30,10 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body, html { height: 100%; width: 100%; background: var(--bg-main); color: var(--text-main); font-family: var(--font-main); overflow: hidden; }
 
-    .app-layout { display: flex; height: 100dvh; width: 100vw; }
+    .app-layout { display: flex; height: 100dvh; width: 100vw; position: relative; }
 
     /* SIDEBAR */
-    .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: margin-left 0.3s ease, transform 0.3s ease; flex-shrink: 0; z-index: 50; }
+    .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: margin-left 0.3s ease, transform 0.3s ease; flex-shrink: 0; z-index: 1000; }
     .sidebar.collapsed { margin-left: -260px; } 
     .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
     .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; }
@@ -56,8 +55,11 @@
     .history-item:hover { background: var(--surface-hover); }
     .history-item.active { background: rgba(139, 92, 246, 0.15); color: var(--accent-1); }
 
+    /* MOBILE SIDEBAR OVERLAY */
+    .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; display: none; opacity: 0; transition: 0.3s; }
+
     /* MAIN CONTENT */
-    .main-content { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
+    .main-content { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; z-index: 10; }
     .top-bar { display: flex; align-items: center; padding: 12px 20px; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 10; }
     .toggle-sidebar-btn { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
     .toggle-sidebar-btn:hover { background: var(--surface); color: var(--text-main); }
@@ -93,6 +95,7 @@
 
     .bubble h1, .bubble h2, .bubble h3 { margin: 16px 0 8px; color: var(--accent-1); }
     .bubble p { margin-bottom: 12px; } .bubble p:last-child { margin-bottom: 0; }
+    
     .code-container { margin: 16px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #000; }
     .code-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #18181b; border-bottom: 1px solid var(--border); font-family: var(--font-code); font-size: 12px; color: var(--text-muted); }
     .code-lang { display: flex; align-items: center; gap: 8px; text-transform: uppercase; color: var(--accent-1); }
@@ -103,6 +106,7 @@
     .code-btn.run-btn { border-color: rgba(16, 185, 129, 0.4); color: var(--accent-3); background: rgba(16, 185, 129, 0.1); }
     .code-container pre { margin: 0; padding: 16px; overflow-x: auto; background: transparent !important; }
     .code-container code { font-family: var(--font-code); font-size: 13px; line-height: 1.5; }
+    
     .terminal-output { background: #09090b; border-top: 1px dashed var(--border); padding: 12px 16px; font-family: var(--font-code); font-size: 12px; color: var(--accent-3); display: none; white-space: pre-wrap; }
     .terminal-output.error { color: var(--error); }
 
@@ -137,9 +141,11 @@
     .close-preview { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--error); padding: 6px 12px; border-radius: 8px; cursor: pointer; }
     .preview-iframe { flex: 1; width: 100%; border: none; background: #fff; }
 
+    /* MOBILE RESPONSIVE FIXES */
     @media(max-width: 768px) {
-      .sidebar { position: fixed; height: 100%; transform: translateX(-100%); margin-left: 0; }
+      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; height: 100dvh; transform: translateX(-100%); margin-left: 0; box-shadow: 5px 0 20px rgba(0,0,0,0.5); }
       .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.show { display: block; opacity: 1; }
       .msg-content { max-width: 100%; }
       .input-zone { padding: 0 12px 16px; }
       .preview-modal { width: 100%; height: 100vh; border-radius: 0; }
@@ -149,6 +155,9 @@
 <body>
 
   <div class="app-layout">
+    
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="logo">B</div>
@@ -238,9 +247,6 @@
   </div>
 
   <script>
-    // ==========================================
-    // JS LOGIC & UI INTERACTIONS
-    // ==========================================
     const API = "/api/chat";
     const STORAGE_KEY = "bimo_sessions_v5";
     
@@ -263,6 +269,7 @@
     const stopBtn = document.getElementById("stop-btn");
     const welcomeScreen = document.getElementById("welcome-screen");
     const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebar-overlay");
 
     window.onload = () => {
       renderSidebarHistory();
@@ -283,7 +290,7 @@
       if (sessions.length > 15) sessions.pop(); 
       chatContainer.innerHTML = ""; chatContainer.appendChild(welcomeScreen); welcomeScreen.style.display = "block";
       saveSessions();
-      if(window.innerWidth < 768) sidebar.classList.remove('open');
+      closeSidebarOnMobile();
     }
 
     function updateCurrentSession() {
@@ -311,7 +318,7 @@
         chatContainer.appendChild(welcomeScreen); welcomeScreen.style.display = "block";
       }
       renderSidebarHistory();
-      if(window.innerWidth < 768) sidebar.classList.remove('open');
+      closeSidebarOnMobile();
     }
 
     function renderSidebarHistory() {
@@ -333,7 +340,19 @@
       }
     }
 
-    function toggleSidebar() { sidebar.classList.toggle('collapsed'); sidebar.classList.toggle('open'); }
+    // FIXED MOBILE TOGGLE
+    function toggleSidebar() { 
+      sidebar.classList.toggle('collapsed'); 
+      sidebar.classList.toggle('open'); 
+      sidebarOverlay.classList.toggle('show');
+    }
+    function closeSidebarOnMobile() {
+      if(window.innerWidth < 768) {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('show');
+      }
+    }
+
     function toggleOption(type) {
       if (type === 'search') { isSearchOn = !isSearchOn; document.getElementById("menu-search").innerText = `🔍 Web Search: ${isSearchOn ? 'ON' : 'OFF'}`; } 
       else { isCodeOn = !isCodeOn; document.getElementById("menu-code").innerText = `💻 Code Mode: ${isCodeOn ? 'ON' : 'OFF'}`; }
@@ -344,15 +363,21 @@
       setTimeout(() => t.classList.remove("show"), 2500);
     }
 
-    async function copyBotMsg(encodedText) {
-      try { await navigator.clipboard.writeText(decodeURIComponent(encodedText)); showToast("📋 Copied to clipboard!"); } 
-      catch(e) { showToast("⚠️ Failed to copy"); }
+    // FIXED: BUTTON CLICKS (Base64 encoding prevents syntax errors from quotes)
+    async function copyBotMsg(b64Text) {
+      try { 
+        const text = decodeURIComponent(escape(atob(b64Text)));
+        await navigator.clipboard.writeText(text); 
+        showToast("📋 Copied to clipboard!"); 
+      } catch(e) { showToast("⚠️ Failed to copy"); }
     }
-    async function shareBotMsg(encodedText) {
-      const text = decodeURIComponent(encodedText);
-      if (navigator.share) { try { await navigator.share({ title: 'Bimo AI Reply', text: text }); } catch (e) { copyBotMsg(encodedText); } } 
-      else { copyBotMsg(encodedText); showToast("📋 Copied to share!"); }
+    async function shareBotMsg(b64Text) {
+      const text = decodeURIComponent(escape(atob(b64Text)));
+      if (navigator.share) { 
+        try { await navigator.share({ title: 'Bimo AI Reply', text: text }); } catch (e) { copyBotMsg(b64Text); } 
+      } else { copyBotMsg(b64Text); showToast("📋 Copied to share!"); }
     }
+
     function regenerateLast() {
       if(isBusy || chatHistory.length === 0) return;
       if(chatHistory[chatHistory.length - 1].role === 'assistant') { chatHistory.pop(); }
@@ -361,38 +386,35 @@
       processApiRequest();
     }
 
-    // === CODE RENDERER ===
+    // FIXED: HTML PREVIEW BUTTON LOGIC & BASE64 BUTTON FIX
     const renderer = new marked.Renderer();
     renderer.code = function(code, lang) {
       const language = (lang || "text").toLowerCase();
       const validLang = hljs.getLanguage(language) ? language : 'plaintext';
       const highlighted = hljs.highlight(code, { language: validLang }).value;
-      const encodedCode = encodeURIComponent(code);
-
-      let actionButtons = `<button class="code-btn" onclick="copyBotMsg('${encodedCode}')">📋 Copy</button>`;
       
-      if (['html', 'xml'].includes(validLang) || code.includes('<!DOCTYPE html>') || code.includes('<html') || code.includes('<div')) {
-        actionButtons = `<button class="code-btn run-btn" onclick="openPreview(decodeURIComponent('${encodedCode}'))">👁 Preview UI</button>` + actionButtons;
+      const b64Code = btoa(unescape(encodeURIComponent(code))); // Safe string for HTML
+
+      let actionButtons = `<button class="code-btn" onclick="copyBotMsg('${b64Code}')">📋 Copy</button>`;
+      
+      if (['html', 'xml'].includes(validLang) || code.includes('<html') || code.includes('<div') || code.includes('<style')) {
+        actionButtons = `<button class="code-btn run-btn" onclick="openPreview('${b64Code}')">👁 Preview UI</button>` + actionButtons;
       } else if (['python', 'py', 'javascript', 'js'].includes(validLang)) {
-        actionButtons = `<button class="code-btn run-btn" onclick="runScript(this, decodeURIComponent('${encodedCode}'), '${validLang}')">▶ Run Console</button>` + actionButtons;
+        actionButtons = `<button class="code-btn run-btn" onclick="runScript(this, '${b64Code}', '${validLang}')">▶ Run Console</button>` + actionButtons;
       }
 
       return `<div class="code-container"><div class="code-header"><span class="code-lang">${language}</span><div class="code-actions">${actionButtons}</div></div><pre><code>${highlighted}</code></pre><div class="terminal-output"></div></div>`;
     };
     marked.setOptions({ renderer: renderer, breaks: true, gfm: true });
 
-    // === IFRAME PREVIEW FIX ===
-    function openPreview(htmlCode) { 
+    function openPreview(b64Code) { 
+      const htmlCode = decodeURIComponent(escape(atob(b64Code)));
       const iframe = document.getElementById('preview-iframe');
-      iframe.srcdoc = "<html><body></body></html>"; // Clear previous state
-      setTimeout(() => {
-        iframe.srcdoc = htmlCode; 
-        document.getElementById('preview-overlay').classList.add('show'); 
-      }, 50);
+      iframe.srcdoc = htmlCode; 
+      document.getElementById('preview-overlay').classList.add('show'); 
     }
     function closePreview() { document.getElementById('preview-overlay').classList.remove('show'); document.getElementById('preview-iframe').srcdoc = ""; }
 
-    // === PYTHON / JS RUNNERS (FIXED) ===
     async function initPyodide() {
       if(!window.loadPyodide) { await new Promise((res) => { const s = document.createElement('script'); s.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"; s.onload = res; document.head.appendChild(s); }); }
       const pyodide = await loadPyodide();
@@ -400,7 +422,8 @@
       return pyodide;
     }
 
-    async function runScript(btn, code, lang) {
+    async function runScript(btn, b64Code, lang) {
+      const code = decodeURIComponent(escape(atob(b64Code)));
       const container = btn.closest('.code-container');
       const terminal = container.querySelector('.terminal-output');
       terminal.style.display = 'block'; terminal.classList.remove('error');
@@ -408,19 +431,13 @@
       if (lang === 'js' || lang === 'javascript') {
         terminal.innerText = "Running JS...\n";
         let out = ""; const ogLog = console.log;
-        
-        // BUG FIX: Finally block guarantees console.log is restored even if code fails!
         try {
           console.log = (...args) => { out += args.join(" ") + "\n"; };
           const result = new Function(code)();
           if(result !== undefined) out += "Returned: " + result;
           terminal.innerText = out || "(Executed successfully with no output)";
-        } catch (e) { 
-          terminal.classList.add('error'); 
-          terminal.innerText = e.toString(); 
-        } finally {
-          console.log = ogLog;
-        }
+        } catch (e) { terminal.classList.add('error'); terminal.innerText = e.toString(); 
+        } finally { console.log = ogLog; }
         return;
       }
 
@@ -437,7 +454,6 @@
       }
     }
 
-    // === FILE UPLOADS ===
     function handleFileUpload(input) {
       const file = input.files[0]; if (!file) return;
       if (file.size > 200000) return alert("File too large! Max 200KB.");
@@ -459,11 +475,11 @@
       
       let actionsHTML = "";
       if (role === "bot") {
-        const safeText = encodeURIComponent(text);
+        const b64Text = btoa(unescape(encodeURIComponent(text)));
         actionsHTML = `
           <div class="msg-actions">
-            <button class="msg-action-btn" onclick="copyBotMsg('${safeText}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>
-            <button class="msg-action-btn" onclick="shareBotMsg('${safeText}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share</button>
+            <button class="msg-action-btn" onclick="copyBotMsg('${b64Text}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>
+            <button class="msg-action-btn" onclick="shareBotMsg('${b64Text}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share</button>
             <button class="msg-action-btn" onclick="regenerateLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> Regenerate</button>
           </div>
         `;
@@ -501,19 +517,14 @@
       loadingDiv.innerHTML = `<div class="msg-avatar">B</div><div class="msg-content"><div class="bubble">Thinking...</div></div>`;
       chatContainer.appendChild(loadingDiv); chatArea.scrollTop = chatArea.scrollHeight;
       
-      // BUG FIX: Secretly inject HTML instruction into the payload WITHOUT overriding your Master Prompt!
-      let apiMessages = JSON.parse(JSON.stringify(chatHistory));
-      if(isCodeOn && apiMessages.length > 0) {
-        apiMessages[apiMessages.length - 1].content += "\n\n[CRITICAL RULE: If the user asks for web UI/components, you MUST combine HTML, CSS, and JS into a single ```html block. Put CSS in <style> and JS in <script> tags.]";
-      }
-
+      // Removed the hidden prompt injection. It now strictly uses your backend API messages!
       currentAbortController = new AbortController();
 
       try {
         const response = await fetch(API, {
           method: "POST", headers: { "Content-Type": "application/json" },
           signal: currentAbortController.signal,
-          body: JSON.stringify({ messages: apiMessages }) // Removed system override here!
+          body: JSON.stringify({ messages: chatHistory }) 
         });
 
         const responseData = await response.json();
