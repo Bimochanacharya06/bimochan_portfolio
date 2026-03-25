@@ -1,59 +1,77 @@
 import json
 import os
-from utils import get_client_ip, rate_limit_check
-from cache import CacheManager
-
-cache = CacheManager()
-rate_limit_store = {}
+import urllib.request
+import urllib.error
 
 def handler(request):
-    """Vercel Adapter -> Your existing logic"""
     try:
-        # Convert Vercel request → AWS-style event
-        event = {
-            "httpMethod": request.method,
-            "headers": dict(request.headers),
-            "body": request.get_data(as_text=True)
-        }
+        # ✅ Handle CORS
+        if request.method == "OPTIONS":
+            return _response(200, {"ok": True})
 
-        # Call your original logic
-        return main_handler(event)
-
-    except Exception as e:
-        print(f"Adapter Error: {e}")
-        return _response(500, {"error": "Server Error"})
-
-
-# ✅ YOUR ORIGINAL LOGIC (unchanged concept)
-def main_handler(event):
-    try:
-        # 1. Only allow POST requests
-        if event['httpMethod'] != "POST":
+        # ✅ Only POST
+        if request.method != "POST":
             return _response(405, {"error": "Method Not Allowed"})
 
-        # 2. Parse the request body
+        # ✅ Parse JSON body
         try:
-            body = json.loads(event['body'])
-        except json.JSONDecodeError:
+            body = request.get_json()
+        except Exception:
             return _response(400, {"error": "Invalid JSON"})
 
-        # 3. Rate-limit checks
-        client_ip = get_client_ip(event['headers'])
-        rate_limit = rate_limit_check(client_ip, rate_limit_store)
-        if not rate_limit["allowed"]:
-            return _response(429, {
-                "error": "Rate limited",
-                "retry_in": rate_limit["reset_in"]
-            })
+        messages = body.get("messages", [])
 
-        # 4. Your logic
+        if not isinstance(messages, list):
+            return _response(400, {"error": "messages must be an array"})
+
+        # ✅ API key
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            return _response(500, {"error": "Missing ANTHROPIC_API_KEY"})
+
+        # ✅ Build request payload
+        payload = {
+            "model": "claude-3-5-sonnet-latest",
+            "max_tokens": 1024,
+            "messages": messages
+        }
+
+        # ✅ Call Anthropic API
+        req = urllib.request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=60) as res:
+            raw = res.read().decode("utf-8")
+
+        data = json.loads(raw)
+
+        # ✅ Extract reply
+        reply = ""
+        for block in data.get("content", []):
+            if block.get("type") == "text":
+                reply += block.get("text", "")
+
         return _response(200, {
-            "reply": f"Hello, {body['messages'][0]['content']}" if body.get("messages") else "Hello, world!",
+            "reply": reply.strip() or "No response"
         })
 
+    except urllib.error.HTTPError as e:
+        try:
+            err = e.read().decode("utf-8")
+        except:
+            err = str(e)
+        return _response(e.code, {"error": err})
+
     except Exception as e:
-        print(f"Server Error: {e}")
-        return _response(500, {"error": "Server Error"})
+        return _response(500, {"error": str(e)})
 
 
 def _response(status_code, body):
@@ -61,7 +79,9 @@ def _response(status_code, body):
         "statusCode": status_code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Content-Type": "application/json"
         },
-        "body": json.dumps(body),
+        "body": json.dumps(body)
     }
