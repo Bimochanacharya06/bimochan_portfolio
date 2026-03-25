@@ -74,7 +74,7 @@
        3. CHAT AREA
        ========================================= */
     .chat-area { flex: 1; overflow-y: auto; padding: 24px 20px; scroll-behavior: smooth; }
-    .chat-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    .chat-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; padding-bottom: 40px; }
 
     .welcome-screen { margin: 60px auto 0; text-align: center; }
     .welcome-icon { font-size: 44px; margin-bottom: 16px; animation: pulse 3s infinite; }
@@ -97,7 +97,7 @@
     .bot .bubble { background: var(--surface); border: 1px solid var(--border); border-top-left-radius: 4px; }
     .user .bubble { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-top-right-radius: 4px; }
 
-    /* Bot Action Buttons (Copy/Share) */
+    /* Bot Action Buttons (Copy/Share/Regen) */
     .msg-actions { display: flex; gap: 12px; margin-top: 8px; margin-left: 4px; }
     .msg-action-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; font-family: var(--font-main); }
     .msg-action-btn:hover { color: var(--accent-1); }
@@ -119,10 +119,16 @@
     .terminal-output.error { color: var(--error); }
 
     /* =========================================
-       4. CENTERED INPUT AREA
+       4. CENTERED INPUT AREA & FLOATING ACTIONS
        ========================================= */
-    .input-zone { padding: 0 20px 24px; background: linear-gradient(0deg, var(--bg-main) 60%, transparent); z-index: 10; }
-    .input-wrapper { max-width: 800px; margin: 0 auto; }
+    .input-zone { position: relative; padding: 0 20px 24px; background: linear-gradient(0deg, var(--bg-main) 60%, transparent); z-index: 10; }
+    .input-wrapper { max-width: 800px; margin: 0 auto; position: relative; }
+    
+    /* Stop Button */
+    .stop-btn { position: absolute; top: -45px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-family: var(--font-main); cursor: pointer; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 20; transition: 0.2s; }
+    .stop-btn:hover { background: var(--surface-hover); color: var(--error); border-color: rgba(239, 68, 68, 0.3); }
+    .stop-btn.show { display: flex; }
+
     .input-box { display: flex; align-items: flex-end; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 10px 14px; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     .input-box:focus-within { border-color: var(--accent-1); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2), 0 10px 30px rgba(0,0,0,0.5); }
     .attach-btn { background: none; border: none; color: var(--text-muted); padding: 8px; cursor: pointer; border-radius: 12px; display: flex; align-items: center; }
@@ -218,6 +224,13 @@
 
       <div class="input-zone">
         <div class="input-wrapper">
+          
+          <!-- STOP GENERATING BUTTON -->
+          <button class="stop-btn" id="stop-btn" onclick="stopGenerating()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+            Stop generating
+          </button>
+
           <div class="input-box">
             <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach File">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
@@ -264,6 +277,8 @@
     let chatHistory = [];
     
     let isBusy = false;
+    let currentAbortController = null; // Used for Stop Button
+    
     let attachedText = "";
     let attachedName = "";
     let isSearchOn = true;
@@ -274,30 +289,29 @@
     const chatContainer = document.getElementById("chat-container");
     const chatInput = document.getElementById("chat-input");
     const sendBtn = document.getElementById("send-btn");
+    const stopBtn = document.getElementById("stop-btn");
     const welcomeScreen = document.getElementById("welcome-screen");
     const sidebar = document.getElementById("sidebar");
 
     // === INITIALIZATION ===
     window.onload = () => {
       renderSidebarHistory();
-      if(sessions.length > 0) {
-        loadSession(sessions[0].id); // Load most recent chat
-      } else {
-        createNewSession();
-      }
+      if(sessions.length > 0) { loadSession(sessions[0].id); } 
+      else { createNewSession(); }
     };
 
-    // === SESSION MANAGEMENT (PREVIOUS CHATS) ===
+    // === SESSION MANAGEMENT ===
     function saveSessions() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
       renderSidebarHistory();
     }
 
     function createNewSession() {
+      if(isBusy) stopGenerating();
       currentSessionId = "sess_" + Date.now();
       chatHistory = [];
       sessions.unshift({ id: currentSessionId, title: "New Chat", messages: [] });
-      if (sessions.length > 15) sessions.pop(); // Keep only 15 recent chats
+      if (sessions.length > 15) sessions.pop(); 
       
       chatContainer.innerHTML = "";
       chatContainer.appendChild(welcomeScreen);
@@ -311,7 +325,6 @@
       let sess = sessions.find(s => s.id === currentSessionId);
       if (sess) {
         sess.messages = [...chatHistory];
-        // Auto-generate title based on the first user message
         const firstUser = chatHistory.find(m => m.role === 'user');
         if (firstUser && sess.title === "New Chat") {
           sess.title = firstUser.content.replace(/\[.*?\]/g, '').substring(0, 25) + "...";
@@ -321,6 +334,7 @@
     }
 
     function loadSession(id) {
+      if(isBusy) stopGenerating();
       let sess = sessions.find(s => s.id === id);
       if (!sess) return;
       currentSessionId = id;
@@ -343,7 +357,7 @@
       const histContainer = document.getElementById("sidebar-history");
       histContainer.innerHTML = "";
       sessions.forEach(s => {
-        if (s.messages.length === 0 && s.id !== currentSessionId) return; // Hide empty chats
+        if (s.messages.length === 0 && s.id !== currentSessionId) return; 
         const btn = document.createElement("button");
         btn.className = `history-item ${s.id === currentSessionId ? 'active' : ''}`;
         btn.innerText = s.title;
@@ -354,17 +368,12 @@
 
     function clearAllData() {
       if(confirm("Are you sure you want to delete all chat history?")) {
-        sessions = [];
-        localStorage.removeItem(STORAGE_KEY);
-        createNewSession();
+        sessions = []; localStorage.removeItem(STORAGE_KEY); createNewSession();
       }
     }
 
     // === UI UTILITIES ===
-    function toggleSidebar() {
-      sidebar.classList.toggle('collapsed');
-      sidebar.classList.toggle('open');
-    }
+    function toggleSidebar() { sidebar.classList.toggle('collapsed'); sidebar.classList.toggle('open'); }
 
     function toggleOption(type) {
       if (type === 'search') {
@@ -375,8 +384,7 @@
     }
 
     function autoResize(textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
+      textarea.style.height = "auto"; textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
     }
 
     function showToast(msg) {
@@ -385,26 +393,35 @@
       setTimeout(() => t.classList.remove("show"), 2500);
     }
 
-    // === COPY & SHARE AI REPLIES ===
+    // === COPY, SHARE, REGENERATE ===
     async function copyBotMsg(encodedText) {
-      try {
-        await navigator.clipboard.writeText(decodeURIComponent(encodedText));
-        showToast("📋 Copied to clipboard!");
-      } catch(e) { showToast("⚠️ Failed to copy"); }
+      try { await navigator.clipboard.writeText(decodeURIComponent(encodedText)); showToast("📋 Copied to clipboard!"); } 
+      catch(e) { showToast("⚠️ Failed to copy"); }
     }
 
     async function shareBotMsg(encodedText) {
       const text = decodeURIComponent(encodedText);
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Bimo AI Reply', text: text }); } 
-        catch (e) { copyBotMsg(encodedText); } // Fallback to copy if user cancels share
-      } else {
-        copyBotMsg(encodedText); // Fallback to copy for PC
-        showToast("📋 Copied to clipboard to share!");
-      }
+      if (navigator.share) { try { await navigator.share({ title: 'Bimo AI Reply', text: text }); } catch (e) { copyBotMsg(encodedText); } } 
+      else { copyBotMsg(encodedText); showToast("📋 Copied to share!"); }
     }
 
-    // === MARKDOWN & CODE RENDERING ===
+    function regenerateLast() {
+      if(isBusy || chatHistory.length === 0) return;
+      
+      // Remove last AI message from history array
+      if(chatHistory[chatHistory.length - 1].role === 'assistant') {
+        chatHistory.pop();
+      }
+      
+      // Re-render UI up to the last user message
+      chatContainer.innerHTML = "";
+      chatHistory.forEach(m => appendMessage(m.role === 'assistant' ? 'bot' : 'user', m.content, false));
+      
+      // Trigger API call again without needing to type anything
+      processApiRequest();
+    }
+
+    // === MARKDOWN & CODE RENDERING (WITH HTML FIX) ===
     const renderer = new marked.Renderer();
     renderer.code = function(code, lang) {
       const language = (lang || "text").toLowerCase();
@@ -412,9 +429,10 @@
       const highlighted = hljs.highlight(code, { language: validLang }).value;
       const encodedCode = encodeURIComponent(code);
 
-      let actionButtons = `<button class="code-btn" onclick="copyBotMsg('${encodedCode}')">📋 Copy</button>`;
+      let actionButtons = `<button class="code-btn" onclick="copyBotMsg('${encodedCode}')">��� Copy</button>`;
       
-      if (['html', 'css', 'javascript', 'js', 'jsx'].includes(validLang) && code.includes('<html') || code.includes('<div') || code.includes('<style')) {
+      // Fix for previewing single-file HTML components
+      if (['html', 'xml'].includes(validLang) || code.includes('<!DOCTYPE html>') || code.includes('<html') || code.includes('<div')) {
         actionButtons = `<button class="code-btn run-btn" onclick="openPreview(decodeURIComponent('${encodedCode}'))">👁 Preview UI</button>` + actionButtons;
       } else if (['python', 'py', 'javascript', 'js'].includes(validLang)) {
         actionButtons = `<button class="code-btn run-btn" onclick="runScript(this, decodeURIComponent('${encodedCode}'), '${validLang}')">▶ Run Console</button>` + actionButtons;
@@ -493,12 +511,14 @@
       const renderedText = role === 'bot' ? marked.parse(text) : text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       
       let actionsHTML = "";
+      // Add Copy, Share, and Regenerate buttons to bot messages
       if (role === "bot") {
         const safeText = encodeURIComponent(text);
         actionsHTML = `
           <div class="msg-actions">
-            <button class="msg-action-btn" onclick="copyBotMsg('${safeText}')">📋 Copy</button>
-            <button class="msg-action-btn" onclick="shareBotMsg('${safeText}')">↗️ Share</button>
+            <button class="msg-action-btn" onclick="copyBotMsg('${safeText}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>
+            <button class="msg-action-btn" onclick="shareBotMsg('${safeText}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share</button>
+            <button class="msg-action-btn" onclick="regenerateLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> Regenerate</button>
           </div>
         `;
       }
@@ -513,15 +533,16 @@
       chatContainer.appendChild(msgDiv); 
       chatArea.scrollTop = chatArea.scrollHeight;
       
-      if(save && role === 'user') {
-        chatHistory.push({ role: "user", content: text });
-        updateCurrentSession();
-      } else if (save && role === 'bot') {
-        chatHistory.push({ role: "assistant", content: text });
-        updateCurrentSession();
-      }
+      if(save && role === 'user') { chatHistory.push({ role: "user", content: text }); updateCurrentSession(); } 
+      else if (save && role === 'bot') { chatHistory.push({ role: "assistant", content: text }); updateCurrentSession(); }
       
       return msgDiv;
+    }
+
+    function stopGenerating() {
+      if(currentAbortController) {
+        currentAbortController.abort();
+      }
     }
 
     async function sendMessage() {
@@ -529,25 +550,42 @@
       if (!text && !attachedText) return;
       if (isBusy) return;
 
-      isBusy = true; sendBtn.disabled = true; chatInput.value = ""; autoResize(chatInput);
-
+      chatInput.value = ""; autoResize(chatInput);
       let payloadText = text;
-      if (attachedText) {
-        payloadText = `[User attached file: ${attachedName}]\n\`\`\`\n${attachedText}\n\`\`\`\n\nUser Message: ${text}`;
-        clearFile();
-      }
+      if (attachedText) { payloadText = `[User attached file: ${attachedName}]\n\`\`\`\n${attachedText}\n\`\`\`\n\nUser Message: ${text}`; clearFile(); }
 
       appendMessage("user", payloadText, true);
+      processApiRequest(); // Separated for regenerate support
+    }
+
+    async function processApiRequest() {
+      if (isBusy) return;
+      isBusy = true; 
+      sendBtn.disabled = true; 
+      stopBtn.classList.add('show'); // Show Stop Button
 
       const loadingDiv = document.createElement("div");
       loadingDiv.className = "msg bot";
       loadingDiv.innerHTML = `<div class="msg-avatar">B</div><div class="msg-content"><div class="bubble">Thinking...</div></div>`;
       chatContainer.appendChild(loadingDiv); chatArea.scrollTop = chatArea.scrollHeight;
       
+      // The Secret System Prompt forcing single-file HTML
+      let secretInstruction = "";
+      if(isCodeOn) {
+        secretInstruction = "CRITICAL INSTRUCTION: If the user asks you to write a web component, UI, or HTML/CSS/JS, you MUST write it ENTIRELY inside a SINGLE ```html block. Put all CSS inside a <style> tag in the head, and all JS inside a <script> tag at the body end. Do NOT output multiple markdown blocks.";
+      }
+
+      currentAbortController = new AbortController();
+
       try {
         const response = await fetch(API, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: chatHistory })
+          method: "POST", 
+          headers: { "Content-Type": "application/json" },
+          signal: currentAbortController.signal,
+          body: JSON.stringify({ 
+            messages: chatHistory,
+            system: secretInstruction
+          })
         });
 
         const responseData = await response.json();
@@ -563,13 +601,21 @@
         if (!reply) throw new Error("No response text received");
 
         loadingDiv.remove();
-        appendMessage("bot", reply, true); // Appends and auto-saves to session
+        appendMessage("bot", reply, true); 
 
       } catch (error) {
         loadingDiv.remove();
-        appendMessage("bot", `⚠️ Error: ${error.message}`, false);
+        if (error.name === 'AbortError') {
+          appendMessage("bot", `*[Generation Stopped by User]*`, false);
+        } else {
+          appendMessage("bot", `⚠️ Error: ${error.message}`, false);
+        }
       } finally {
-        isBusy = false; sendBtn.disabled = false; chatInput.focus();
+        isBusy = false; 
+        sendBtn.disabled = false; 
+        stopBtn.classList.remove('show'); // Hide Stop Button
+        currentAbortController = null;
+        chatInput.focus();
       }
     }
   </script>
