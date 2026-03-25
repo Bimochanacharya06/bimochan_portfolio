@@ -1,72 +1,67 @@
-async function send(regenTxt = null) {
-  const txt = (regenTxt ?? inp.value).trim();
-  if (!txt && !attachedText) return; 
-  if (busy) return;
-
-  // Initialize Chat Sending
-  busy = true;
-  stopStream = false;
-  inp.value = "";
-  rsz();
-  $("cc").textContent = "0 / 2000";
-  $("sndb").disabled = true;
-  $("spb").classList.remove("hide");
-  $("rb").classList.add("hide");
-
-  appendMsg("user", txt || "(Sent an attachment)", {
-    raw: true,
-    attached: attachedName || false,
-  });
-
-  let backendPayload = txt;
-  if (attachedText) {
-    backendPayload = `[User attached file: ${attachedName}]\n\`\`\`\n${attachedText}\n\`\`\`\n\nUser Message: ${txt}`;
-    clearFile();
+export default async function handler(req, res) {
+  // 1. Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  hist.push({ role: "user", content: backendPayload });
-  lastP = backendPayload;
-  persist();
-
-  const ws = wantsSrch(txt); // Web search toggle
-  const te = appendMsg("bot", "", { typing: true, searching: ws, coding: code });
-
   try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: hist,
-        web_search: ws,
-        code_mode: code,
-        system: sysPrompt(),
-      }),
-    });
+    // 2. Extract data sent from your frontend
+    const { messages, system, web_search, code_mode } = req.body;
 
-    // Handle Response
-    let data;
-    try {
-      data = await response.json();
-    } catch (err) {
-      throw new Error("Invalid response format from API");
+    // 3. Ensure the API key exists
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ 
+        reply: "Error: ANTHROPIC_API_KEY is missing from Vercel Environment Variables." 
+      });
     }
 
-    if (!data.reply) throw new Error("Claude's response is incomplete or null.");
+    // 4. Format messages for Anthropic (Claude requires alternating user/assistant roles)
+    // We filter out any potential empty messages just to be safe.
+    const formattedMessages = messages.filter(m => m.content && m.content.trim() !== "");
 
-    if (te?.parentNode) te.remove();
-    const replyDiv = appendMsg("bot", data.reply);
-    await typewrite(replyDiv.querySelector(".bub"), data.reply);
-    hist.push({ role: "assistant", content: data.reply });
-    persist();
-    $("rb").classList.remove("hide");
-  } catch (err) {
-    if (te?.parentNode) te.remove(); // Remove typing effect
-    appendMsg("bot", `⚠️ ${err.message}`, { raw: true });
-    console.error("[CHAT ERROR]", err.message);
-  } finally {
-    busy = false;
-    $("sndb").disabled = false;
-    $("spb").classList.add("hide");
-    inp.focus();
+    // 5. Call the Anthropic Claude API
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-haiku-20241022", // Fast and cost-effective model
+        max_tokens: 2000, // Max length of response
+        system: system, // Your custom prompt about Bimochan
+        messages: formattedMessages,
+        temperature: 0.7
+      })
+    });
+
+    // 6. Handle API errors from Anthropic
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Anthropic API Error:", errorData);
+      return res.status(500).json({ 
+        reply: `Anthropic API Error: ${errorData.error?.message || "Unknown error occurred"}` 
+      });
+    }
+
+    // 7. Parse the successful response
+    const data = await response.json();
+
+    // 8. Extract Claude's text response
+    if (data.content && data.content[0] && data.content[0].text) {
+      const botReply = data.content[0].text;
+      // Send it back to the frontend!
+      return res.status(200).json({ reply: botReply });
+    } else {
+      throw new Error("Claude returned an unexpected response format.");
+    }
+
+  } catch (error) {
+    console.error("Backend Crash:", error);
+    return res.status(500).json({ 
+      reply: `Backend Error: ${error.message}` 
+    });
   }
 }
