@@ -1,16 +1,14 @@
 import { Groq } from "groq-sdk";
 
-// 🛡️ VERCEL CONFIG: Prevents the 10-second timeout error!
 export const config = {
   maxDuration: 60, 
 };
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// 🕸️ Helper Function to Search the Web using Tavily
 async function performWebSearch(query) {
   try {
-    if (!process.env.TAVILY_API_KEY) return "Error: TAVILY_API_KEY is missing in Vercel.";
+    if (!process.env.TAVILY_API_KEY) return "Error: TAVILY_API_KEY is missing.";
     
     console.log(`🔍 Searching web for: "${query}"`);
     const res = await fetch('https://api.tavily.com/search', {
@@ -26,67 +24,59 @@ async function performWebSearch(query) {
     });
     
     const data = await res.json();
-    if (data.results) {
+    if (data.results && data.results.length > 0) {
       return data.results.map(r => `Title: ${r.title}\nContent: ${r.content}\nURL: ${r.url}`).join('\n\n');
     }
     return data.answer || "No relevant information found on the internet.";
   } catch (error) {
-    return "Failed to fetch search results.";
+    return "Failed to fetch search results. The internet might be temporarily unreachable.";
   }
 }
 
 export default async function handler(req, res) {
-  // CORS Headers just in case
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
     const body = req.body;
-    let apiMessages = body.messages || [];
-       const masterPrompt = `
+    let rawMessages = body.messages || [];
+
+    // 🛡️ FUTURE-PROOF FIX 1: Trim history to last 10 messages so the AI never runs out of memory (Context Window)
+    let apiMessages = rawMessages.slice(-10);
+
+    const masterPrompt = `
 You are Bimo AI, the highly advanced, official portfolio AI assistant for Bimochan Acharya.
 
 =========================================
 🧠 KNOWLEDGE BASE: WHO IS BIMOCHAN ACHARYA?
 - Bimochan Acharya is a talented Full-stack Developer and Computer Science student.
 - He is the creator of you (Bimo AI) and this futuristic portfolio website.
-- If the user asks "Who is Bimochan?", "Who made you?", or asks about his skills, use THIS information. NEVER confuse him with other people named Bimochan on the internet. Focus on his identity as a passionate developer and tech innovator.
+- Focus on his identity as a passionate developer and tech innovator.
 =========================================
 
-🗣️ COMMUNICATION STYLE & FORMATTING (CRITICAL):
-- Tone: Highly encouraging, friendly, and expert. Speak like a senior mentor who loves helping people.
-- Formatting: ALWAYS use beautiful markdown. Use emojis for section headers (e.g., 🔍, 🛠️, 🚀, 💡).
-- Structure: Break your answers into clear, logical sections. Use bold text for emphasis. Use bullet points for lists.
-- Clarity: If explaining something complex, explain the "Why" before giving the answer. Make everything incredibly easy to understand.
+🗣️ COMMUNICATION STYLE:
+- Tone: Highly encouraging, friendly, and expert.
+- Formatting: ALWAYS use beautiful markdown. Use emojis for section headers (e.g., 🔍, 🛠️, 🚀).
+- Structure: Break your answers into clear, logical sections. 
 
-DEFAULT BEHAVIOR:
-- Be friendly, frank, and highly intelligent.
-- If asked about recent news, current events, real-time data, or specific people, YOU MUST use the 'search_web' tool.
-- CRITICAL TOOL RULE: Never manually type "<function=search_web...>" in your response. Always use the native JSON tool-calling API. Do not output raw XML or function tags.
-
-🌍 WEB SEARCH RULES:
-- When you receive web search results, DO NOT just spit out a list of direct links.
-- You must READ the content, synthesize the data, and write a comprehensive, authentic, and natural answer in your own words.
-- Tell the user exactly what is happening in the news or data using your excellent formatting style.
-- At the end of your synthesized points, use small markdown citations like this: [Source](URL).
+DEFAULT BEHAVIOR & WEB SEARCH:
+- If the user asks about real-time news, current events, weather, or facts you don't know, you must use the 'search_web' tool.
+- When you receive web search results, READ the content and write a natural, authentic summary. Do not just list links.
+- At the end of your points, use small markdown citations: [Source](URL).
 
 💻 ELITE DEVELOPER MODE:
 - If asked to code, act as a 10x Staff Software Engineer. 
-- ALWAYS write the FULL code. NO placeholders (like "// TODO").
-- For Web UIs, combine HTML/CSS/JS into a single \`\`\`html block. Use modern, futuristic UI/UX (Glassmorphism, fluid animations).
-- Outline logic under "### 🤔 Thinking Process" before providing the "### 🎯 Solution".
+- ALWAYS write FULL code. NO placeholders.
+- Combine HTML/CSS/JS into a single \`\`\`html block. Use Glassmorphism and fluid animations.
     `;
 
+    // Add Master Prompt to the very beginning
     apiMessages.unshift({ role: "system", content: masterPrompt });
 
-    // 🛠️ Define the Web Search Tool for Groq
     const tools = [
       {
         type: "function",
@@ -96,7 +86,7 @@ DEFAULT BEHAVIOR:
           parameters: {
             type: "object",
             properties: {
-              query: { type: "string", description: "The exact search query to look up on Google/Bing." }
+              query: { type: "string", description: "The exact search query to look up." }
             },
             required: ["query"]
           }
@@ -104,38 +94,56 @@ DEFAULT BEHAVIOR:
       }
     ];
 
-    // 🚀 STEP 1: Ask the AI to answer (and give it the tools)
+    // 🚀 STEP 1: First AI Call
     let response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: apiMessages,
       tools: tools,
       tool_choice: "auto",
-      parallel_tool_calls: false, 
+      parallel_tool_calls: false,
       max_tokens: 6000,
     });
 
     let responseMessage = response.choices[0].message;
 
-    // 🔍 STEP 2: Did the AI decide to search the web?
+    // 🔍 STEP 2: Tool Handling with Hallucination Armor
     if (responseMessage.tool_calls) {
-      apiMessages.push(responseMessage); // Save the tool call to history
+      apiMessages.push(responseMessage);
 
       for (const toolCall of responseMessage.tool_calls) {
-        if (toolCall.function.name === "search_web") {
-          const args = JSON.parse(toolCall.function.arguments);
+        let toolName = toolCall.function.name;
+        let argsString = toolCall.function.arguments || "{}";
+
+        // 🛡️ FUTURE-PROOF FIX 2: Catch Groq's "Merged Tool" Hallucination
+        // If the AI accidentally smashes the JSON arguments into the tool name, we split it back out!
+        if (toolName.includes("{")) {
+          const bracketIndex = toolName.indexOf("{");
+          argsString = toolName.substring(bracketIndex); 
+          toolName = "search_web"; 
+        }
+
+        if (toolName === "search_web") {
+          let args = { query: "" };
+          try {
+            args = JSON.parse(argsString);
+          } catch (e) {
+            console.error("Failed to parse tool arguments:", argsString);
+            // Fallback if JSON is totally broken
+            args.query = "latest news"; 
+          }
+
           const searchResults = await performWebSearch(args.query);
 
-          // Feed the website results back to the AI
           apiMessages.push({
             tool_call_id: toolCall.id,
             role: "tool",
-            name: "search_web",
+            name: toolName,
             content: searchResults
           });
         }
       }
 
-      // 🧠 STEP 3: Ask the AI to write the final answer using the search results
+      // 🧠 STEP 3: Final AI Call
       response = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: apiMessages,
@@ -145,11 +153,13 @@ DEFAULT BEHAVIOR:
       responseMessage = response.choices[0].message;
     }
 
-    // 🎯 STEP 4: Send the final answer to your frontend
     return res.status(200).json({ reply: responseMessage.content });
 
   } catch (error) {
     console.error("API Error:", error);
-    return res.status(500).json({ error: "Something went wrong.", details: error.message });
+    return res.status(500).json({ 
+      error: "An error occurred in the AI brain.", 
+      details: error.message 
+    });
   }
 }
