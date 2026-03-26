@@ -1,0 +1,8 @@
+{
+  "name": "bimochan-portfolio",
+  "version": "1.0.0",
+  "type": "module",  <--- ADD THIS EXACT LINE
+  "dependencies": {
+    "groq-sdk": "^0.3.2"
+  }
+}
