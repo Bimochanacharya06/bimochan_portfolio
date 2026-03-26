@@ -1,84 +1,136 @@
-module.exports = async function (req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ reply: '⚠️ Error: Method not allowed. Use POST.' });
-  }
+import { Groq } from "groq-sdk";
 
+// 🛡️ VERCEL CONFIG: Prevents the 10-second timeout error!
+export const config = {
+  maxDuration: 60, 
+};
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// 🕸️ Helper Function to Search the Web using Tavily
+async function performWebSearch(query) {
   try {
-    let body = req.body;
-    if (typeof body === 'string') body = JSON.parse(body);
-
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      return res.status(200).json({ reply: "⚠️ Error: GROQ_API_KEY is missing from Vercel." });
-    }
-
-    const messages = body.messages || [];
-       const masterPrompt = `
-You are Bimo AI, the official portfolio assistant for Bimochan Acharya (a Full-stack developer & CS student). 
-
-DEFAULT BEHAVIOR (CONVERSATIONAL & FRIENDLY):
-- If the user makes casual conversation (e.g., "hey", "how are you", "love"), reply normally, warmly, and briefly. 
-- DO NOT write code unless the user explicitly asks for it or describes a technical problem.
-
-ELITE DEVELOPER MODE (When asked to code or build):
-When the user asks you to build an app, website, UI, or write code, you must activate Elite Developer Mode and act as a 10x Staff Software Engineer. You are capable of building complex, production-ready applications.
-
-CRITICAL CODING RULES (NEVER IGNORE THESE):
-1. ZERO PLACEHOLDERS: You must write the FULL, complete code. NEVER use placeholders like "// Add logic here", "// TODO", or "...rest of the code". Write every single line needed to make the app work perfectly.
-2. MODERN UI/UX: If building a Web UI, it must look stunning. Use modern design trends: soft shadows, glassmorphism, smooth CSS transitions, hover effects, rounded corners, and responsive Flexbox/Grid layouts. It must look like a premium SaaS app.
-3. ARCHITECTURE BEFORE CODE: Always plan the app first. Use a "### 🤔 Thinking Process" heading to quickly outline the state management, components, and edge cases before you write the code.
-4. ERROR HANDLING: Always include try/catch blocks, null checks, and form validation in your code.
-5. SINGLE-FILE WEB APPS: If the user asks for a web app, component, or UI, you MUST combine all HTML, CSS, and JS into a single \`\`\`html block. Put CSS in <style> and JS in <script> tags so it can be previewed instantly.
-
-RESPONSE FORMAT FOR COMPLEX APPS:
-### 🤔 Thinking Process
-(Briefly explain your architectural choices and UI design)
-
-### 🎯 Solution
-(Provide the COMPLETE, un-truncated code block)
-    `;
-    const system = body.system && body.system.trim() !== "" 
-      ? body.system 
-      : masterPrompt;
-   
-
-    // Format uses the exact OpenAI/ChatGPT standard
-    const formattedMessages = [
-      { role: "system", content: system },
-      ...messages.filter(m => m.content && m.content.trim() !== "").map(m => ({
-        role: m.role, // Your frontend already perfectly uses "user" and "assistant"
-        content: m.content
-      }))
-    ];
-
-    // Call Groq API
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
+    if (!process.env.TAVILY_API_KEY) return "Error: TAVILY_API_KEY is missing in Vercel.";
+    
+    console.log(`🔍 Searching web for: "${query}"`);
+    const res = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile", // Free, incredibly fast, and smart
-        messages: formattedMessages,
-        temperature: 0.7,
-        max_tokens: 6000
+        api_key: process.env.TAVILY_API_KEY,
+        query: query,
+        search_depth: "basic",
+        include_answer: true,
+        max_results: 3
       })
     });
+    
+    const data = await res.json();
+    if (data.results) {
+      return data.results.map(r => `Title: ${r.title}\nContent: ${r.content}\nURL: ${r.url}`).join('\n\n');
+    }
+    return data.answer || "No relevant information found on the internet.";
+  } catch (error) {
+    return "Failed to fetch search results.";
+  }
+}
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return res.status(200).json({ reply: `⚠️ Groq API Error: ${errorText}` });
+export default async function handler(req, res) {
+  // CORS Headers just in case
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  try {
+    const body = req.body;
+    let apiMessages = body.messages || [];
+
+    const masterPrompt = `
+You are Bimo AI, the official portfolio assistant for Bimochan Acharya (a Full-stack developer & CS student). You are a highly advanced AI Agent with real-time internet access.
+
+DEFAULT BEHAVIOR:
+- Be friendly, frank, and conversational.
+- If asked about recent news, current events, real-time data, or things you don't know, YOU MUST use the 'search_web' tool.
+- When you use search results, cite your sources briefly (e.g., "According to [Website Name]...").
+
+ELITE DEVELOPER MODE:
+- If asked to code, act as a 10x Staff Software Engineer. 
+- ALWAYS write the FULL code. NO placeholders (like "// TODO").
+- For Web UIs, combine HTML/CSS/JS into a single \`\`\`html block. Use modern, futuristic UI/UX (Glassmorphism, fluid animations).
+- Outline logic under "### 🤔 Thinking Process" before providing the "### 🎯 Solution".
+    `;
+
+    apiMessages.unshift({ role: "system", content: masterPrompt });
+
+    // 🛠️ Define the Web Search Tool for Groq
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "search_web",
+          description: "Search the internet for real-time information, news, weather, or facts.",
+          parameters: {
+            type: "object",
+            properties: {
+              query: { type: "string", description: "The exact search query to look up on Google/Bing." }
+            },
+            required: ["query"]
+          }
+        }
+      }
+    ];
+
+    // 🚀 STEP 1: Ask the AI to answer (and give it the tools)
+    let response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: apiMessages,
+      tools: tools,
+      tool_choice: "auto",
+      max_tokens: 6000,
+    });
+
+    let responseMessage = response.choices[0].message;
+
+    // 🔍 STEP 2: Did the AI decide to search the web?
+    if (responseMessage.tool_calls) {
+      apiMessages.push(responseMessage); // Save the tool call to history
+
+      for (const toolCall of responseMessage.tool_calls) {
+        if (toolCall.function.name === "search_web") {
+          const args = JSON.parse(toolCall.function.arguments);
+          const searchResults = await performWebSearch(args.query);
+
+          // Feed the website results back to the AI
+          apiMessages.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: "search_web",
+            content: searchResults
+          });
+        }
+      }
+
+      // 🧠 STEP 3: Ask the AI to write the final answer using the search results
+      response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: apiMessages,
+        max_tokens: 6000,
+      });
+
+      responseMessage = response.choices[0].message;
     }
 
-    const data = await response.json();
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      return res.status(200).json({ reply: data.choices[0].message.content });
-    } else {
-      return res.status(200).json({ reply: "⚠️ Error: Unexpected response format from AI." });
-    }
+    // 🎯 STEP 4: Send the final answer to your frontend
+    return res.status(200).json({ reply: responseMessage.content });
 
   } catch (error) {
-    return res.status(200).json({ reply: `⚠️ Server Crash: ${error.message}` });
+    console.error("API Error:", error);
+    return res.status(500).json({ error: "Something went wrong.", details: error.message });
   }
-};
+}
