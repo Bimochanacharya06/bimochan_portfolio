@@ -78,16 +78,27 @@
     .chip { background: var(--surface); border: 1px solid var(--border); color: var(--text-main); padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; }
     .chip:hover { background: rgba(139, 92, 246, 0.1); border-color: var(--accent-1); color: var(--accent-1); transform: translateY(-2px); }
 
-    .msg { display: flex; gap: 16px; width: 100%; animation: slideUp 0.3s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* FUTURISTIC FLUID ANIMATIONS */
+    .msg { display: flex; gap: 16px; width: 100%; animation: springUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes springUp { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
     .msg.user { flex-direction: row-reverse; }
     .msg-avatar { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
     .bot .msg-avatar { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: white; }
     .user .msg-avatar { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); }
+    
     .msg-content { max-width: 85%; }
     .bubble { padding: 14px 18px; font-size: 15px; line-height: 1.6; border-radius: 18px; word-break: break-word; }
     .bot .bubble { background: var(--surface); border: 1px solid var(--border); border-top-left-radius: 4px; }
     .user .bubble { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-top-right-radius: 4px; }
+
+    /* GLOWING THINKING ANIMATION */
+    .bubble.thinking {
+      background: linear-gradient(90deg, var(--surface), rgba(139, 92, 246, 0.2), var(--surface));
+      background-size: 200% 100%;
+      animation: glowingPulse 1.5s infinite linear;
+      border-color: var(--accent-1);
+    }
+    @keyframes glowingPulse { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
     .msg-actions { display: flex; gap: 12px; margin-top: 8px; margin-left: 4px; }
     .msg-action-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; font-family: var(--font-main); }
@@ -96,10 +107,23 @@
     .bubble h1, .bubble h2, .bubble h3 { margin: 16px 0 8px; color: var(--accent-1); }
     .bubble p { margin-bottom: 12px; } .bubble p:last-child { margin-bottom: 0; }
     
-    .code-container { margin: 16px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #000; }
-    .code-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: #18181b; border-bottom: 1px solid var(--border); font-family: var(--font-code); font-size: 12px; color: var(--text-muted); }
+    .code-container { margin: 16px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #000; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    
+    /* MACOS STYLE CODE BLOCKS */
+    .code-header { 
+      display: flex; align-items: center; justify-content: space-between; 
+      padding: 8px 16px 8px 60px; /* Padding for Mac dots */
+      background: #111113; border-bottom: 1px solid var(--border); 
+      font-family: var(--font-code); font-size: 12px; color: var(--text-muted); 
+      position: relative;
+    }
+    .code-header::before {
+      content: ''; position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; 
+      box-shadow: 16px 0 0 #ffbd2e, 32px 0 0 #27c93f; 
+    }
+    
     .code-lang { display: flex; align-items: center; gap: 8px; text-transform: uppercase; color: var(--accent-1); }
-    .code-lang::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-1); }
     .code-actions { display: flex; gap: 8px; }
     .code-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; transition: 0.2s; font-family: var(--font-code); }
     .code-btn:hover { background: rgba(139, 92, 246, 0.2); border-color: var(--accent-1); color: var(--accent-1); }
@@ -110,7 +134,7 @@
     .terminal-output { background: #09090b; border-top: 1px dashed var(--border); padding: 12px 16px; font-family: var(--font-code); font-size: 12px; color: var(--accent-3); display: none; white-space: pre-wrap; }
     .terminal-output.error { color: var(--error); }
 
-    /* INPUT AREA */
+    /* INPUT AREA - HOLOGRAPHIC GLASS */
     .input-zone { position: relative; padding: 0 20px 24px; background: linear-gradient(0deg, var(--bg-main) 60%, transparent); z-index: 10; }
     .input-wrapper { max-width: 800px; margin: 0 auto; position: relative; }
     
@@ -118,8 +142,9 @@
     .stop-btn:hover { background: var(--surface-hover); color: var(--error); border-color: rgba(239, 68, 68, 0.3); }
     .stop-btn.show { display: flex; }
 
-    .input-box { display: flex; align-items: flex-end; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 10px 14px; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .input-box:focus-within { border-color: var(--accent-1); box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2), 0 10px 30px rgba(0,0,0,0.5); }
+    .input-box { display: flex; align-items: flex-end; gap: 12px; border-radius: 20px; padding: 10px 14px; transition: 0.3s; background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .input-box:focus-within { background: rgba(24, 24, 27, 0.8); border-color: var(--accent-1); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 10px 30px rgba(0,0,0,0.5); }
+    
     .attach-btn { background: none; border: none; color: var(--text-muted); padding: 8px; cursor: pointer; border-radius: 12px; display: flex; align-items: center; }
     .attach-btn:hover { background: var(--surface-hover); color: var(--accent-1); }
     .textarea-wrapper { flex: 1; display: flex; flex-direction: column; }
@@ -147,74 +172,9 @@
       .sidebar.open { transform: translateX(0); }
       .sidebar-overlay.show { display: block; opacity: 1; }
       .msg-content { max-width: 100%; }
-      .input-zone { padding: 0 12px 16px; }
+      .input-zone { padding: 0 16px 20px; background: transparent; }
+      .input-box { border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
       .preview-modal { width: 100%; height: 100vh; border-radius: 0; }
-    }
-        /* =========================================
-       🚀 FUTURISTIC PREMIUM UPGRADES (ADDED)
-       ========================================= */
-
-    /* 1. Holographic Glass Input (Sci-Fi Glow) */
-    .input-box {
-      background: rgba(24, 24, 27, 0.6);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .input-box:focus-within {
-      background: rgba(24, 24, 27, 0.8);
-      border-color: var(--accent-1);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* 2. MacOS-Style Code Blocks */
-    .code-header {
-      background: #111113;
-      padding-left: 60px; /* Make room for dots */
-      position: relative;
-    }
-    .code-header::before {
-      content: '';
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #ff5f56; /* Mac Red */
-      box-shadow: 16px 0 0 #ffbd2e, 32px 0 0 #27c93f; /* Mac Yellow & Green */
-    }
-
-    /* 3. Fluid "Spring" Animations */
-    .msg { animation: springUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    @keyframes springUp {
-      0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* Glowing 'Thinking' State */
-    .bubble:contains("Thinking...") {
-      background: linear-gradient(90deg, var(--surface), rgba(139, 92, 246, 0.2), var(--surface));
-      background-size: 200% 100%;
-      animation: glowingPulse 1.5s infinite linear;
-      border-color: var(--accent-1);
-    }
-    @keyframes glowingPulse {
-      0% { background-position: 100% 0; }
-      100% { background-position: -100% 0; }
-    }
-
-    /* 4. Floating Mobile Input */
-    @media(max-width: 768px) {
-      .input-zone { 
-        padding: 0 16px 20px; 
-        background: transparent; /* Remove gradient block */
-      }
-      .input-box {
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      }
     }
   </style>
 </head>
@@ -263,10 +223,10 @@
           <div class="welcome-screen" id="welcome-screen">
             <div class="welcome-icon">👋</div>
             <h2>Hello, I'm Bimo AI</h2>
-            <p>I can answer questions, write code, or run scripts.</p>
+            <p>I can answer questions, browse the web, or write code.</p>
             <div class="suggestion-chips">
               <button class="chip" onclick="sendQuickMessage('Who is Bimochan Acharya?')">👤 About Bimochan</button>
-              <button class="chip" onclick="sendQuickMessage('Write a Python script to reverse a string')">🐍 Python Test</button>
+              <button class="chip" onclick="sendQuickMessage('What is the top AI news today?')">🌍 Search Web</button>
               <button class="chip" onclick="sendQuickMessage('Build a beautiful HTML CSS button')">🎨 Code UI</button>
             </div>
           </div>
@@ -314,7 +274,7 @@
 
   <script>
     const API = "/api/chat";
-    const STORAGE_KEY = "bimo_sessions_v5";
+    const STORAGE_KEY = "bimo_sessions_v6";
     
     let sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let currentSessionId = null;
@@ -406,12 +366,12 @@
       }
     }
 
-    // FIXED MOBILE TOGGLE
     function toggleSidebar() { 
       sidebar.classList.toggle('collapsed'); 
       sidebar.classList.toggle('open'); 
       sidebarOverlay.classList.toggle('show');
     }
+    
     function closeSidebarOnMobile() {
       if(window.innerWidth < 768) {
         sidebar.classList.remove('open');
@@ -423,13 +383,14 @@
       if (type === 'search') { isSearchOn = !isSearchOn; document.getElementById("menu-search").innerText = `🔍 Web Search: ${isSearchOn ? 'ON' : 'OFF'}`; } 
       else { isCodeOn = !isCodeOn; document.getElementById("menu-code").innerText = `💻 Code Mode: ${isCodeOn ? 'ON' : 'OFF'}`; }
     }
+    
     function autoResize(textarea) { textarea.style.height = "auto"; textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px"; }
+    
     function showToast(msg) {
       const t = document.getElementById("toast"); t.innerText = msg; t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2500);
     }
 
-    // FIXED: BUTTON CLICKS (Base64 encoding prevents syntax errors from quotes)
     async function copyBotMsg(b64Text) {
       try { 
         const text = decodeURIComponent(escape(atob(b64Text)));
@@ -437,6 +398,7 @@
         showToast("📋 Copied to clipboard!"); 
       } catch(e) { showToast("⚠️ Failed to copy"); }
     }
+    
     async function shareBotMsg(b64Text) {
       const text = decodeURIComponent(escape(atob(b64Text)));
       if (navigator.share) { 
@@ -452,14 +414,13 @@
       processApiRequest();
     }
 
-    // FIXED: HTML PREVIEW BUTTON LOGIC & BASE64 BUTTON FIX
     const renderer = new marked.Renderer();
     renderer.code = function(code, lang) {
       const language = (lang || "text").toLowerCase();
       const validLang = hljs.getLanguage(language) ? language : 'plaintext';
       const highlighted = hljs.highlight(code, { language: validLang }).value;
       
-      const b64Code = btoa(unescape(encodeURIComponent(code))); // Safe string for HTML
+      const b64Code = btoa(unescape(encodeURIComponent(code)));
 
       let actionButtons = `<button class="code-btn" onclick="copyBotMsg('${b64Code}')">📋 Copy</button>`;
       
@@ -479,6 +440,7 @@
       iframe.srcdoc = htmlCode; 
       document.getElementById('preview-overlay').classList.add('show'); 
     }
+    
     function closePreview() { document.getElementById('preview-overlay').classList.remove('show'); document.getElementById('preview-iframe').srcdoc = ""; }
 
     async function initPyodide() {
@@ -527,6 +489,7 @@
       reader.onload = (e) => { attachedText = e.target.result; attachedName = file.name; document.getElementById("attach-name").innerText = attachedName; document.getElementById("attach-badge").style.display = "block"; };
       reader.readAsText(file); input.value = ""; 
     }
+    
     function clearFile() { attachedText = ""; attachedName = ""; document.getElementById("attach-badge").style.display = "none"; }
 
     function sendQuickMessage(text) { chatInput.value = text; autoResize(chatInput); sendMessage(); }
@@ -580,10 +543,10 @@
 
       const loadingDiv = document.createElement("div");
       loadingDiv.className = "msg bot";
-      loadingDiv.innerHTML = `<div class="msg-avatar">B</div><div class="msg-content"><div class="bubble">Thinking...</div></div>`;
+      // Added .thinking class for the new glowing animation
+      loadingDiv.innerHTML = `<div class="msg-avatar">B</div><div class="msg-content"><div class="bubble thinking">Thinking...</div></div>`;
       chatContainer.appendChild(loadingDiv); chatArea.scrollTop = chatArea.scrollHeight;
       
-      // Removed the hidden prompt injection. It now strictly uses your backend API messages!
       currentAbortController = new AbortController();
 
       try {
@@ -595,18 +558,31 @@
 
         const responseData = await response.json();
         let reply = "";
+
+        // 🎯 NEW: ACCURATE ERROR HANDLING
+        if (responseData.error) {
+          throw new Error(responseData.details || responseData.error);
+        }
+
         if (responseData.statusCode !== undefined) {
           const bodyText = typeof responseData.body === 'string' ? responseData.body : JSON.stringify(responseData.body);
           reply = JSON.parse(bodyText).reply;
-        } else { reply = responseData.reply; }
+        } else { 
+          reply = responseData.reply; 
+        }
 
-        if (!reply) throw new Error("No response text received");
+        if (!reply) throw new Error("API returned an empty response.");
+
         loadingDiv.remove(); appendMessage("bot", reply, true); 
 
       } catch (error) {
         loadingDiv.remove();
-        if (error.name === 'AbortError') { appendMessage("bot", `*[Generation Stopped by User]*`, false); } 
-        else { appendMessage("bot", `⚠️ Error: ${error.message}`, false); }
+        if (error.name === 'AbortError') { 
+          appendMessage("bot", `*[Generation Stopped by User]*`, false); 
+        } else { 
+          // Will now display the EXACT Groq/Vercel error text!
+          appendMessage("bot", `⚠️ **Error:** ${error.message}`, false); 
+        }
       } finally {
         isBusy = false; sendBtn.disabled = false; stopBtn.classList.remove('show'); currentAbortController = null; chatInput.focus();
       }
