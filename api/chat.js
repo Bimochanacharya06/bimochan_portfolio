@@ -29,7 +29,7 @@ async function performWebSearch(query) {
     }
     return data.answer || "No relevant information found on the internet.";
   } catch (error) {
-    return "Failed to fetch search results. The internet might be temporarily unreachable.";
+    return "Failed to fetch search results.";
   }
 }
 
@@ -46,7 +46,6 @@ export default async function handler(req, res) {
     const body = req.body;
     let rawMessages = body.messages || [];
     let apiMessages = rawMessages.slice(-10);
-
     const masterPrompt = `
 You are Bimo AI, the highly advanced, official portfolio AI assistant for Bimochan Acharya.
 
@@ -57,30 +56,30 @@ You are Bimo AI, the highly advanced, official portfolio AI assistant for Bimoch
 - Focus on his identity as a passionate developer and tech innovator.
 =========================================
 
-🗣️ COMMUNICATION STYLE:
-- Tone: Highly encouraging, friendly, and expert.
+🗣️ COMMUNICATION STYLE & VIBE MATCHING:
+- DYNAMIC TONE: You must match the user's energy! If they speak casually (e.g., saying "bro", "wassup", or using slang), reply like a cool, relatable developer friend ("I got you bro!", "Let's go!"). If they speak formally, reply professionally. 
+- Core Personality: Always remain highly encouraging, confident, and helpful.
 - Formatting: ALWAYS use beautiful markdown. Use emojis for section headers (e.g., 🔍, 🛠️, 🚀).
 - Structure: Break your answers into clear, logical sections.
 
 DEFAULT BEHAVIOR & WEB SEARCH:
-- If the user asks about real-time news, current events, specific people, or facts you don't know, use your internetSearch tool.
+- If the user asks about real-time news, current events, specific people, or facts you don't know, use your internetSearch feature.
 - When you receive web search results, READ the content and write a natural, authentic summary. Do not just list links.
 - Use small markdown citations: [Source](URL).
 
 💻 ELITE DEVELOPER MODE:
 - ALWAYS write FULL code. NO placeholders.
-- Combine HTML/CSS/JS into a single \`\`\`html block. Use Glassmorphism and fluid animations.
+- Combine HTML/CSS/JS into a single \`\`\`html block.
     `;
 
     apiMessages.unshift({ role: "system", content: masterPrompt });
 
-    // I renamed the tool to "internetSearch" to stop Llama 3 from hallucinating its pre-trained tags
     const tools = [
       {
         type: "function",
         function: {
           name: "internetSearch",
-          description: "Search the internet for real-time information, news, or facts.",
+          description: "Search the internet for real-time information.",
           parameters: {
             type: "object",
             properties: {
@@ -107,26 +106,28 @@ DEFAULT BEHAVIOR & WEB SEARCH:
       responseMessage = response.choices[0].message;
 
     } catch (apiErr) {
-      // 🚨 THE GENIUS INTERCEPTOR: If Groq crashes, we catch the error!
-      const errText = typeof apiErr === 'object' ? JSON.stringify(apiErr) : apiErr.toString();
+      // 🚨 THE FIXED INTERCEPTOR: Now accurately reads the JS Error object!
+      const errText = apiErr.message || apiErr.toString();
       
-      // If the AI hallucinated the tool call...
       if (errText.includes("failed_generation") || errText.includes("tool_use_failed")) {
-        console.log("Caught Groq tool hallucination! Extracting query safely...");
+        console.log("Intercepted hallucination!");
         
-        // Use Regex to pull the query right out of the error message!
-        const match = errText.match(/"query"\s*:\s*"([^"]+)"/i);
+        // Smarter Regex: Ignores backslashes (\") and extracts the text perfectly
+        const match = errText.match(/query[^:]*:\s*\\?["']([^"'\\]+)/i);
+        
         if (match && match[1]) {
-           const extractedQuery = match[1];
+           const extractedQuery = match[1].trim();
+           console.log("Successfully extracted hidden query:", extractedQuery);
+           
            const searchResults = await performWebSearch(extractedQuery);
 
-           // Feed the results back into the prompt, bypassing the tool system entirely
+           // Feed the results back directly as a system message
            apiMessages.push({
              role: "system",
-             content: `Web Search Results for "${extractedQuery}":\n\n${searchResults}\n\nPlease summarize this data beautifully for the user.`
+             content: `[System Update] Web search results for "${extractedQuery}":\n\n${searchResults}\n\nPlease summarize this information beautifully for the user.`
            });
 
-           // Ask Groq one more time WITHOUT tools, so it is mathematically impossible to crash
+           // Run a clean recovery call WITHOUT tools to guarantee no crashes
            let recoveryResponse = await groq.chat.completions.create({
              model: "llama-3.3-70b-versatile",
              messages: apiMessages,
@@ -136,11 +137,10 @@ DEFAULT BEHAVIOR & WEB SEARCH:
            return res.status(200).json({ reply: recoveryResponse.choices[0].message.content });
         }
       }
-      // If it's a normal error (like API down), throw it
-      throw apiErr; 
+      throw apiErr; // Throw only if it's a completely unrelated error
     }
 
-    // 🔍 STEP 2: Standard Tool Handling (if the AI does it correctly the first time)
+    // 🔍 STEP 2: Standard Tool Handling
     if (responseMessage.tool_calls) {
       apiMessages.push(responseMessage);
 
@@ -148,7 +148,6 @@ DEFAULT BEHAVIOR & WEB SEARCH:
         let argsString = toolCall.function.arguments || "{}";
         let toolName = toolCall.function.name;
 
-        // Clean up broken tool names
         if (toolName.includes("{")) {
           const bracketIndex = toolName.indexOf("{");
           argsString = toolName.substring(bracketIndex); 
@@ -162,7 +161,7 @@ DEFAULT BEHAVIOR & WEB SEARCH:
         apiMessages.push({
           tool_call_id: toolCall.id,
           role: "tool",
-          name: toolCall.function.name, // Keep exact name AI requested
+          name: toolCall.function.name,
           content: searchResults
         });
       }
