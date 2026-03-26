@@ -34,6 +34,7 @@ async function performWebSearch(query) {
 }
 
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -44,8 +45,6 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
     let rawMessages = body.messages || [];
-
-    // 🛡️ FUTURE-PROOF FIX 1: Trim history to last 10 messages so the AI never runs out of memory (Context Window)
     let apiMessages = rawMessages.slice(-10);
 
     const masterPrompt = `
@@ -61,32 +60,31 @@ You are Bimo AI, the highly advanced, official portfolio AI assistant for Bimoch
 🗣️ COMMUNICATION STYLE:
 - Tone: Highly encouraging, friendly, and expert.
 - Formatting: ALWAYS use beautiful markdown. Use emojis for section headers (e.g., 🔍, 🛠️, 🚀).
-- Structure: Break your answers into clear, logical sections. 
+- Structure: Break your answers into clear, logical sections.
 
 DEFAULT BEHAVIOR & WEB SEARCH:
-- If the user asks about real-time news, current events, weather, or facts you don't know, search the internet to find the answer.
+- If the user asks about real-time news, current events, specific people, or facts you don't know, use your internetSearch tool.
 - When you receive web search results, READ the content and write a natural, authentic summary. Do not just list links.
-- At the end of your points, use small markdown citations: [Source](URL).
+- Use small markdown citations: [Source](URL).
 
 💻 ELITE DEVELOPER MODE:
-- If asked to code, act as a 10x Staff Software Engineer. 
 - ALWAYS write FULL code. NO placeholders.
 - Combine HTML/CSS/JS into a single \`\`\`html block. Use Glassmorphism and fluid animations.
     `;
 
-    // Add Master Prompt to the very beginning
     apiMessages.unshift({ role: "system", content: masterPrompt });
 
+    // I renamed the tool to "internetSearch" to stop Llama 3 from hallucinating its pre-trained tags
     const tools = [
       {
         type: "function",
         function: {
-          name: "search_web",
-          description: "Search the internet for real-time information, news, weather, or facts.",
+          name: "internetSearch",
+          description: "Search the internet for real-time information, news, or facts.",
           parameters: {
             type: "object",
             properties: {
-              query: { type: "string", description: "The exact search query to look up." }
+              query: { type: "string", description: "The search query." }
             },
             required: ["query"]
           }
@@ -94,72 +92,97 @@ DEFAULT BEHAVIOR & WEB SEARCH:
       }
     ];
 
-    // 🚀 STEP 1: First AI Call
-    let response = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: apiMessages,
-      tools: tools,
-      tool_choice: "auto",
-      parallel_tool_calls: false,
-      max_tokens: 6000,
-    });
+    let responseMessage;
 
-    let responseMessage = response.choices[0].message;
+    // 🚀 STEP 1: The Bulletproof Wrapper
+    try {
+      let response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: apiMessages,
+        tools: tools,
+        tool_choice: "auto",
+        parallel_tool_calls: false,
+        max_tokens: 6000,
+      });
+      responseMessage = response.choices[0].message;
 
-    // 🔍 STEP 2: Tool Handling with Hallucination Armor
+    } catch (apiErr) {
+      // 🚨 THE GENIUS INTERCEPTOR: If Groq crashes, we catch the error!
+      const errText = typeof apiErr === 'object' ? JSON.stringify(apiErr) : apiErr.toString();
+      
+      // If the AI hallucinated the tool call...
+      if (errText.includes("failed_generation") || errText.includes("tool_use_failed")) {
+        console.log("Caught Groq tool hallucination! Extracting query safely...");
+        
+        // Use Regex to pull the query right out of the error message!
+        const match = errText.match(/"query"\s*:\s*"([^"]+)"/i);
+        if (match && match[1]) {
+           const extractedQuery = match[1];
+           const searchResults = await performWebSearch(extractedQuery);
+
+           // Feed the results back into the prompt, bypassing the tool system entirely
+           apiMessages.push({
+             role: "system",
+             content: `Web Search Results for "${extractedQuery}":\n\n${searchResults}\n\nPlease summarize this data beautifully for the user.`
+           });
+
+           // Ask Groq one more time WITHOUT tools, so it is mathematically impossible to crash
+           let recoveryResponse = await groq.chat.completions.create({
+             model: "llama-3.3-70b-versatile",
+             messages: apiMessages,
+             max_tokens: 6000,
+           });
+           
+           return res.status(200).json({ reply: recoveryResponse.choices[0].message.content });
+        }
+      }
+      // If it's a normal error (like API down), throw it
+      throw apiErr; 
+    }
+
+    // 🔍 STEP 2: Standard Tool Handling (if the AI does it correctly the first time)
     if (responseMessage.tool_calls) {
       apiMessages.push(responseMessage);
 
       for (const toolCall of responseMessage.tool_calls) {
-        let toolName = toolCall.function.name;
         let argsString = toolCall.function.arguments || "{}";
+        let toolName = toolCall.function.name;
 
-        // 🛡️ FUTURE-PROOF FIX 2: Catch Groq's "Merged Tool" Hallucination
-        // If the AI accidentally smashes the JSON arguments into the tool name, we split it back out!
+        // Clean up broken tool names
         if (toolName.includes("{")) {
           const bracketIndex = toolName.indexOf("{");
           argsString = toolName.substring(bracketIndex); 
-          toolName = "search_web"; 
         }
 
-        if (toolName === "search_web") {
-          let args = { query: "" };
-          try {
-            args = JSON.parse(argsString);
-          } catch (e) {
-            console.error("Failed to parse tool arguments:", argsString);
-            // Fallback if JSON is totally broken
-            args.query = "latest news"; 
-          }
+        let args = { query: "latest news" };
+        try { args = JSON.parse(argsString); } catch (e) {}
 
-          const searchResults = await performWebSearch(args.query);
+        const searchResults = await performWebSearch(args.query);
 
-          apiMessages.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            name: toolName,
-            content: searchResults
-          });
-        }
+        apiMessages.push({
+          tool_call_id: toolCall.id,
+          role: "tool",
+          name: toolCall.function.name, // Keep exact name AI requested
+          content: searchResults
+        });
       }
 
       // 🧠 STEP 3: Final AI Call
-      response = await groq.chat.completions.create({
+      let finalResponse = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: apiMessages,
         max_tokens: 6000,
       });
-
-      responseMessage = response.choices[0].message;
+      responseMessage = finalResponse.choices[0].message;
     }
 
     return res.status(200).json({ reply: responseMessage.content });
 
   } catch (error) {
-    console.error("API Error:", error);
+    console.error("Fatal Backend Error:", error);
     return res.status(500).json({ 
-      error: "An error occurred in the AI brain.", 
-      details: error.message 
+      error: "An error occurred in the AI backend.", 
+      details: error.message || error.toString() 
     });
   }
 }
