@@ -1,11 +1,64 @@
 import { Groq } from "groq-sdk";
 
-export const config = { maxDuration: 60 };
+export const config = {
+  maxDuration: 60,
+};
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 /* =========================
-   🔐 TIMEOUT WRAPPER
+   🧠 MEMORY STORE (replace with DB in SaaS v3)
+========================= */
+const memoryStore = new Map();
+
+/* =========================
+   ⚡ RATE LIMIT (production safety)
+========================= */
+const rateLimitStore = new Map();
+
+function rateLimit(ip) {
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const maxReq = 12;
+
+  if (!rateLimitStore.has(ip)) rateLimitStore.set(ip, []);
+
+  const arr = rateLimitStore.get(ip).filter(t => now - t < windowMs);
+
+  if (arr.length >= maxReq) return false;
+
+  arr.push(now);
+  rateLimitStore.set(ip, arr);
+  return true;
+}
+
+/* =========================
+   📦 SAFE RESPONSE
+========================= */
+function sendJSON(res, status, data) {
+  res.setHeader("Content-Type", "application/json");
+  return res.status(status).json(data);
+}
+
+/* =========================
+   🧠 MEMORY SYSTEM (STRUCTURED)
+========================= */
+function getMemory(userId) {
+  if (!memoryStore.has(userId)) {
+    memoryStore.set(userId, []);
+  }
+  return memoryStore.get(userId);
+}
+
+function addMemory(userId, role, content) {
+  const mem = getMemory(userId);
+  mem.push({ role, content, ts: Date.now() });
+
+  if (mem.length > 25) mem.shift();
+}
+
+/* =========================
+   ⏱ TIMEOUT WRAPPER
 ========================= */
 function withTimeout(promise, ms = 25000) {
   return Promise.race([
@@ -17,9 +70,9 @@ function withTimeout(promise, ms = 25000) {
 }
 
 /* =========================
-   🧠 SAFE AI CALL (RETRY SYSTEM)
+   🧠 SAFE AI ENGINE (RETRY + STABILITY)
 ========================= */
-async function safeAICall(messages, max_tokens = 1000, retries = 2) {
+async function ai(messages, max_tokens = 800, retries = 2) {
   for (let i = 0; i <= retries; i++) {
     try {
       const res = await withTimeout(
@@ -27,19 +80,15 @@ async function safeAICall(messages, max_tokens = 1000, retries = 2) {
           model: "llama-3.3-70b-versatile",
           messages,
           max_tokens,
-        }),
-        25000
+          temperature: 0.7,
+        })
       );
 
-      const content = res?.choices?.[0]?.message?.content;
+      const out = res?.choices?.[0]?.message?.content;
 
-      if (content && content.trim().length > 0) {
-        return content;
-      }
-
-      console.warn(`⚠️ Empty response attempt ${i + 1}`);
+      if (out && out.trim().length > 0) return out;
     } catch (err) {
-      console.error(`❌ AI error attempt ${i + 1}:`, err.message);
+      console.error("AI retry error:", err.message);
     }
   }
 
@@ -47,174 +96,239 @@ async function safeAICall(messages, max_tokens = 1000, retries = 2) {
 }
 
 /* =========================
-   📤 RESPONSE HELPER
+   🌐 WEB SEARCH (TAVILY SAFE)
 ========================= */
-function sendJSON(res, status, payload) {
-  res.setHeader("Content-Type", "application/json");
-  return res.status(status).json(payload);
+async function webSearch(query) {
+  try {
+    const res = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: process.env.TAVILY_API_KEY,
+        query,
+        search_depth: "basic",
+        max_results: 5,
+      }),
+    });
+
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return "Search service error.";
+    }
+
+    const results =
+      data?.results?.map(r =>
+        `Title: ${r.title}\n${r.content}\nURL: ${r.url}`
+      ) || [];
+
+    return results.join("\n\n") || "No results found.";
+  } catch (e) {
+    return "Search failed.";
+  }
 }
 
 /* =========================
-   🧠 MASTER PROMPT
+   🧭 INTENT ROUTER (CORE OF SAAS)
 ========================= */
-const masterPrompt = `
-You are Bimo AI — assistant for Bimochan Acharya and senior frontend engineer.
+function detectIntent(text) {
+  const t = text.toLowerCase();
 
-GENERAL:
-- Be precise, useful, and honest
-- Avoid hallucinations
+  const builder = /(build|create|make|website|web app|app|dashboard|portfolio)/;
+  const search = /(latest|news|today|current|price|weather|update|who is|what is)/;
 
-BUILDER MODE:
-- Use React + Tailwind only
-- Modular components
-- Clean production structure
-- No plain HTML apps
-`;
+  if (builder.test(t)) return "BUILDER";
+  if (search.test(t)) return "SEARCH";
+  return "CHAT";
+}
 
 /* =========================
-   🧩 BUILDER PIPELINE
+   🧠 CHAT AGENT
 ========================= */
-
-async function generatePlan(messages) {
+async function chatAgent(messages) {
   return (
-    (await safeAICall(
-      [
-        ...messages,
-        {
-          role: "system",
-          content:
-            "Create a short web app plan (pages, components, features).",
-        },
-      ],
-      500
-    )) || "⚠️ Plan generation failed."
-  );
-}
-
-async function generateComponents(plan) {
-  return (
-    (await safeAICall(
-      [
-        {
-          role: "system",
-          content:
-            "Generate React + Tailwind components with filenames. Keep clean and modular.",
-        },
-        { role: "user", content: plan },
-      ],
-      900
-    )) || "⚠️ Component generation failed."
-  );
-}
-
-async function assembleProject(components) {
-  return (
-    (await safeAICall(
-      [
-        {
-          role: "system",
-          content:
-            "Generate minimal React project structure (App.jsx, folders, setup).",
-        },
-        { role: "user", content: components },
-      ],
-      900
-    )) || "⚠️ Project generation failed."
+    (await ai(messages, 900)) ||
+    "⚠️ I couldn't generate a response."
   );
 }
 
 /* =========================
-   🖥️ HTML PREVIEW EXTRACTOR
+   🌐 SEARCH AGENT
 ========================= */
-function extractHTMLPreview(text) {
-  const match = text?.match(/```(?:html|jsx|tsx)?([\s\S]*?)```/i);
-  return match ? match[1] : null;
+async function searchAgent(query) {
+  const data = await webSearch(query);
+
+  const result = await ai(
+    [
+      {
+        role: "system",
+        content:
+          "Use ONLY the provided real-time data. Be factual and concise.",
+      },
+      { role: "user", content: data },
+    ],
+    900
+  );
+
+  return result || "⚠️ Search failed.";
 }
 
 /* =========================
-   🚀 MAIN HANDLER
+   🧱 BUILDER AGENT (STABLE PIPELINE)
+========================= */
+async function builderAgent(messages) {
+  const plan = await ai(
+    [
+      ...messages,
+      {
+        role: "system",
+        content:
+          "Create a structured web app plan (pages, UI, features).",
+      },
+    ],
+    500
+  );
+
+  const components = await ai(
+    [
+      { role: "system", content: "Generate React + Tailwind components." },
+      { role: "user", content: plan || "" },
+    ],
+    900
+  );
+
+  const project = await ai(
+    [
+      { role: "system", content: "Generate full project structure." },
+      { role: "user", content: components || "" },
+    ],
+    1000
+  );
+
+  return {
+    reply: `
+🚀 PLAN:
+${plan || "Failed"}
+
+🧩 COMPONENTS:
+${components || "Failed"}
+
+📦 PROJECT:
+${project || "Failed"}
+    `,
+    preview: extractPreview(project),
+  };
+}
+
+/* =========================
+   🧾 PREVIEW EXTRACTOR
+========================= */
+function extractPreview(text) {
+  if (!text) return null;
+
+  const match = text.match(/```(?:html|jsx|tsx)?([\s\S]*?)```/i);
+  if (match) return match[1];
+
+  if (text.includes("<div") || text.includes("<html")) {
+    return text;
+  }
+
+  return null;
+}
+
+/* =========================
+   🚀 MAIN API HANDLER (SAAS V2 CORE)
 ========================= */
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  const ip =
+    req.headers["x-forwarded-for"] ||
+    req.socket?.remoteAddress ||
+    "unknown";
 
-  if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST")
+  if (!rateLimit(ip)) {
+    return sendJSON(res, 429, {
+      error: "Rate limit exceeded",
+    });
+  }
+
+  if (req.method !== "POST") {
     return sendJSON(res, 405, { error: "Method not allowed" });
+  }
 
   let body;
   try {
-    body = typeof req.body === "object" ? req.body : JSON.parse(req.body);
+    body =
+      typeof req.body === "object"
+        ? req.body
+        : JSON.parse(req.body);
   } catch {
     return sendJSON(res, 400, { error: "Invalid JSON" });
   }
 
+  const rawMessages = body.messages || [];
+  const userId = body.userId || ip;
+
+  const userMessage =
+    rawMessages[rawMessages.length - 1]?.content || "";
+
+  /* =========================
+     🧠 MEMORY WRITE
+  ========================= */
+  addMemory(userId, "user", userMessage);
+
+  const memory = getMemory(userId).slice(-10);
+
+  const messages = [
+    {
+      role: "system",
+      content:
+        "You are Bimo AI — a production SaaS AI agent system.",
+    },
+    ...memory.map(m => ({
+      role: m.role,
+      content: m.content,
+    })),
+  ];
+
+  const intent = detectIntent(userMessage);
+
   try {
-    const rawMessages = body.messages || [];
-    const userMessage =
-      rawMessages[rawMessages.length - 1]?.content || "";
+    let result;
 
-    let apiMessages = rawMessages.slice(-5);
-
-    if (!apiMessages.some((m) => m.role === "system")) {
-      apiMessages.unshift({ role: "system", content: masterPrompt });
+    /* ================= CHAT ================= */
+    if (intent === "CHAT") {
+      result = {
+        reply: await chatAgent(messages),
+      };
     }
 
-    const isBuilder =
-      /build|create|website|web app|portfolio|landing page/i.test(
-        userMessage
-      );
-
-    /* =========================
-       🧠 BUILDER MODE
-    ========================= */
-    if (isBuilder) {
-      const plan = await generatePlan(apiMessages);
-      const components = await generateComponents(plan);
-      const project = await assembleProject(components);
-
-      const finalReply = `
-🚀 PLAN:
-${plan}
-
-🧩 COMPONENTS:
-${components}
-
-📦 PROJECT:
-${project}
-      `;
-
-      const previewCode =
-        extractHTMLPreview(project) ||
-        `<div style="padding:20px;font-family:sans-serif;">
-          <h2>Preview Not Available</h2>
-          <p>Code generated successfully but no HTML preview detected.</p>
-        </div>`;
-
-      return sendJSON(res, 200, {
-        reply:
-          finalReply && finalReply.trim().length > 0
-            ? finalReply
-            : "⚠️ Failed to generate project.",
-        preview: previewCode,
-      });
+    /* ================= SEARCH ================= */
+    if (intent === "SEARCH") {
+      result = {
+        reply: await searchAgent(userMessage),
+      };
     }
 
-    /* =========================
-       🤖 NORMAL CHAT MODE
-    ========================= */
-    const response = await safeAICall(apiMessages, 1000);
+    /* ================= BUILDER ================= */
+    if (intent === "BUILDER") {
+      result = await builderAgent(messages);
+    }
 
+    /* ================= FINAL RESPONSE ================= */
     return sendJSON(res, 200, {
-      reply: response || "⚠️ No response from AI.",
+      status: "success",
+      reply: result?.reply || "⚠️ No response generated.",
+      preview: result?.preview || null,
+      intent,
     });
-  } catch (error) {
-    console.error("Fatal Error:", error);
-
+  } catch (err) {
     return sendJSON(res, 500, {
-      error: "Server error",
-      details: error.message,
+      status: "error",
+      error: "SAAS v2 crash safe handler",
+      details: err.message,
     });
   }
 }
