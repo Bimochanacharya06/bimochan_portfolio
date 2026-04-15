@@ -7,21 +7,7 @@ export const config = {
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 /* =========================
-   🧠 DATABASE LAYER (SUPABASE READY)
-   Replace with real DB in production
-========================= */
-async function dbGetMessages(userId) {
-  // TODO: Supabase SELECT
-  return [];
-}
-
-async function dbSaveMessage(userId, message) {
-  // TODO: Supabase INSERT
-  return true;
-}
-
-/* =========================
-   ⚡ RATE LIMIT (PRODUCTION SAFE)
+   RATE LIMIT
 ========================= */
 const rateMap = new Map();
 
@@ -32,9 +18,7 @@ function rateLimit(ip) {
 
   if (!rateMap.has(ip)) rateMap.set(ip, []);
 
-  const arr = rateMap
-    .get(ip)
-    .filter(t => now - t < window);
+  const arr = rateMap.get(ip).filter(t => now - t < window);
 
   if (arr.length >= limit) return false;
 
@@ -45,25 +29,15 @@ function rateLimit(ip) {
 }
 
 /* =========================
-   📡 STREAM ENGINE (CHATGPT STYLE)
+   SAFE JSON RESPONSE (IMPORTANT)
 ========================= */
-function streamResponse(res, text, speed = 12) {
-  let i = 0;
-
-  const interval = setInterval(() => {
-    if (i >= text.length) {
-      clearInterval(interval);
-      res.end();
-      return;
-    }
-
-    res.write(text[i]);
-    i++;
-  }, speed);
+function sendJSON(res, status, data) {
+  res.setHeader("Content-Type", "application/json");
+  return res.status(status).json(data);
 }
 
 /* =========================
-   🧠 SAFE AI ENGINE
+   SAFE AI CALL
 ========================= */
 async function ai(messages, max_tokens = 900) {
   try {
@@ -74,15 +48,15 @@ async function ai(messages, max_tokens = 900) {
       temperature: 0.7,
     });
 
-    return res?.choices?.[0]?.message?.content || null;
+    return res?.choices?.[0]?.message?.content ?? null;
   } catch (e) {
-    console.error("AI error:", e.message);
+    console.error("AI ERROR:", e.message);
     return null;
   }
 }
 
 /* =========================
-   🌐 WEB SEARCH
+   WEB SEARCH
 ========================= */
 async function webSearch(query) {
   try {
@@ -99,7 +73,12 @@ async function webSearch(query) {
 
     const text = await res.text();
 
-    const data = JSON.parse(text);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return "Search error.";
+    }
 
     return (
       data.results
@@ -107,20 +86,20 @@ async function webSearch(query) {
           r =>
             `Title: ${r.title}\n${r.content}\nURL: ${r.url}`
         )
-        .join("\n\n") || "No results"
+        .join("\n\n") || "No results found."
     );
   } catch {
-    return "Search failed";
+    return "Search failed.";
   }
 }
 
 /* =========================
-   🧭 INTENT ENGINE
+   INTENT DETECTION
 ========================= */
 function detectIntent(text) {
   const t = text.toLowerCase();
 
-  if (/(build|create|make|website|app|dashboard|portfolio)/.test(t))
+  if (/(build|create|make|website|app|dashboard)/.test(t))
     return "BUILDER";
 
   if (/(latest|news|price|weather|update|who is|current)/.test(t))
@@ -130,42 +109,45 @@ function detectIntent(text) {
 }
 
 /* =========================
-   🧠 CHAT AGENT
+   CHAT AGENT
 ========================= */
-async function chatAgent(history) {
-  return await ai(history, 900);
+async function chatAgent(messages) {
+  const out = await ai(messages, 900);
+  return out ?? "I couldn't generate a response.";
 }
 
 /* =========================
-   🌐 SEARCH AGENT
+   SEARCH AGENT
 ========================= */
 async function searchAgent(query) {
   const data = await webSearch(query);
 
-  return await ai(
+  const out = await ai(
     [
       {
         role: "system",
-        content: "Use ONLY provided real-time data.",
+        content: "Use ONLY provided data.",
       },
       { role: "user", content: data },
     ],
     900
   );
+
+  return out ?? "Search failed.";
 }
 
 /* =========================
-   🧱 BUILDER AGENT (V4 SIMPLIFIED BUT STABLE)
+   BUILDER AGENT
 ========================= */
-async function builderAgent(history) {
-  const plan = await ai(history, 500);
+async function builderAgent(messages) {
+  const plan = await ai(messages, 500);
 
   const code = await ai(
     [
       {
         role: "system",
         content:
-          "Generate production React + Tailwind app code.",
+          "Generate React + Tailwind production-ready UI.",
       },
       { role: "user", content: plan || "" },
     ],
@@ -173,25 +155,23 @@ async function builderAgent(history) {
   );
 
   return {
-    reply: code,
+    reply: code ?? "Builder failed to generate code.",
     preview: extractPreview(code),
   };
 }
 
 /* =========================
-   🧾 PREVIEW EXTRACTOR
+   PREVIEW EXTRACTOR
 ========================= */
 function extractPreview(text) {
   if (!text) return null;
 
   const match = text.match(/```(?:html|jsx|tsx)?([\s\S]*?)```/i);
-  if (match) return match[1];
-
-  return text.includes("<div") ? text : null;
+  return match ? match[1] : null;
 }
 
 /* =========================
-   🚀 MAIN HANDLER (V4 CORE)
+   MAIN HANDLER (FIXED — ALWAYS JSON)
 ========================= */
 export default async function handler(req, res) {
   const ip =
@@ -200,76 +180,86 @@ export default async function handler(req, res) {
     "unknown";
 
   if (!rateLimit(ip)) {
-    return res.status(429).json({
+    return sendJSON(res, 429, {
+      status: "error",
       error: "Rate limit exceeded",
+      reply: null,
     });
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({
+    return sendJSON(res, 405, {
+      status: "error",
       error: "Method not allowed",
+      reply: null,
     });
   }
 
   let body;
+
   try {
     body =
       typeof req.body === "object"
         ? req.body
         : JSON.parse(req.body);
   } catch {
-    return res.status(400).json({
-      error: "Invalid JSON",
+    return sendJSON(res, 400, {
+      status: "error",
+      error: "Invalid JSON body",
+      reply: null,
     });
   }
 
-  const { messages = [], userId = ip } = body;
+  const { messages = [] } = body;
 
   const userMessage =
     messages[messages.length - 1]?.content || "";
 
-  /* =========================
-     💾 SAVE USER MESSAGE
-  ========================= */
-  await dbSaveMessage(userId, {
-    role: "user",
-    content: userMessage,
-  });
-
-  const history = await dbGetMessages(userId);
+  if (!userMessage) {
+    return sendJSON(res, 400, {
+      status: "error",
+      error: "Empty message",
+      reply: null,
+    });
+  }
 
   const intent = detectIntent(userMessage);
 
-  let result;
-
   try {
-    /* ================= CHAT ================= */
+    let result = null;
+
     if (intent === "CHAT") {
-      result = await chatAgent(history);
+      result = await chatAgent(messages);
     }
 
-    /* ================= SEARCH ================= */
     if (intent === "SEARCH") {
       result = await searchAgent(userMessage);
     }
 
-    /* ================= BUILDER ================= */
     if (intent === "BUILDER") {
-      result = await builderAgent(history);
+      result = await builderAgent(messages);
     }
 
-    /* ================= STREAM RESPONSE ================= */
-    res.setHeader("Content-Type", "text/plain");
-
-    const final =
-      typeof result === "string"
-        ? result
-        : result?.reply || "No response";
-
-    streamResponse(res, final);
+    /* =========================
+       FINAL GUARANTEED SAFE RESPONSE
+    ========================= */
+    return sendJSON(res, 200, {
+      status: "success",
+      intent,
+      reply:
+        typeof result === "string"
+          ? result
+          : result?.reply ?? "No response generated",
+      preview:
+        typeof result === "object"
+          ? result?.preview ?? null
+          : null,
+    });
   } catch (err) {
-    return res.status(500).json({
-      error: "SAAS v4 crash",
+    return sendJSON(res, 500, {
+      status: "error",
+      error: "Server crashed safely",
+      reply: "Something went wrong. Try again.",
       details: err.message,
     });
   }
