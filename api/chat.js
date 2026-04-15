@@ -7,96 +7,82 @@ export const config = {
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 /* =========================
-   🧠 MEMORY STORE (replace with DB in SaaS v3)
+   🧠 DATABASE LAYER (SUPABASE READY)
+   Replace with real DB in production
 ========================= */
-const memoryStore = new Map();
+async function dbGetMessages(userId) {
+  // TODO: Supabase SELECT
+  return [];
+}
 
-/* =========================
-   ⚡ RATE LIMIT (production safety)
-========================= */
-const rateLimitStore = new Map();
-
-function rateLimit(ip) {
-  const now = Date.now();
-  const windowMs = 60 * 1000;
-  const maxReq = 12;
-
-  if (!rateLimitStore.has(ip)) rateLimitStore.set(ip, []);
-
-  const arr = rateLimitStore.get(ip).filter(t => now - t < windowMs);
-
-  if (arr.length >= maxReq) return false;
-
-  arr.push(now);
-  rateLimitStore.set(ip, arr);
+async function dbSaveMessage(userId, message) {
+  // TODO: Supabase INSERT
   return true;
 }
 
 /* =========================
-   📦 SAFE RESPONSE
+   ⚡ RATE LIMIT (PRODUCTION SAFE)
 ========================= */
-function sendJSON(res, status, data) {
-  res.setHeader("Content-Type", "application/json");
-  return res.status(status).json(data);
+const rateMap = new Map();
+
+function rateLimit(ip) {
+  const now = Date.now();
+  const window = 60000;
+  const limit = 15;
+
+  if (!rateMap.has(ip)) rateMap.set(ip, []);
+
+  const arr = rateMap
+    .get(ip)
+    .filter(t => now - t < window);
+
+  if (arr.length >= limit) return false;
+
+  arr.push(now);
+  rateMap.set(ip, arr);
+
+  return true;
 }
 
 /* =========================
-   🧠 MEMORY SYSTEM (STRUCTURED)
+   📡 STREAM ENGINE (CHATGPT STYLE)
 ========================= */
-function getMemory(userId) {
-  if (!memoryStore.has(userId)) {
-    memoryStore.set(userId, []);
-  }
-  return memoryStore.get(userId);
-}
+function streamResponse(res, text, speed = 12) {
+  let i = 0;
 
-function addMemory(userId, role, content) {
-  const mem = getMemory(userId);
-  mem.push({ role, content, ts: Date.now() });
-
-  if (mem.length > 25) mem.shift();
-}
-
-/* =========================
-   ⏱ TIMEOUT WRAPPER
-========================= */
-function withTimeout(promise, ms = 25000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Timeout")), ms)
-    ),
-  ]);
-}
-
-/* =========================
-   🧠 SAFE AI ENGINE (RETRY + STABILITY)
-========================= */
-async function ai(messages, max_tokens = 800, retries = 2) {
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const res = await withTimeout(
-        groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
-          messages,
-          max_tokens,
-          temperature: 0.7,
-        })
-      );
-
-      const out = res?.choices?.[0]?.message?.content;
-
-      if (out && out.trim().length > 0) return out;
-    } catch (err) {
-      console.error("AI retry error:", err.message);
+  const interval = setInterval(() => {
+    if (i >= text.length) {
+      clearInterval(interval);
+      res.end();
+      return;
     }
-  }
 
-  return null;
+    res.write(text[i]);
+    i++;
+  }, speed);
 }
 
 /* =========================
-   🌐 WEB SEARCH (TAVILY SAFE)
+   🧠 SAFE AI ENGINE
+========================= */
+async function ai(messages, max_tokens = 900) {
+  try {
+    const res = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages,
+      max_tokens,
+      temperature: 0.7,
+    });
+
+    return res?.choices?.[0]?.message?.content || null;
+  } catch (e) {
+    console.error("AI error:", e.message);
+    return null;
+  }
+}
+
+/* =========================
+   🌐 WEB SEARCH
 ========================= */
 async function webSearch(query) {
   try {
@@ -113,46 +99,41 @@ async function webSearch(query) {
 
     const text = await res.text();
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      return "Search service error.";
-    }
+    const data = JSON.parse(text);
 
-    const results =
-      data?.results?.map(r =>
-        `Title: ${r.title}\n${r.content}\nURL: ${r.url}`
-      ) || [];
-
-    return results.join("\n\n") || "No results found.";
-  } catch (e) {
-    return "Search failed.";
+    return (
+      data.results
+        ?.map(
+          r =>
+            `Title: ${r.title}\n${r.content}\nURL: ${r.url}`
+        )
+        .join("\n\n") || "No results"
+    );
+  } catch {
+    return "Search failed";
   }
 }
 
 /* =========================
-   🧭 INTENT ROUTER (CORE OF SAAS)
+   🧭 INTENT ENGINE
 ========================= */
 function detectIntent(text) {
   const t = text.toLowerCase();
 
-  const builder = /(build|create|make|website|web app|app|dashboard|portfolio)/;
-  const search = /(latest|news|today|current|price|weather|update|who is|what is)/;
+  if (/(build|create|make|website|app|dashboard|portfolio)/.test(t))
+    return "BUILDER";
 
-  if (builder.test(t)) return "BUILDER";
-  if (search.test(t)) return "SEARCH";
+  if (/(latest|news|price|weather|update|who is|current)/.test(t))
+    return "SEARCH";
+
   return "CHAT";
 }
 
 /* =========================
    🧠 CHAT AGENT
 ========================= */
-async function chatAgent(messages) {
-  return (
-    (await ai(messages, 900)) ||
-    "⚠️ I couldn't generate a response."
-  );
+async function chatAgent(history) {
+  return await ai(history, 900);
 }
 
 /* =========================
@@ -161,65 +142,39 @@ async function chatAgent(messages) {
 async function searchAgent(query) {
   const data = await webSearch(query);
 
-  const result = await ai(
+  return await ai(
     [
       {
         role: "system",
-        content:
-          "Use ONLY the provided real-time data. Be factual and concise.",
+        content: "Use ONLY provided real-time data.",
       },
       { role: "user", content: data },
     ],
     900
   );
-
-  return result || "⚠️ Search failed.";
 }
 
 /* =========================
-   🧱 BUILDER AGENT (STABLE PIPELINE)
+   🧱 BUILDER AGENT (V4 SIMPLIFIED BUT STABLE)
 ========================= */
-async function builderAgent(messages) {
-  const plan = await ai(
+async function builderAgent(history) {
+  const plan = await ai(history, 500);
+
+  const code = await ai(
     [
-      ...messages,
       {
         role: "system",
         content:
-          "Create a structured web app plan (pages, UI, features).",
+          "Generate production React + Tailwind app code.",
       },
-    ],
-    500
-  );
-
-  const components = await ai(
-    [
-      { role: "system", content: "Generate React + Tailwind components." },
       { role: "user", content: plan || "" },
     ],
-    900
-  );
-
-  const project = await ai(
-    [
-      { role: "system", content: "Generate full project structure." },
-      { role: "user", content: components || "" },
-    ],
-    1000
+    1200
   );
 
   return {
-    reply: `
-🚀 PLAN:
-${plan || "Failed"}
-
-🧩 COMPONENTS:
-${components || "Failed"}
-
-📦 PROJECT:
-${project || "Failed"}
-    `,
-    preview: extractPreview(project),
+    reply: code,
+    preview: extractPreview(code),
   };
 }
 
@@ -232,15 +187,11 @@ function extractPreview(text) {
   const match = text.match(/```(?:html|jsx|tsx)?([\s\S]*?)```/i);
   if (match) return match[1];
 
-  if (text.includes("<div") || text.includes("<html")) {
-    return text;
-  }
-
-  return null;
+  return text.includes("<div") ? text : null;
 }
 
 /* =========================
-   🚀 MAIN API HANDLER (SAAS V2 CORE)
+   🚀 MAIN HANDLER (V4 CORE)
 ========================= */
 export default async function handler(req, res) {
   const ip =
@@ -249,13 +200,15 @@ export default async function handler(req, res) {
     "unknown";
 
   if (!rateLimit(ip)) {
-    return sendJSON(res, 429, {
+    return res.status(429).json({
       error: "Rate limit exceeded",
     });
   }
 
   if (req.method !== "POST") {
-    return sendJSON(res, 405, { error: "Method not allowed" });
+    return res.status(405).json({
+      error: "Method not allowed",
+    });
   }
 
   let body;
@@ -265,69 +218,58 @@ export default async function handler(req, res) {
         ? req.body
         : JSON.parse(req.body);
   } catch {
-    return sendJSON(res, 400, { error: "Invalid JSON" });
+    return res.status(400).json({
+      error: "Invalid JSON",
+    });
   }
 
-  const rawMessages = body.messages || [];
-  const userId = body.userId || ip;
+  const { messages = [], userId = ip } = body;
 
   const userMessage =
-    rawMessages[rawMessages.length - 1]?.content || "";
+    messages[messages.length - 1]?.content || "";
 
   /* =========================
-     🧠 MEMORY WRITE
+     💾 SAVE USER MESSAGE
   ========================= */
-  addMemory(userId, "user", userMessage);
+  await dbSaveMessage(userId, {
+    role: "user",
+    content: userMessage,
+  });
 
-  const memory = getMemory(userId).slice(-10);
-
-  const messages = [
-    {
-      role: "system",
-      content:
-        "You are Bimo AI — a production SaaS AI agent system.",
-    },
-    ...memory.map(m => ({
-      role: m.role,
-      content: m.content,
-    })),
-  ];
+  const history = await dbGetMessages(userId);
 
   const intent = detectIntent(userMessage);
 
-  try {
-    let result;
+  let result;
 
+  try {
     /* ================= CHAT ================= */
     if (intent === "CHAT") {
-      result = {
-        reply: await chatAgent(messages),
-      };
+      result = await chatAgent(history);
     }
 
     /* ================= SEARCH ================= */
     if (intent === "SEARCH") {
-      result = {
-        reply: await searchAgent(userMessage),
-      };
+      result = await searchAgent(userMessage);
     }
 
     /* ================= BUILDER ================= */
     if (intent === "BUILDER") {
-      result = await builderAgent(messages);
+      result = await builderAgent(history);
     }
 
-    /* ================= FINAL RESPONSE ================= */
-    return sendJSON(res, 200, {
-      status: "success",
-      reply: result?.reply || "⚠️ No response generated.",
-      preview: result?.preview || null,
-      intent,
-    });
+    /* ================= STREAM RESPONSE ================= */
+    res.setHeader("Content-Type", "text/plain");
+
+    const final =
+      typeof result === "string"
+        ? result
+        : result?.reply || "No response";
+
+    streamResponse(res, final);
   } catch (err) {
-    return sendJSON(res, 500, {
-      status: "error",
-      error: "SAAS v2 crash safe handler",
+    return res.status(500).json({
+      error: "SAAS v4 crash",
       details: err.message,
     });
   }
