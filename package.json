@@ -1,5 +1,5 @@
 {
-  "name": "bimo-portfolio",
+  "name": "arccore",
   "type": "module",
   "dependencies": {
     "groq-sdk": "latest"
