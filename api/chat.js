@@ -4,79 +4,76 @@ export const config = { maxDuration: 120 };
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════
    RATE LIMITER
-═══════════════════════════════════════════ */
+════════════════════════════════════════ */
 const rateMap = new Map();
+
 function rateLimit(ip) {
   const now = Date.now();
-  const window = 60000;
-  const limit = 20;
-  if (!rateMap.has(ip)) rateMap.set(ip, []);
-  const arr = rateMap.get(ip).filter(t => now - t < window);
-  if (arr.length >= limit) return false;
+  const WINDOW = 60_000;
+  const LIMIT = 20;
+  const arr = (rateMap.get(ip) || []).filter(t => now - t < WINDOW);
+  if (arr.length >= LIMIT) return false;
   arr.push(now);
   rateMap.set(ip, arr);
   return true;
 }
 
-/* ═══════════════════════════════════════════
-   MEMORY STORE
-═══════════════════════════════════════════ */
-const memoryStore = new Map();
-
-function getMemory(userId) {
-  if (!memoryStore.has(userId)) {
-    memoryStore.set(userId, {
-      profile: { language: null },
-      tasks: [],
-      preferences: {},
-      patterns: [],
-    });
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, arr] of rateMap) {
+    const fresh = arr.filter(t => now - t < 60_000);
+    if (fresh.length === 0) rateMap.delete(ip);
+    else rateMap.set(ip, fresh);
   }
-  return memoryStore.get(userId);
-}
+}, 300_000);
 
-function updateMemory(userId, update) {
-  const mem = getMemory(userId);
-  if (update.language) mem.profile.language = update.language;
-  if (update.task) {
-    mem.tasks.unshift(update.task);
-    if (mem.tasks.length > 50) mem.tasks.pop();
-  }
-  if (update.pattern) mem.patterns.push(update.pattern);
-}
+/* ════════════════════════════════════════
+   BIMOCHAN PROFILE — Portfolio knowledge base
+════════════════════════════════════════ */
+const BIMOCHAN_PROFILE = `
+You are an AI agent built by and for Bimochan Acharya — a full-stack developer, AI builder, and entrepreneur from Nepal.
 
-/* ═══════════════════════════════════════════
-   SAFE JSON RESPONSE
-═══════════════════════════════════════════ */
+ABOUT BIMOCHAN ACHARYA:
+- Full-stack developer specializing in Next.js, React, Node.js, Python
+- AI/ML enthusiast who builds autonomous agent systems
+- Founder of ArcCore — a multi-agent AI platform
+- Projects include: ArcCore AI, various SaaS tools, portfolio websites
+- Skills: JavaScript/TypeScript, Python, AI APIs (Groq, OpenAI, Anthropic), web scraping, automation
+- Based in Nepal, building globally
+- Philosophy: "Build fast, ship value, make AI accessible to everyone"
+- Contact/Portfolio: Available on GitHub and LinkedIn
+
+When asked about Bimochan, share this information enthusiastically as his portfolio agent.
+When doing other tasks (coding, research, etc.), still be helpful but note you are Bimochan's AI.
+`;
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
 function sendJSON(res, status, data) {
   res.setHeader("Content-Type", "application/json");
   return res.status(status).json(data);
 }
 
-/* ═══════════════════════════════════════════
-   SAFE JSON PARSER (CRITICAL FIX)
-═══════════════════════════════════════════ */
 function safeParseJSON(text, fallback) {
+  if (!text) return fallback;
   try {
-    if (!text) return fallback;
-
-    const clean = text.replace(/```json|```/g, "").trim();
-    const start = clean.indexOf("{");
-    const end = clean.lastIndexOf("}");
-
-    if (start === -1 || end === -1) return fallback;
-
-    return JSON.parse(clean.slice(start, end + 1));
+    const clean = text.replace(/```json[\s\S]*?```|```[\s\S]*?```/g, m => m.replace(/```\w*/g,'').replace(/```/g,''));
+    // Extract first valid JSON object
+    const match = clean.match(/\{[\s\S]*\}/);
+    if (!match) return fallback;
+    return JSON.parse(match[0]);
   } catch {
     return fallback;
   }
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════
    CORE AI CALL
-═══════════════════════════════════════════ */
+════════════════════════════════════════ */
 async function callAI(messages, maxTokens = 1200, temperature = 0.7) {
   try {
     const res = await groq.chat.completions.create({
@@ -85,18 +82,17 @@ async function callAI(messages, maxTokens = 1200, temperature = 0.7) {
       max_tokens: maxTokens,
       temperature,
     });
-
     return res?.choices?.[0]?.message?.content || "";
   } catch (e) {
     console.error("AI ERROR:", e.message);
-    return "";
+    throw new Error(`AI call failed: ${e.message}`);
   }
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════
    WEB SEARCH
-═══════════════════════════════════════════ */
-async function webSearch(query, depth = "basic") {
+════════════════════════════════════════ */
+async function webSearch(query, depth = "advanced") {
   try {
     const res = await fetch("https://api.tavily.com/search", {
       method: "POST",
@@ -107,250 +103,256 @@ async function webSearch(query, depth = "basic") {
         search_depth: depth,
         max_results: 6,
         include_answer: true,
+        include_raw_content: false,
       }),
     });
-
+    if (!res.ok) throw new Error(`Tavily: ${res.status}`);
     const data = await res.json();
-    const answer = data.answer ? `Summary: ${data.answer}\n\n` : "";
-
-    const results = data.results
-      ?.map(r => `[${r.title}]\n${r.content}\nSource: ${r.url}`)
-      .join("\n\n") || "No results.";
-
-    return answer + results;
-  } catch {
-    return "Search failed.";
+    const answer = data.answer ? `**Summary:** ${data.answer}\n\n` : "";
+    const results = (data.results || [])
+      .map(r => `**${r.title}**\n${r.content}\n*Source: ${r.url}*`)
+      .join("\n\n");
+    return answer + (results || "No results found.");
+  } catch (e) {
+    console.error("Search error:", e.message);
+    return `Web search unavailable: ${e.message}`;
   }
 }
 
-/* ═══════════════════════════════════════════
-   LANGUAGE DETECTOR
-═══════════════════════════════════════════ */
-async function detectLanguage(text) {
-  const out = await callAI([
-    {
-      role: "system",
-      content: "Detect language. Reply ONLY with language name.",
-    },
-    { role: "user", content: text.substring(0, 200) },
-  ], 10, 0.1);
-
-  return out.trim() || "English";
-}
-
-/* ═══════════════════════════════════════════
-   COMPLEXITY ANALYZER
-═══════════════════════════════════════════ */
-async function analyzeComplexity(userMessage, memory) {
-  const out = await callAI([
-    {
-      role: "system",
-      content: `Return ONLY JSON:
-{
-  "level": "simple|medium|complex",
-  "needsClarification": true|false,
-  "clarificationQuestion": "",
-  "domains": [],
-  "estimatedSteps": 1,
-  "taskTitle": ""
-}`,
-    },
-    { role: "user", content: userMessage },
-  ], 300, 0.1);
-
-  return safeParseJSON(out, {
-    level: "simple",
-    needsClarification: false,
-    domains: ["research"],
-    estimatedSteps: 1,
-    taskTitle: "Task",
-  });
-}
-
-/* ═══════════════════════════════════════════
-   TASK PLANNER
-═══════════════════════════════════════════ */
-async function planTask(userMessage, complexity, memory, language) {
-  const out = await callAI([
-    {
-      role: "system",
-      content: `Return ONLY JSON:
-{
-  "plan": [{ "step":1,"title":"","agent":"","action":"","tool":"none"}],
-  "approach": ""
-}`,
-    },
-    { role: "user", content: userMessage },
-  ], 600, 0.3);
-
-  return safeParseJSON(out, {
-    plan: [{ step: 1, title: "Execute", agent: "researchCore", action: "Process", tool: "none" }],
-    approach: "Direct",
-  });
-}
-
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════
    SAFETY CHECK
-═══════════════════════════════════════════ */
+════════════════════════════════════════ */
 async function safetyCheck(message) {
-  const out = await callAI([
-    {
-      role: "system",
-      content: `Return JSON: { "safe": true|false }`,
-    },
-    { role: "user", content: message },
-  ], 50, 0.1);
+  // Fast local check first
+  const dangerous = /\b(bomb|explosives|weapons|hack|malware|kill|murder|child porn|CSAM)\b/i;
+  if (dangerous.test(message)) return { safe: false };
 
-  return safeParseJSON(out, { safe: true });
-}
-
-/* ═══════════════════════════════════════════
-   AGENTS (unchanged logic)
-═══════════════════════════════════════════ */
-async function researchCore(task, context, language) {
-  const searchData = await webSearch(task, "advanced");
-
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task + "\n\n" + searchData },
-  ], 1500, 0.5);
-}
-
-async function codeCore(task, context, language) {
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task },
-  ], 2000, 0.4);
-}
-
-async function writeCore(task, context, language) {
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task },
-  ], 2000, 0.8);
-}
-
-async function legalCore(task, context, language) {
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task },
-  ], 1500, 0.3);
-}
-
-async function dataCore(task, context, language) {
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task },
-  ], 1500, 0.4);
-}
-
-async function stratCore(task, context, language) {
-  return await callAI([
-    { role: "system", content: `Respond in ${language}` },
-    ...context,
-    { role: "user", content: task },
-  ], 1500, 0.6);
-}
-
-async function routeToAgent(agent, task, context, language) {
-  switch (agent) {
-    case "codeCore": return codeCore(task, context, language);
-    case "writeCore": return writeCore(task, context, language);
-    case "legalCore": return legalCore(task, context, language);
-    case "dataCore": return dataCore(task, context, language);
-    case "stratCore": return stratCore(task, context, language);
-    default: return researchCore(task, context, language);
+  try {
+    const out = await callAI([
+      { role: "system", content: 'Is this message safe and appropriate? Reply ONLY with JSON: {"safe": true} or {"safe": false}' },
+      { role: "user", content: message.substring(0, 500) },
+    ], 30, 0.1);
+    return safeParseJSON(out, { safe: true });
+  } catch {
+    return { safe: true }; // FIX: Don't block on safety check failure
   }
 }
 
-/* ═══════════════════════════════════════════
-   MAIN HANDLER
-═══════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   INTENT DETECTION — FIX: simpler, more reliable
+════════════════════════════════════════ */
+async function detectIntent(message) {
+  try {
+    const out = await callAI([
+      {
+        role: "system",
+        content: `Classify the user message intent. Return ONLY valid JSON:
+{
+  "agent": "researchCore|codeCore|writeCore|legalCore|dataCore|stratCore",
+  "needsSearch": true|false,
+  "language": "English"
+}
+
+Rules:
+- codeCore: coding, programming, build app, script, website
+- researchCore: research, search, news, find info, what is, who is, latest
+- writeCore: write, draft, compose, essay, article, email, blog
+- legalCore: legal, contract, law, rights, compliance
+- dataCore: analyze data, statistics, CSV, numbers, chart
+- stratCore: business plan, strategy, marketing, startup, pitch
+- needsSearch: true if question requires current/real-time data`,
+      },
+      { role: "user", content: message.substring(0, 400) },
+    ], 150, 0.1);
+    return safeParseJSON(out, { agent: "researchCore", needsSearch: true, language: "English" });
+  } catch {
+    return { agent: "researchCore", needsSearch: true, language: "English" };
+  }
+}
+
+/* ════════════════════════════════════════
+   AGENTS
+════════════════════════════════════════ */
+async function researchCore(userMsg, history, searchData) {
+  const systemPrompt = `${BIMOCHAN_PROFILE}
+
+You are ResearchCore — a research and information specialist.
+When search results are provided, use them to give accurate, up-to-date answers.
+Cite sources when relevant. Be comprehensive but concise.
+Format responses with markdown for readability.`;
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...history.slice(-6), // FIX: limit history to avoid token overflow
+    { role: "user", content: searchData ? `${userMsg}\n\n---\nSearch Results:\n${searchData}` : userMsg },
+  ];
+  return callAI(messages, 1800, 0.5);
+}
+
+async function codeCore(userMsg, history) {
+  const systemPrompt = `${BIMOCHAN_PROFILE}
+
+You are CodeCore — an expert software engineer.
+Write clean, production-ready, well-commented code.
+Always explain what the code does after the code block.
+Support: JavaScript, TypeScript, Python, HTML/CSS, React, Next.js, Node.js, and more.
+For UI: create beautiful, modern designs with good UX.`;
+
+  const messages = [
+    { role: "system", content: systemPrompt },
+    ...history.slice(-6),
+    { role: "user", content: userMsg },
+  ];
+  return callAI(messages, 2500, 0.3);
+}
+
+async function writeCore(userMsg, history) {
+  return callAI([
+    { role: "system", content: `${BIMOCHAN_PROFILE}\n\nYou are WriteCore — a professional writer and content creator. Write engaging, well-structured content.` },
+    ...history.slice(-6),
+    { role: "user", content: userMsg },
+  ], 2000, 0.75);
+}
+
+async function legalCore(userMsg, history) {
+  return callAI([
+    { role: "system", content: `${BIMOCHAN_PROFILE}\n\nYou are LegalCore — a legal information specialist. Provide helpful information but always note you're not a lawyer and this isn't legal advice.` },
+    ...history.slice(-6),
+    { role: "user", content: userMsg },
+  ], 1500, 0.2);
+}
+
+async function dataCore(userMsg, history, searchData) {
+  return callAI([
+    { role: "system", content: `${BIMOCHAN_PROFILE}\n\nYou are DataCore — a data analysis and insights specialist. Use available data to provide clear analysis with charts/tables in markdown where helpful.` },
+    ...history.slice(-6),
+    { role: "user", content: searchData ? `${userMsg}\n\nData:\n${searchData}` : userMsg },
+  ], 1800, 0.3);
+}
+
+async function stratCore(userMsg, history, searchData) {
+  return callAI([
+    { role: "system", content: `${BIMOCHAN_PROFILE}\n\nYou are StratCore — a business strategy and entrepreneurship expert. Provide actionable, structured strategic advice.` },
+    ...history.slice(-6),
+    { role: "user", content: searchData ? `${userMsg}\n\nMarket Research:\n${searchData}` : userMsg },
+  ], 1800, 0.5);
+}
+
+/* ════════════════════════════════════════
+   MAIN HANDLER — FIXED
+════════════════════════════════════════ */
 export default async function handler(req, res) {
-  const ip = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
+  // CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return sendJSON(res, 405, { status: "error", error: "Method not allowed" });
+
+  // Rate limit
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
   if (!rateLimit(ip)) {
-    return sendJSON(res, 429, {
-      status: "error",
-      error: "Rate limit exceeded",
-      reply: null,
-    });
+    return sendJSON(res, 429, { status: "error", error: "Rate limit exceeded. Try again in a minute." });
   }
 
-  if (req.method !== "POST") {
-    return sendJSON(res, 405, { status: "error", error: "Method not allowed" });
-  }
-
-  /* SAFE BODY PARSE (FIXED) */
+  // FIX: Parse body safely — Next.js may auto-parse or not
   let body;
   try {
-    if (!req.body) body = {};
-    else if (typeof req.body === "object") body = req.body;
-    else body = JSON.parse(req.body);
+    if (!req.body) {
+      body = {};
+    } else if (typeof req.body === "string") {
+      body = JSON.parse(req.body);
+    } else if (typeof req.body === "object") {
+      body = req.body;
+    } else {
+      body = {};
+    }
   } catch {
     return sendJSON(res, 400, { status: "error", error: "Invalid JSON body" });
   }
 
-  const messages = body.messages || [];
-  const userMessage = messages[messages.length - 1]?.content || "";
-
-  if (!userMessage) {
-    return sendJSON(res, 400, { status: "error", error: "Empty message" });
+  // FIX: Validate messages array
+  const rawMessages = Array.isArray(body.messages) ? body.messages : [];
+  if (rawMessages.length === 0) {
+    return sendJSON(res, 400, { status: "error", error: "No messages provided" });
   }
 
-  const memory = getMemory(ip);
+  // FIX: Sanitize messages — only keep role and content
+  const messages = rawMessages
+    .filter(m => m && typeof m.role === "string" && typeof m.content === "string")
+    .map(m => ({ role: m.role, content: m.content }));
+
+  const lastMsg = messages[messages.length - 1];
+  if (!lastMsg || lastMsg.role !== "user" || !lastMsg.content.trim()) {
+    return sendJSON(res, 400, { status: "error", error: "Last message must be a non-empty user message" });
+  }
+
+  const userMessage = lastMsg.content;
+  const history = messages.slice(0, -1); // all messages except the last user message
 
   try {
+    // Safety check
     const safety = await safetyCheck(userMessage);
     if (!safety.safe) {
       return sendJSON(res, 200, {
         status: "blocked",
-        reply: "Request blocked by safety layer.",
+        reply: "I'm unable to help with that request. Please ask something appropriate.",
       });
     }
 
-    const language = memory.profile.language || await detectLanguage(userMessage);
-    updateMemory(ip, { language });
+    // Detect intent
+    const intent = await detectIntent(userMessage);
+    const agent = intent.agent || "researchCore";
+    const needsSearch = intent.needsSearch !== false;
+    const language = intent.language || "English";
 
-    const complexity = await analyzeComplexity(userMessage, memory);
+    // Build progress log
+    const progressLog = [];
 
-    const agent =
-      complexity.domains?.[0] === "coding" ? "codeCore" :
-      complexity.domains?.[0] === "writing" ? "writeCore" :
-      complexity.domains?.[0] === "legal" ? "legalCore" :
-      complexity.domains?.[0] === "data" ? "dataCore" :
-      complexity.domains?.[0] === "strategy" ? "stratCore" :
-      "researchCore";
+    // Run web search if needed
+    let searchData = null;
+    if (needsSearch && ["researchCore", "dataCore", "stratCore"].includes(agent)) {
+      progressLog.push({ status: "running", message: "Searching the web…" });
+      // Extract clean search query from user message
+      const searchQuery = userMessage.replace(/[?!]/g, '').substring(0, 120);
+      searchData = await webSearch(searchQuery);
+      progressLog.push({ status: "done", message: "Web search complete" });
+    }
 
-    const reply = await routeToAgent(agent, userMessage, messages.slice(0, -1), language);
+    // Route to agent
+    progressLog.push({ status: "running", message: `${agent} generating response…` });
+    let reply;
 
-    updateMemory(ip, {
-      task: {
-        title: complexity.taskTitle,
-        level: complexity.level,
-        timestamp: Date.now(),
-      },
-    });
+    switch (agent) {
+      case "codeCore":   reply = await codeCore(userMessage, history); break;
+      case "writeCore":  reply = await writeCore(userMessage, history); break;
+      case "legalCore":  reply = await legalCore(userMessage, history); break;
+      case "dataCore":   reply = await dataCore(userMessage, history, searchData); break;
+      case "stratCore":  reply = await stratCore(userMessage, history, searchData); break;
+      default:           reply = await researchCore(userMessage, history, searchData);
+    }
+
+    progressLog.push({ status: "done", message: "Response ready" });
+
+    if (!reply || !reply.trim()) {
+      throw new Error("Agent returned empty response");
+    }
 
     return sendJSON(res, 200, {
       status: "success",
-      reply: reply && reply.trim() ? reply : "ArcCore failed to respond properly.",
+      reply: reply.trim(),
       intent: agent,
       language,
+      progressLog,
     });
 
   } catch (err) {
-    console.error("CRASH:", err.message);
-
+    console.error("HANDLER ERROR:", err.message, err.stack);
     return sendJSON(res, 500, {
       status: "error",
-      error: "Internal error",
-      reply: "ArcCore crashed. Try again.",
+      error: "Internal server error",
+      reply: `Something went wrong: ${err.message}. Please try again.`,
     });
   }
 }
